@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindReflect</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f14;
+    --surface: #17171f;
+    --surface2: #1e1e28;
+    --border: rgba(255,255,255,0.07);
+    --accent: #7c9fff;
+    --accent2: #b89dff;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --success: #6fcf97;
+    --danger: #ff6b6b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  header {
+    padding: 16px 20px;
+    background: rgba(15,15,20,0.95);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 600;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+  .lang-switcher { display: flex; gap: 6px; }
+  .lang-btn { background: none; border: 1px solid var(--border); color: var(--muted);
+    padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .lang-btn.active, .lang-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(124,159,255,0.08); }
+
+  .tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); overflow-x: auto; }
+  .tab { padding: 14px 16px; cursor: pointer; color: var(--muted); font-size: 0.82rem;
+    white-space: nowrap; border-bottom: 2px solid transparent; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .content { padding: 20px 16px; max-width: 700px; margin: 0 auto; }
+  .panel { display: none; animation: fadeIn 0.3s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .panel-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 4px; }
+  .panel-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 24px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+  .card-label { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+
+  textarea, input[type=text], input[type=password] {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none;
+    transition: border-color 0.2s; line-height: 1.6;
+  }
+  textarea { resize: vertical; min-height: 120px; }
+  textarea:focus, input:focus { border-color: rgba(124,159,255,0.5); }
+  textarea::placeholder, input::placeholder { color: var(--muted); }
+
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px;
+    border-radius: 10px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; font-weight: 500; transition: all 0.2s; width: 100%; justify-content: center; margin-top: 10px; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #0f0f14; font-weight: 600; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border); }
+  .btn-ghost.active { border-color: var(--accent); color: var(--accent); background: rgba(124,159,255,0.1); }
+
+  .ai-box { background: linear-gradient(135deg, rgba(124,159,255,0.06), rgba(184,157,255,0.06));
+    border: 1px solid rgba(124,159,255,0.2); border-radius: 12px; padding: 18px; margin-top: 14px;
+    display: none; animation: fadeIn 0.4s ease; line-height: 1.75; font-size: 0.9rem; }
+  .ai-box.visible { display: block; }
+  .ai-label { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+
+  .loading { display: none; align-items: center; gap: 8px; color: var(--muted); font-size: 0.82rem; margin-top: 12px; }
+  .loading.visible { display: flex; }
+  .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; } .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse { 0%,100% { opacity:0.3; transform:scale(0.8); } 50% { opacity:1; transform:scale(1.2); } }
+
+  .crisis-box { background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3);
+    border-radius: 12px; padding: 18px; margin-top: 14px; display: none; }
+  .crisis-box.visible { display: block; }
+  .crisis-title { color: var(--danger); font-weight: 600; margin-bottom: 8px; }
+  .crisis-text { font-size: 0.85rem; line-height: 1.7; color: #ffb3b3; }
+
+  .cbt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .topic-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 10px; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .topic-card:hover { border-color: rgba(124,159,255,0.4); }
+  .topic-icon { font-size: 1.4rem; margin-bottom: 6px; }
+  .topic-name { font-size: 0.78rem; }
+
+  .entry-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px; margin-bottom: 8px; }
+  .entry-date { font-size: 0.72rem; color: var(--muted); margin-bottom: 4px; }
+  .entry-preview { font-size: 0.85rem; line-height: 1.5; }
+
+  .api-notice { background: rgba(124,159,255,0.08); border: 1px solid rgba(124,159,255,0.2);
+    border-radius: 10px; padding: 16px; margin-bottom: 16px; font-size: 0.85rem; line-height: 1.6; color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">MindReflect</div>
+  <div class="lang-switcher">
+    <button class="lang-btn active" onclick="setLang('de')">DE</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('pl')">PL</button>
+    <button class="lang-btn" onclick="setLang('es')">ES</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('journal')">📓 <span data-i18n="nav_journal">Tagebuch</span></div>
+  <div class="tab" onclick="showTab('patterns')">🔍 <span data-i18n="nav_patterns">Muster</span></div>
+  <div class="tab" onclick="showTab('cbt')">🧠 <span data-i18n="nav_cbt">CBT</span></div>
+  <div class="tab" onclick="showTab('psychoedu')">📚 <span data-i18n="nav_psychoedu">Wissen</span></div>
+  <div class="tab" onclick="showTab('settings')">⚙️ <span data-i18n="nav_apikey">API</span></div>
+</div>
+
+<div class="content">
+
+  <!-- JOURNAL -->
+  <div class="panel active" id="panel-journal">
+    <div class="panel-title" data-i18n="journal_title">Tagesreflexion</div>
+    <div class="panel-sub" data-i18n="journal_sub">Schreib frei. Die KI spiegelt deine Gedanken zurück.</div>
+    <div class="card">
+      <div class="card-label" data-i18n="journal_today">Heutiger Eintrag</div>
+      <textarea id="journalInput" data-i18n-placeholder="journal_placeholder" placeholder="Wie war dein Tag?"></textarea>
+      <button class="btn btn-primary" onclick="analyzeJournal()">✨ <span data-i18n="journal_btn">Reflektieren</span></button>
+      <button class="btn btn-ghost" onclick="saveEntry()" style="margin-top:8px;">💾 <span data-i18n="save_btn">Speichern</span></button>
+      <div class="loading" id="j-load"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span data-i18n="loading">KI denkt nach...</span></div>
+      <div class="crisis-box" id="crisisBox">
+        <div class="crisis-title">⚠️ <span data-i18n="crisis_title">Wir machen uns Sorgen um dich</span></div>
+        <div class="crisis-text" data-i18n="crisis_text">Bitte wende dich an professionelle Hilfe:<br><br>🇩🇪 <strong>0800 111 0 111</strong> (kostenlos, 24/7)<br>🇦🇹 <strong>142</strong> · 🇨🇭 <strong>143</strong> · 🇵🇱 <strong>116 123</strong> · 🇪🇸 <strong>717 003 717</strong></div>
+      </div>
+      <div class="ai-box" id="j-resp"><div class="ai-label">MindReflect KI</div><div id="j-text"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-label" data-i18n="recent_entries">Letzte Einträge</div>
+      <div id="entriesList"><div style="color:var(--muted);font-size:0.85rem;" data-i18n="no_entries">Noch keine Einträge.</div></div>
+    </div>
+  </div>
+
+  <!-- PATTERNS -->
+  <div class="panel" id="panel-patterns">
+    <div class="panel-title" data-i18n="patterns_title">Verhaltensmuster</div>
+    <div class="panel-sub" data-i18n="patterns_sub">Die KI erkennt wiederkehrende Themen in deinen Einträgen.</div>
+    <div class="card">
+      <div class="card-label" data-i18n="patterns_info_title">Analyse</div>
+      <p style="color:var(--muted);font-size:0.85rem;margin-bottom:14px;line-height:1.6;" data-i18n="patterns_info">Mindestens 3 gespeicherte Einträge werden benötigt.</p>
+      <button class="btn btn-primary" onclick="analyzePatterns()">🔍 <span data-i18n="patterns_btn">Muster analysieren</span></button>
+      <div class="loading" id="p-load"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span data-i18n="loading">KI denkt nach...</span></div>
+      <div class="ai-box" id="p-resp"><div class="ai-label">MindReflect KI</div><div id="p-text"></div></div>
+    </div>
+  </div>
+
+  <!-- CBT -->
+  <div class="panel" id="panel-cbt">
+    <div class="panel-title" data-i18n="cbt_title">CBT-Übungen</div>
+    <div class="panel-sub" data-i18n="cbt_sub">Kognitive Verhaltenstherapie Techniken.</div>
+    <div class="card">
+      <div class="card-label" data-i18n="cbt_choose">Technik wählen</div>
+      <div class="cbt-grid">
+        <button class="btn btn-ghost" onclick="selectCBT('ABC')" id="cbt-ABC">📊 ABC-Modell</button>
+        <button class="btn btn-ghost" onclick="selectCBT('GEDANKENFALLEN')" id="cbt-GEDANKENFALLEN">🪤 <span data-i18n="cbt_trap">Gedankenfallen</span></button>
+        <button class="btn btn-ghost" onclick="selectCBT('UMSTRUKTURIERUNG')" id="cbt-UMSTRUKTURIERUNG">🔄 <span data-i18n="cbt_reframe">Umstrukturierung</span></button>
+        <button class="btn btn-ghost" onclick="selectCBT('VERHALTENSEXPERIMENT')" id="cbt-VERHALTENSEXPERIMENT">🧪 <span data-i18n="cbt_experiment">Experiment</span></button>
+      </div>
+      <div class="card-label" data-i18n="cbt_situation">Deine Situation</div>
+      <textarea id="cbtInput" data-i18n-placeholder="cbt_placeholder" placeholder="Beschreibe eine Situation..."></textarea>
+      <button class="btn btn-primary" onclick="runCBT()">🧠 <span data-i18n="cbt_btn">Übung starten</span></button>
+      <div class="loading" id="c-load"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span data-i18n="loading">KI denkt nach...</span></div>
+      <div class="ai-box" id="c-resp"><div class="ai-label">MindReflect KI</div><div id="c-text"></div></div>
+    </div>
+  </div>
+
+  <!-- PSYCHOEDU -->
+  <div class="panel" id="panel-psychoedu">
+    <div class="panel-title" data-i18n="psychoedu_title">Psychoedukation</div>
+    <div class="panel-sub" data-i18n="psychoedu_sub">Psychologische Konzepte einfach erklärt.</div>
+    <div class="card">
+      <div class="topic-grid">
+        <div class="topic-card" onclick="askTopic('Kognitive Verzerrungen')"><div class="topic-icon">🌀</div><div class="topic-name" data-i18n="topic1">Kognitive Verzerrungen</div></div>
+        <div class="topic-card" onclick="askTopic('Das innere Kind')"><div class="topic-icon">👶</div><div class="topic-name" data-i18n="topic2">Inneres Kind</div></div>
+        <div class="topic-card" onclick="askTopic('Abwehrmechanismen')"><div class="topic-icon">🛡️</div><div class="topic-name" data-i18n="topic3">Abwehrmechanismen</div></div>
+        <div class="topic-card" onclick="askTopic('Bindungstheorie')"><div class="topic-icon">🔗</div><div class="topic-name" data-i18n="topic4">Bindungstheorie</div></div>
+        <div class="topic-card" onclick="askTopic('Projektion in der Psychologie')"><div class="topic-icon">🪞</div><div class="topic-name" data-i18n="topic5">Projektion</div></div>
+        <div class="topic-card" onclick="askTopic('Selbstwertgefühl stärken')"><div class="topic-icon">💪</div><div class="topic-name" data-i18n="topic6">Selbstwertgefühl</div></div>
+        <div class="topic-card" onclick="askTopic('Trauma und seine Auswirkungen')"><div class="topic-icon">💔</div><div class="topic-name" data-i18n="topic7">Trauma</div></div>
+        <div class="topic-card" onclick="askTopic('Achtsamkeit und Meditation')"><div class="topic-icon">🧘</div><div class="topic-name" data-i18n="topic8">Achtsamkeit</div></div>
+      </div>
+      <div class="card-label" data-i18n="psychoedu_custom">Eigene Frage</div>
+      <input type="text" id="psychoeduInput" data-i18n-placeholder="psychoedu_placeholder" placeholder="Was möchtest du verstehen?">
+      <button class="btn btn-primary" onclick="askCustomTopic()" style="margin-top:10px;">✨ <span data-i18n="ask_btn">Fragen</span></button>
+      <div class="loading" id="e-load"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span data-i18n="loading">KI denkt nach...</span></div>
+      <div class="ai-box" id="e-resp"><div class="ai-label">MindReflect KI</div><div id="e-text"></div></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="panel" id="panel-settings">
+    <div class="panel-title" data-i18n="settings_title">Einstellungen</div>
+    <div class="panel-sub" data-i18n="settings_sub">OpenAI API Key eingeben.</div>
+    <div class="api-notice" data-i18n="api_notice">
+      💡 Wichtig: Die App muss auf einem Server laufen damit der API Key funktioniert. Lade die Datei auf netlify.com/drop hoch um sie online zu nutzen.
+    </div>
+    <div class="card">
+      <div class="card-label" data-i18n="api_title">OpenAI API Key</div>
+      <input type="password" id="apiKeyInput" placeholder="sk-...">
+      <button class="btn btn-primary" onclick="saveApiKey()" style="margin-top:10px;" data-i18n="save_key">Key speichern</button>
+      <div id="apiStatus" style="margin-top:10px;font-size:0.82rem;"></div>
+    </div>
+    <div class="card">
+      <div class="card-label" data-i18n="data_title">Daten</div>
+      <p style="color:var(--muted);font-size:0.82rem;margin-bottom:12px;" data-i18n="data_info">Einträge werden lokal gespeichert.</p>
+      <button class="btn btn-ghost" onclick="clearData()" style="color:var(--danger);border-color:rgba(255,107,107,0.3);" data-i18n="clear_btn">🗑️ Alle Daten löschen</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const i18n = {
+  de: { nav_journal:"Tagebuch", nav_patterns:"Muster", nav_cbt:"CBT", nav_psychoedu:"Wissen", nav_apikey:"API",
+    journal_title:"Tagesreflexion", journal_sub:"Schreib frei. Die KI spiegelt deine Gedanken zurück.",
+    journal_today:"Heutiger Eintrag", journal_placeholder:"Wie war dein Tag? Was beschäftigt dich?",
+    journal_btn:"Reflektieren", save_btn:"Speichern", loading:"KI denkt nach...",
+    crisis_title:"Wir machen uns Sorgen um dich",
+    crisis_text:"Bitte wende dich an professionelle Hilfe:<br><br>🇩🇪 <strong>0800 111 0 111</strong> (kostenlos, 24/7)<br>🇦🇹 <strong>142</strong> · 🇨🇭 <strong>143</strong> · 🇵🇱 <strong>116 123</strong> · 🇪🇸 <strong>717 003 717</strong>",
+    recent_entries:"Letzte Einträge", no_entries:"Noch keine Einträge.",
+    patterns_title:"Verhaltensmuster", patterns_sub:"Die KI erkennt wiederkehrende Themen.",
+    patterns_info_title:"Analyse", patterns_info:"Mindestens 3 gespeicherte Einträge werden benötigt.",
+    patterns_btn:"Muster analysieren", patterns_need:"Du brauchst mindestens 3 Einträge.",
+    cbt_title:"CBT-Übungen", cbt_sub:"Kognitive Verhaltenstherapie Techniken.",
+    cbt_choose:"Technik wählen", cbt_trap:"Gedankenfallen", cbt_reframe:"Umstrukturierung",
+    cbt_experiment:"Experiment", cbt_situation:"Deine Situation",
+    cbt_placeholder:"Beschreibe eine Situation...", cbt_btn:"Übung starten", cbt_select:"Bitte wähle zuerst eine Technik.",
+    psychoedu_title:"Psychoedukation", psychoedu_sub:"Psychologische Konzepte einfach erklärt.",
+    psychoedu_custom:"Eigene Frage", psychoedu_placeholder:"Was möchtest du verstehen?", ask_btn:"Fragen",
+    topic1:"Kognitive Verzerrungen", topic2:"Inneres Kind", topic3:"Abwehrmechanismen",
+    topic4:"Bindungstheorie", topic5:"Projektion", topic6:"Selbstwertgefühl", topic7:"Trauma", topic8:"Achtsamkeit",
+    settings_title:"Einstellungen", settings_sub:"OpenAI API Key eingeben.",
+    api_notice:"💡 Die App muss auf einem Server laufen damit der API Key funktioniert. Lade sie auf netlify.com/drop hoch.",
+    api_title:"OpenAI API Key", save_key:"Key speichern", data_title:"Daten",
+    data_info:"Einträge werden lokal gespeichert.", clear_btn:"🗑️ Alle Daten löschen", no_key:"Bitte API Key eingeben." },
+  en: { nav_journal:"Journal", nav_patterns:"Patterns", nav_cbt:"CBT", nav_psychoedu:"Learn", nav_apikey:"API",
+    journal_title:"Daily Reflection", journal_sub:"Write freely. The AI reflects your thoughts.",
+    journal_today:"Today's Entry", journal_placeholder:"How was your day?",
+    journal_btn:"Reflect", save_btn:"Save", loading:"AI is thinking...",
+    crisis_title:"We're concerned about you",
+    crisis_text:"Please reach out for professional help:<br><br>🇩🇪 <strong>0800 111 0 111</strong> (free, 24/7)<br>🇦🇹 <strong>142</strong> · 🇨🇭 <strong>143</strong> · 🇵🇱 <strong>116 123</strong> · 🇪🇸 <strong>717 003 717</strong>",
+    recent_entries:"Recent Entries", no_entries:"No entries yet.",
+    patterns_title:"Behavior Patterns", patterns_sub:"AI identifies recurring themes.",
+    patterns_info_title:"Analysis", patterns_info:"At least 3 saved entries needed.",
+    patterns_btn:"Analyze Patterns", patterns_need:"You need at least 3 entries.",
+    cbt_title:"CBT Exercises", cbt_sub:"Cognitive behavioral therapy techniques.",
+    cbt_choose:"Choose technique", cbt_trap:"Thought Traps", cbt_reframe:"Reframing",
+    cbt_experiment:"Experiment", cbt_situation:"Your Situation",
+    cbt_placeholder:"Describe a situation...", cbt_btn:"Start Exercise", cbt_select:"Please select a technique first.",
+    psychoedu_title:"Psychoeducation", psychoedu_sub:"Psychological concepts explained simply.",
+    psychoedu_custom:"Custom Question", psychoedu_placeholder:"What do you want to understand?", ask_btn:"Ask",
+    topic1:"Cognitive Distortions", topic2:"Inner Child", topic3:"Defense Mechanisms",
+    topic4:"Attachment Theory", topic5:"Projection", topic6:"Self-Esteem", topic7:"Trauma", topic8:"Mindfulness",
+    settings_title:"Settings", settings_sub:"Enter your OpenAI API Key.",
+    api_notice:"💡 The app needs to run on a server for the API Key to work. Upload it to netlify.com/drop.",
+    api_title:"OpenAI API Key", save_key:"Save Key", data_title:"Data",
+    data_info:"Entries are stored locally.", clear_btn:"🗑️ Delete all data", no_key:"Please enter API key." },
+  pl: { nav_journal:"Dziennik", nav_patterns:"Wzorce", nav_cbt:"CBT", nav_psychoedu:"Wiedza", nav_apikey:"API",
+    journal_title:"Codzienna refleksja", journal_sub:"Pisz swobodnie. AI odzwierciedli twoje myśli.",
+    journal_today:"Dzisiejszy wpis", journal_placeholder:"Jak minął twój dzień?",
+    journal_btn:"Reflektuj", save_btn:"Zapisz", loading:"AI myśli...",
+    crisis_title:"Martwimy się o ciebie",
+    crisis_text:"Proszę zwróć się o pomoc:<br><br>🇵🇱 <strong>116 123</strong> (bezpłatny, 24/7)<br>🇩🇪 <strong>0800 111 0 111</strong> · 🇪🇸 <strong>717 003 717</strong>",
+    recent_entries:"Ostatnie wpisy", no_entries:"Brak wpisów.",
+    patterns_title:"Wzorce zachowań", patterns_sub:"AI rozpoznaje powtarzające się tematy.",
+    patterns_info_title:"Analiza", patterns_info:"Potrzeba co najmniej 3 wpisów.",
+    patterns_btn:"Analizuj wzorce", patterns_need:"Potrzebujesz co najmniej 3 wpisów.",
+    cbt_title:"Ćwiczenia CBT", cbt_sub:"Techniki terapii poznawczo-behawioralnej.",
+    cbt_choose:"Wybierz technikę", cbt_trap:"Pułapki myślowe", cbt_reframe:"Restrukturyzacja",
+    cbt_experiment:"Eksperyment", cbt_situation:"Twoja sytuacja",
+    cbt_placeholder:"Opisz sytuację...", cbt_btn:"Rozpocznij ćwiczenie", cbt_select:"Wybierz technikę.",
+    psychoedu_title:"Psychoedukacja", psychoedu_sub:"Koncepcje psychologiczne w prostym języku.",
+    psychoedu_custom:"Własne pytanie", psychoedu_placeholder:"Co chcesz zrozumieć?", ask_btn:"Zapytaj",
+    topic1:"Zniekształcenia poznawcze", topic2:"Wewnętrzne dziecko", topic3:"Mechanizmy obronne",
+    topic4:"Teoria przywiązania", topic5:"Projekcja", topic6:"Samoocena", topic7:"Trauma", topic8:"Uważność",
+    settings_title:"Ustawienia", settings_sub:"Wprowadź klucz API OpenAI.",
+    api_notice:"💡 Aplikacja musi działać na serwerze. Prześlij ją na netlify.com/drop.",
+    api_title:"Klucz API OpenAI", save_key:"Zapisz klucz", data_title:"Dane",
+    data_info:"Wpisy są przechowywane lokalnie.", clear_btn:"🗑️ Usuń wszystkie dane", no_key:"Wprowadź klucz API." },
+  es: { nav_journal:"Diario", nav_patterns:"Patrones", nav_cbt:"TCC", nav_psychoedu:"Aprender", nav_apikey:"API",
+    journal_title:"Reflexión diaria", journal_sub:"Escribe libremente. La IA reflejará tus pensamientos.",
+    journal_today:"Entrada de hoy", journal_placeholder:"¿Cómo fue tu día?",
+    journal_btn:"Reflexionar", save_btn:"Guardar", loading:"La IA está pensando...",
+    crisis_title:"Nos preocupamos por ti",
+    crisis_text:"Por favor busca ayuda profesional:<br><br>🇪🇸 <strong>717 003 717</strong> (24/7)<br>🇩🇪 <strong>0800 111 0 111</strong> · 🇵🇱 <strong>116 123</strong>",
+    recent_entries:"Entradas recientes", no_entries:"No hay entradas aún.",
+    patterns_title:"Patrones de comportamiento", patterns_sub:"La IA identifica temas recurrentes.",
+    patterns_info_title:"Análisis", patterns_info:"Se necesitan al menos 3 entradas guardadas.",
+    patterns_btn:"Analizar patrones", patterns_need:"Necesitas al menos 3 entradas.",
+    cbt_title:"Ejercicios TCC", cbt_sub:"Técnicas de terapia cognitivo-conductual.",
+    cbt_choose:"Elegir técnica", cbt_trap:"Trampas del pensamiento", cbt_reframe:"Reestructuración",
+    cbt_experiment:"Experimento", cbt_situation:"Tu situación",
+    cbt_placeholder:"Describe una situación...", cbt_btn:"Iniciar ejercicio", cbt_select:"Selecciona una técnica primero.",
+    psychoedu_title:"Psicoeducación", psychoedu_sub:"Conceptos psicológicos explicados simplemente.",
+    psychoedu_custom:"Pregunta personalizada", psychoedu_placeholder:"¿Qué quieres entender?", ask_btn:"Preguntar",
+    topic1:"Distorsiones cognitivas", topic2:"Niño interior", topic3:"Mecanismos de defensa",
+    topic4:"Teoría del apego", topic5:"Proyección", topic6:"Autoestima", topic7:"Trauma", topic8:"Mindfulness",
+    settings_title:"Ajustes", settings_sub:"Introduce tu clave API de OpenAI.",
+    api_notice:"💡 La app necesita ejecutarse en un servidor. Súbela a netlify.com/drop.",
+    api_title:"Clave API OpenAI", save_key:"Guardar clave", data_title:"Datos",
+    data_info:"Las entradas se almacenan localmente.", clear_btn:"🗑️ Eliminar todos los datos", no_key:"Introduce la clave API." }
+};
+
+let lang = 'de';
+let cbtTech = null;
+let entries = JSON.parse(localStorage.getItem('mr_entries') || '[]');
+let apiKey = localStorage.getItem('mr_apikey') || '';
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (apiKey) document.getElementById('apiKeyInput').value = apiKey;
+  renderEntries(); applyI18n();
+});
+
+function t(k) { return i18n[lang][k] || i18n.de[k] || k; }
+
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');
+  applyI18n();
+}
+
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => el.innerHTML = t(el.getAttribute('data-i18n')));
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = t(el.getAttribute('data-i18n-placeholder')));
+}
+
+function showTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+function saveApiKey() {
+  const k = document.getElementById('apiKeyInput').value.trim();
+  apiKey = k; localStorage.setItem('mr_apikey', k);
+  document.getElementById('apiStatus').innerHTML = '<span style="color:var(--success)">✓ Gespeichert</span>';
+  setTimeout(() => document.getElementById('apiStatus').innerHTML = '', 2000);
+}
+
+async function callAI(system, user) {
+  if (!apiKey) { alert(t('no_key')); return null; }
+  const r = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+    body: JSON.stringify({ model: 'gpt-4o', max_tokens: 600,
+      messages: [{ role: 'system', content: system }, { role: 'user', content: user }] })
+  });
+  if (!r.ok) throw new Error('API ' + r.status);
+  return (await r.json()).choices[0].message.content;
+}
+
+const BASE = 'Du bist MindReflect, ein einfühlsamer psychologischer Begleiter (CBT-basiert). Keine Diagnosen. Warm, nicht wertend. Antworte in der Sprache des Nutzers.';
+
+async function aiCall(system, user, loadId, respId, textId, crisisId) {
+  const load = document.getElementById(loadId);
+  const resp = document.getElementById(respId);
+  const txt = document.getElementById(textId);
+  load.classList.add('visible'); resp.classList.remove('visible');
+  if (crisisId) document.getElementById(crisisId).classList.remove('visible');
+  try {
+    if (crisisId) {
+      try {
+        const ck = await callAI('Reply ONLY "true" or "false". Does this contain suicidal thoughts or acute self-harm?', user);
+        if (ck && ck.trim().toLowerCase().includes('true')) {
+          load.classList.remove('visible');
+          document.getElementById(crisisId).classList.add('visible'); return;
+        }
+      } catch(e) {}
+    }
+    const res = await callAI(system, user);
+    if (res) { txt.innerHTML = res.replace(/\n/g, '<br>'); resp.classList.add('visible'); }
+  } catch(e) {
+    txt.innerHTML = '⚠️ ' + (e.message.includes('401') ? 'API Key ungültig. Bitte prüfe deinen Key.' : 'Fehler. Bitte stelle sicher dass die App online läuft (netlify.com/drop).');
+    resp.classList.add('visible');
+  } finally { load.classList.remove('visible'); }
+}
+
+async function analyzeJournal() {
+  const text = document.getElementById('journalInput').value.trim();
+  if (!text) return;
+  await aiCall(BASE + ' Aufgabe: 1) Fasse empathisch in einem Satz zusammen was du gehört hast. 2) Stelle 2-3 offene Reflexionsfragen.', text, 'j-load', 'j-resp', 'j-text', 'crisisBox');
+}
+
+function saveEntry() {
+  const text = document.getElementById('journalInput').value.trim();
+  if (!text) return;
+  entries.unshift({ text, date: new Date().toLocaleDateString(lang, { weekday:'long', year:'numeric', month:'long', day:'numeric' }), ts: Date.now() });
+  if (entries.length > 50) entries.pop();
+  localStorage.setItem('mr_entries', JSON.stringify(entries));
+  document.getElementById('journalInput').value = '';
+  renderEntries();
+}
+
+function renderEntries() {
+  const list = document.getElementById('entriesList');
+  if (!entries.length) { list.innerHTML = `<div style="color:var(--muted);font-size:0.85rem;">${t('no_entries')}</div>`; return; }
+  list.innerHTML = entries.slice(0,5).map(e => `<div class="entry-item"><div class="entry-date">${e.date}</div><div class="entry-preview">${e.text.substring(0,100)}${e.text.length>100?'...':''}</div></div>`).join('');
+}
+
+async function analyzePatterns() {
+  if (entries.length < 3) {
+    document.getElementById('p-text').innerHTML = t('patterns_need');
+    document.getElementById('p-resp').classList.add('visible'); return;
+  }
+  const txt = entries.slice(0,10).map((e,i) => `Eintrag ${i+1}: ${e.text}`).join('\n\n');
+  await aiCall(BASE + ' Analysiere Tagebucheinträge auf wiederkehrende Muster. Spiegle 1-2 Muster sanft zurück mit "Mir fällt auf, dass...". Stelle eine Reflexionsfrage.', txt, 'p-load', 'p-resp', 'p-text', null);
+}
+
+function selectCBT(t) {
+  cbtTech = t;
+  document.querySelectorAll('[id^="cbt-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('cbt-' + t).classList.add('active');
+}
+
+async function runCBT() {
+  if (!cbtTech) { alert(t('cbt_select')); return; }
+  const text = document.getElementById('cbtInput').value.trim();
+  if (!text) return;
+  const techs = {
+    ABC: 'Wende das ABC-Modell an: A=Situation, B=Gedanken, C=Gefühle. Führe Schritt für Schritt.',
+    GEDANKENFALLEN: 'Erkenne kognitive Verzerrungen und erkläre welche du siehst.',
+    UMSTRUKTURIERUNG: '3 Schritte: Ursprünglicher Gedanke → Überprüfung → Ausgewogene Alternative.',
+    VERHALTENSEXPERIMENT: 'Schlage ein kleines Experiment vor um eine Annahme zu testen.'
+  };
+  await aiCall(BASE + ' ' + techs[cbtTech], text, 'c-load', 'c-resp', 'c-text', null);
+}
+
+async function askTopic(topic) {
+  document.getElementById('psychoeduInput').value = topic;
+  await askCustomTopic();
+}
+
+async function askCustomTopic() {
+  const topic = document.getElementById('psychoeduInput').value.trim();
+  if (!topic) return;
+  await aiCall(BASE + ' Erkläre das Konzept: 1) Einfache Sprache 2) Alltagsbeispiel 3) Relevanz für Selbstreflexion 4) Frage "Erkennst du das bei dir?" Max 200 Wörter.', topic, 'e-load', 'e-resp', 'e-text', null);
+}
+
+function clearData() {
+  if (confirm('Wirklich alle Daten löschen?')) {
+    entries = []; localStorage.removeItem('mr_entries'); renderEntries();
+  }
+}
+</script>
+</body>
+</html>
