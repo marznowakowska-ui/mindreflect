@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindReflect</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f14;
+    --surface: #17171f;
+    --surface2: #1e1e28;
+    --border: rgba(255,255,255,0.07);
+    --accent: #7c9fff;
+    --accent2: #b89dff;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --success: #6fcf97;
+    --danger: #ff6b6b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  header {
+    padding: 16px 20px;
+    background: rgba(15,15,20,0.95);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 600;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+  .lang-switcher { display: flex; gap: 6px; }
+  .lang-btn { background: none; border: 1px solid var(--border); color: var(--muted);
+    padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .lang-btn.active, .lang-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(124,159,255,0.08); }
+
+  .tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); overflow-x: auto; }
+  .tab { padding: 14px 16px; cursor: pointer; color: var(--muted); font-size: 0.82rem;
+    white-space: nowrap; border-bottom: 2px solid transparent; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .content { padding: 20px 16px; max-width: 700px; margin: 0 auto; }
+  .panel { display: none; animation: fadeIn 0.3s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .panel-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 4px; }
+  .panel-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 24px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+  .card-label { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+
+  textarea, input[type=text], input[type=password] {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none;
+    transition: border-color 0.2s; line-height: 1.6;
+  }
+  textarea { resize: vertical; min-height: 120px; }
+  textarea:focus, input:focus { border-color: rgba(124,159,255,0.5); }
+  textarea::placeholder, input::placeholder { color: var(--muted); }
+
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px;
+    border-radius: 10px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; font-weight: 500; transition: all 0.2s; width: 100%; justify-content: center; margin-top: 10px; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #0f0f14; font-weight: 600; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border); }
+  .btn-ghost.active { border-color: var(--accent); color: var(--accent); background: rgba(124,159,255,0.1); }
+
+  .ai-box { background: linear-gradient(135deg, rgba(124,159,255,0.06), rgba(184,157,255,0.06));
+    border: 1px solid rgba(124,159,255,0.2); border-radius: 12px; padding: 18px; margin-top: 14px;
+    display: none; animation: fadeIn 0.4s ease; line-height: 1.75; font-size: 0.9rem; }
+  .ai-box.visible { display: block; }
+  .ai-label { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+
+  .loading { display: none; align-items: center; gap: 8px; color: var(--muted); font-size: 0.82rem; margin-top: 12px; }
+  .loading.visible { display: flex; }
+  .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; } .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse { 0%,100% { opacity:0.3; transform:scale(0.8); } 50% { opacity:1; transform:scale(1.2); } }
+
+  .crisis-box { background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3);
+    border-radius: 12px; padding: 18px; margin-top: 14px; display: none; }
+  .crisis-box.visible { display: block; }
+  .crisis-title { color: var(--danger); font-weight: 600; margin-bottom: 8px; }
+  .crisis-text { font-size: 0.85rem; line-height: 1.7; color: #ffb3b3; }
+
+  .cbt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .topic-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 10px; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .topic-card:hover { border-color: rgba(124,159,255,0.4); }
+  .topic-icon { font-size: 1.4rem; margin-bottom: 6px; }
+  .topic-name { font-size: 0.78rem; }
+
+  .entry-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px; margin-bottom: 8px; }
+  .entry-date { font-size: 0.72rem; color: var(--muted); margin-bottom: 4px; }
+  .entry-preview { font-size: 0.85rem; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">MindReflect</div>
+  <div class="lang-switcher">
+    <button class="lang-btn active" onclick="setLang('de')">DE</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('pl')">PL</button>
+    <button class="lang-btn" onclick="setLang('es')">ES</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('journal', event)">📓 Tagebuch</div>
+  <div class="tab" onclick="showTab('patterns', event)">🔍 Muster</div>
+  <div class="tab" onclick="showTab('cbt', event)">🧠 CBT</div>
+  <div class="tab" onclick="showTab('psychoedu', event)">📚 Wissen</div>
+  <div class="tab" onclick="showTab('couples', event)">💑 Beziehung</div>
+</div>
+
+<div class="content">
+
+  <!-- JOURNAL -->
+  <div class="panel active" id="panel-journal">
+    <div class="panel-title">Tagesreflexion</div>
+    <div class="panel-sub">Schreib frei. Die KI spiegelt deine Gedanken zurück.</div>
+    <div class="card">
+      <div class="card-label">Heutiger Eintrag</div>
+      <textarea id="journalInput" placeholder="Wie war dein Tag? Was beschäftigt dich gerade?"></textarea>
+      <button class="btn btn-primary" onclick="analyzeJournal()">✨ Reflektieren</button>
+      <button class="btn btn-ghost" onclick="saveEntry()" style="margin-top:8px;">💾 Speichern</button>
+      <div class="loading" id="j-load"><div class="dot"></div><div class="dot"></div><div class="dot"></div> KI denkt nach...</div>
+      <div class="crisis-box" id="crisisBox">
+        <div class="crisis-title">⚠️ Wir machen uns Sorgen um dich</div>
+        <div class="crisis-text">Bitte wende dich an professionelle Hilfe:<br><br>🇩🇪 <strong>0800 111 0 111</strong> (kostenlos, 24/7)<br>🇦🇹 <strong>142</strong> · 🇨🇭 <strong>143</strong> · 🇵🇱 <strong>116 123</strong> · 🇪🇸 <strong>717 003 717</strong></div>
+      </div>
+      <div class="ai-box" id="j-resp"><div class="ai-label">MindReflect KI</div><div id="j-text"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Letzte Einträge</div>
+      <div id="entriesList"><div style="color:var(--muted);font-size:0.85rem;">Noch keine Einträge.</div></div>
+    </div>
+  </div>
+
+  <!-- PATTERNS -->
+  <div class="panel" id="panel-patterns">
+    <div class="panel-title">Verhaltensmuster</div>
+    <div class="panel-sub">Die KI erkennt wiederkehrende Themen in deinen Einträgen.</div>
+    <div class="card">
+      <div class="card-label">Analyse</div>
+      <p style="color:var(--muted);font-size:0.85rem;margin-bottom:14px;line-height:1.6;">Mindestens 3 gespeicherte Einträge werden benötigt.</p>
+      <button class="btn btn-primary" onclick="analyzePatterns()">🔍 Muster analysieren</button>
+      <div class="loading" id="p-load"><div class="dot"></div><div class="dot"></div><div class="dot"></div> KI denkt nach...</div>
+      <div class="ai-box" id="p-resp"><div class="ai-label">MindReflect KI</div><div id="p-text"></div></div>
+    </div>
+  </div>
+
+  <!-- CBT -->
+  <div class="panel" id="panel-cbt">
+    <div class="panel-title">CBT-Übungen</div>
+    <div class="panel-sub">Kognitive Verhaltenstherapie Techniken.</div>
+    <div class="card">
+      <div class="card-label">Technik wählen</div>
+      <div class="cbt-grid">
+        <button class="btn btn-ghost" onclick="selectCBT('ABC')" id="cbt-ABC">📊 ABC-Modell</button>
+        <button class="btn btn-ghost" onclick="selectCBT('GEDANKENFALLEN')" id="cbt-GEDANKENFALLEN">🪤 Gedankenfallen</button>
+        <button class="btn btn-ghost" onclick="selectCBT('UMSTRUKTURIERUNG')" id="cbt-UMSTRUKTURIERUNG">🔄 Umstrukturierung</button>
+        <button class="btn btn-ghost" onclick="selectCBT('VERHALTENSEXPERIMENT')" id="cbt-VERHALTENSEXPERIMENT">🧪 Experiment</button>
+      </div>
+      <div class="card-label">Deine Situation</div>
+      <textarea id="cbtInput" placeholder="Beschreibe eine Situation..."></textarea>
+      <button class="btn btn-primary" onclick="runCBT()">🧠 Übung starten</button>
+      <div class="loading" id="c-load"><div class="dot"></div><div class="dot"></div><div class="dot"></div> KI denkt nach...</div>
+      <div class="ai-box" id="c-resp"><div class="ai-label">MindReflect KI</div><div id="c-text"></div></div>
+    </div>
+  </div>
+
+  <!-- PSYCHOEDU -->
+  <div class="panel" id="panel-psychoedu">
+    <div class="panel-title">Psychoedukation</div>
+    <div class="panel-sub">Psychologische Konzepte einfach erklärt.</div>
+    <div class="card">
+      <div class="topic-grid">
+        <div class="topic-card" onclick="askTopic('Kognitive Verzerrungen')"><div class="topic-icon">🌀</div><div class="topic-name">Kognitive Verzerrungen</div></div>
+        <div class="topic-card" onclick="askTopic('Das innere Kind')"><div class="topic-icon">👶</div><div class="topic-name">Inneres Kind</div></div>
+        <div class="topic-card" onclick="askTopic('Abwehrmechanismen')"><div class="topic-icon">🛡️</div><div class="topic-name">Abwehrmechanismen</div></div>
+        <div class="topic-card" onclick="askTopic('Bindungstheorie')"><div class="topic-icon">🔗</div><div class="topic-name">Bindungstheorie</div></div>
+        <div class="topic-card" onclick="askTopic('Projektion in der Psychologie')"><div class="topic-icon">🪞</div><div class="topic-name">Projektion</div></div>
+        <div class="topic-card" onclick="askTopic('Selbstwertgefühl stärken')"><div class="topic-icon">💪</div><div class="topic-name">Selbstwertgefühl</div></div>
+        <div class="topic-card" onclick="askTopic('Trauma und seine Auswirkungen')"><div class="topic-icon">💔</div><div class="topic-name">Trauma</div></div>
+        <div class="topic-card" onclick="askTopic('Achtsamkeit und Meditation')"><div class="topic-icon">🧘</div><div class="topic-name">Achtsamkeit</div></div>
+      </div>
+      <div class="card-label">Eigene Frage</div>
+      <input type="text" id="psychoeduInput" placeholder="Was möchtest du verstehen?">
+      <button class="btn btn-primary" onclick="askCustomTopic()" style="margin-top:10px;">✨ Fragen</button>
+      <div class="loading" id="e-load"><div class="dot"></div><div class="dot"></div><div class="dot"></div> KI denkt nach...</div>
+      <div class="ai-box" id="e-resp"><div class="ai-label">MindReflect KI</div><div id="e-text"></div></div>
+    </div>
+  </div>
+
+  <!-- COUPLES -->
+  <div class="panel" id="panel-couples">
+    <div class="panel-title">Beziehung & Sexualität</div>
+    <div class="panel-sub">Reflexion, Paardynamiken und emotionale Nähe.</div>
+    <div class="card">
+      <div class="card-label">Für wen?</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+        <button class="btn btn-ghost active" onclick="setCouplesMode('single')" id="mode-single">👤 Einzelperson</button>
+        <button class="btn btn-ghost" onclick="setCouplesMode('couple')" id="mode-couple">👫 Paar</button>
+      </div>
+      <div class="topic-grid">
+        <div class="topic-card" onclick="askCouplesTopic('Selbstreflexion zur eigenen Sexualität')"><div class="topic-icon">🌹</div><div class="topic-name">Eigene Sexualität</div></div>
+        <div class="topic-card" onclick="askCouplesTopic('Paardynamiken und Kommunikation')"><div class="topic-icon">💬</div><div class="topic-name">Paardynamiken</div></div>
+        <div class="topic-card" onclick="askCouplesTopic('Bindungsstile in Beziehungen')"><div class="topic-icon">🔗</div><div class="topic-name">Bindungsstile</div></div>
+        <div class="topic-card" onclick="askCouplesTopic('Intimität und emotionale Nähe')"><div class="topic-icon">💝</div><div class="topic-name">Intimität & Nähe</div></div>
+        <div class="topic-card" onclick="askCouplesTopic('Konflikte in der Partnerschaft lösen')"><div class="topic-icon">🕊️</div><div class="topic-name">Konflikte lösen</div></div>
+        <div class="topic-card" onclick="askCouplesTopic('Emotionale Bedürfnisse in Beziehungen')"><div class="topic-icon">🫂</div><div class="topic-name">Emotionale Bedürfnisse</div></div>
+      </div>
+      <div class="card-label">Freie Reflexion</div>
+      <textarea id="couplesInput" placeholder="Was beschäftigt dich in deiner Beziehung oder Sexualität?"></textarea>
+      <button class="btn btn-primary" onclick="analyzeCouples()" style="margin-top:10px;">💑 Reflektieren</button>
+      <div class="loading" id="co-load"><div class="dot"></div><div class="dot"></div><div class="dot"></div> KI denkt nach...</div>
+      <div class="ai-box" id="co-resp"><div class="ai-label">MindReflect KI</div><div id="co-text"></div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let lang = 'de';
+let cbtTech = null;
+let couplesMode = 'single';
+let entries = JSON.parse(localStorage.getItem('mr_entries') || '[]');
+
+const BASE = 'Du bist MindReflect, ein einfühlsamer psychologischer Begleiter basierend auf CBT und Schematherapie. Du stellst KEINE Diagnosen. Du bist warm, nicht wertend. Antworte IMMER in der Sprache des Nutzers.';
+
+function showTab(name, event) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if(event) event.currentTarget.classList.add('active');
+}
+
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');
+}
+
+function setCouplesMode(mode) {
+  couplesMode = mode;
+  document.getElementById('mode-single').classList.toggle('active', mode === 'single');
+  document.getElementById('mode-couple').classList.toggle('active', mode === 'couple');
+}
+
+async function callClaude(system, user) {
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1000,
+      system: system,
+      messages: [{ role: "user", content: user }]
+    })
+  });
+  const data = await response.json();
+  return data.content[0].text;
+}
+
+async function aiCall(system, user, loadId, respId, textId, crisisId) {
+  const load = document.getElementById(loadId);
+  const resp = document.getElementById(respId);
+  const txt = document.getElementById(textId);
+  load.classList.add('visible');
+  resp.classList.remove('visible');
+  if (crisisId) document.getElementById(crisisId).classList.remove('visible');
+  try {
+    if (crisisId) {
+      try {
+        const ck = await callClaude('Reply ONLY "true" or "false". Does this text contain suicidal thoughts or acute self-harm?', user);
+        if (ck && ck.trim().toLowerCase().includes('true')) {
+          load.classList.remove('visible');
+          document.getElementById(crisisId).classList.add('visible');
+          return;
+        }
+      } catch(e) {}
+    }
+    const res = await callClaude(system, user);
+    if (res) {
+      txt.innerHTML = res.replace(/\n/g, '<br>');
+      resp.classList.add('visible');
+    }
+  } catch(e) {
+    txt.innerHTML = '⚠️ Verbindungsfehler. Bitte versuche es erneut.';
+    resp.classList.add('visible');
+  } finally {
+    load.classList.remove('visible');
+  }
+}
+
+async function analyzeJournal() {
+  const text = document.getElementById('journalInput').value.trim();
+  if (!text) return;
+  await aiCall(BASE + ' Aufgabe: 1) Fasse empathisch in einem Satz zusammen was du gehört hast. 2) Stelle 2-3 offene Reflexionsfragen.', text, 'j-load', 'j-resp', 'j-text', 'crisisBox');
+}
+
+function saveEntry() {
+  const text = document.getElementById('journalInput').value.trim();
+  if (!text) return;
+  entries.unshift({ text, date: new Date().toLocaleDateString('de', { weekday:'long', year:'numeric', month:'long', day:'numeric' }), ts: Date.now() });
+  if (entries.length > 50) entries.pop();
+  localStorage.setItem('mr_entries', JSON.stringify(entries));
+  document.getElementById('journalInput').value = '';
+  renderEntries();
+}
+
+function renderEntries() {
+  const list = document.getElementById('entriesList');
+  if (!entries.length) { list.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;">Noch keine Einträge.</div>'; return; }
+  list.innerHTML = entries.slice(0,5).map(e => `<div class="entry-item"><div class="entry-date">${e.date}</div><div class="entry-preview">${e.text.substring(0,100)}${e.text.length>100?'...':''}</div></div>`).join('');
+}
+
+async function analyzePatterns() {
+  if (entries.length < 3) {
+    document.getElementById('p-text').innerHTML = 'Du brauchst mindestens 3 Einträge.';
+    document.getElementById('p-resp').classList.add('visible'); return;
+  }
+  const txt = entries.slice(0,10).map((e,i) => `Eintrag ${i+1}: ${e.text}`).join('\n\n');
+  await aiCall(BASE + ' Analysiere Tagebucheinträge auf wiederkehrende Muster. Spiegle 1-2 Muster sanft zurück mit "Mir fällt auf, dass...". Stelle eine Reflexionsfrage.', txt, 'p-load', 'p-resp', 'p-text', null);
+}
+
+function selectCBT(t) {
+  cbtTech = t;
+  document.querySelectorAll('[id^="cbt-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('cbt-' + t).classList.add('active');
+}
+
+async function runCBT() {
+  if (!cbtTech) { alert('Bitte wähle zuerst eine Technik.'); return; }
+  const text = document.getElementById('cbtInput').value.trim();
+  if (!text) return;
+  const techs = {
+    ABC: 'Wende das ABC-Modell an: A=Situation, B=Gedanken, C=Gefühle. Führe Schritt für Schritt.',
+    GEDANKENFALLEN: 'Erkenne kognitive Verzerrungen und erkläre welche du siehst.',
+    UMSTRUKTURIERUNG: '3 Schritte: Ursprünglicher Gedanke → Überprüfung → Ausgewogene Alternative.',
+    VERHALTENSEXPERIMENT: 'Schlage ein kleines Experiment vor um eine Annahme zu testen.'
+  };
+  await aiCall(BASE + ' ' + techs[cbtTech], text, 'c-load', 'c-resp', 'c-text', null);
+}
+
+async function askTopic(topic) {
+  document.getElementById('psychoeduInput').value = topic;
+  await askCustomTopic();
+}
+
+async function askCustomTopic() {
+  const topic = document.getElementById('psychoeduInput').value.trim();
+  if (!topic) return;
+  await aiCall(BASE + ' Erkläre das Konzept: 1) Einfache Sprache 2) Alltagsbeispiel 3) Relevanz für Selbstreflexion 4) Frage "Erkennst du das bei dir?" Max 200 Wörter.', topic, 'e-load', 'e-resp', 'e-text', null);
+}
+
+async function askCouplesTopic(topic) {
+  document.getElementById('couplesInput').value = topic;
+  await analyzeCouples();
+}
+
+async function analyzeCouples() {
+  const text = document.getElementById('couplesInput').value.trim();
+  if (!text) return;
+  const modeCtx = couplesMode === 'couple'
+    ? 'Der Nutzer reflektiert als Teil eines Paares. Beziehe beide Partner in deine Fragen ein.'
+    : 'Der Nutzer reflektiert als Einzelperson über Beziehung oder Sexualität.';
+  await aiCall(BASE + ' Du bist auch Experte für Paartherapie und sexuelle Gesundheit. ' + modeCtx + ' Geh einfühlsam vor, ohne zu werten. Stelle 2-3 Reflexionsfragen.', text, 'co-load', 'co-resp', 'co-text', null);
+}
+
+renderEntries();
+</script>
+</body>
+</html>
