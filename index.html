@@ -325,10 +325,9 @@ const i18n = {
 let lang = 'de';
 let cbtTech = null;
 let entries = JSON.parse(localStorage.getItem('mr_entries') || '[]');
-let apiKey = localStorage.getItem('mr_apikey') || '';
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (apiKey) document.getElementById('apiKeyInput').value = apiKey;
+  
   renderEntries(); applyI18n();
 });
 
