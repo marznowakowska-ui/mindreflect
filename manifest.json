@@ -1,0 +1,15 @@
+{
+  "name": "MindReflect",
+  "short_name": "MindReflect",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f14",
+  "theme_color": "#7c9fff",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
