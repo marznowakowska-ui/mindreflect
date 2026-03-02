@@ -16,7 +16,7 @@ export default async (req) => {
 
     const data = await response.json();
 
-    return new Response(JSON.stringify({ output: data.output_text }), {
+    return new Response(JSON.stringify({output:data.output[0].content[0].text }), {
       headers: { "Content-Type": "application/json" }
     });
 
