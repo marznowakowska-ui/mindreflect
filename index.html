@@ -1,801 +1,1366 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MindReflect</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindReflect</title>
 
-<!-- PWA -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f0f14" />
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0f0f14" />
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<style>
-  :root{
-    --bg:#0f0f14;
-    --surface:#17171f;
-    --surface2:#1e1e28;
-    --surface3:#15151c;
-    --border:rgba(255,255,255,0.07);
-    --text:#e8e8f0;
-    --muted:#8b8ba6;
-    --accent:#7c9fff;
-    --accent2:#b89dff;
-    --danger:#ff6b6b;
-    --success:#6fcf97;
-    --shadow: 0 20px 60px rgba(0,0,0,.45);
-    --radius:16px;
-  }
+  <!-- PDF Export -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    font-family:"DM Sans",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-    background: radial-gradient(1000px 600px at 30% -10%, rgba(124,159,255,.18), transparent 60%),
-                radial-gradient(900px 500px at 90% 10%, rgba(184,157,255,.14), transparent 60%),
-                var(--bg);
-    color:var(--text);
-    min-height:100vh;
-  }
+  <style>
+    :root{
+      --bg:#0f0f14;
+      --surface:#17171f;
+      --surface2:#1e1e28;
+      --border: rgba(255,255,255,.10);
+      --text:#e8e8f0;
+      --muted:#a8a8b6;
+      --accent:#7c9fff;
+      --accent2:#b89dff;
+      --ok:#6fcf97;
+      --warn:#f2c94c;
+      --danger:#ff6b6b;
 
-  .wrap{max-width:980px;margin:0 auto;padding:18px 16px 90px;}
-  header{
-    position:sticky;top:0;z-index:50;
-    background: rgba(15,15,20,.85);
-    backdrop-filter: blur(14px);
-    border-bottom:1px solid var(--border);
-  }
-  .head-inner{
-    max-width:980px;margin:0 auto;
-    padding:14px 16px;
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
-  }
-  .brand{
-    display:flex;flex-direction:column;gap:2px;
-  }
-  .logo{
-    font-family:"Playfair Display",serif;
-    font-size:1.55rem;font-weight:600;letter-spacing:.2px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  }
-  .tagline{font-size:.82rem;color:var(--muted)}
-  .langs{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-  .lang{
-    border:1px solid var(--border);
-    background: rgba(255,255,255,.03);
-    color:var(--muted);
-    padding:6px 10px;border-radius:999px;
-    font-size:.78rem;cursor:pointer;
-    transition:.2s;
-    user-select:none;
-  }
-  .lang:hover{border-color: rgba(124,159,255,.45); color:var(--text)}
-  .lang.active{border-color: rgba(124,159,255,.85); color:var(--accent); background: rgba(124,159,255,.10)}
+      --radius: 18px;
+      --shadow: 0 18px 55px rgba(0,0,0,.35);
+      --glass: rgba(255,255,255,.06);
+      --glass2: rgba(255,255,255,.10);
+    }
 
-  /* Cards */
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(12,1fr);
-    gap:12px;
-    margin-top:18px;
-  }
-  .card{
-    grid-column: span 12;
-    background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:16px;
-    box-shadow: var(--shadow);
-  }
-  .card h2{
-    font-family:"Playfair Display",serif;
-    font-size:1.5rem;margin-bottom:6px;
-  }
-  .sub{color:var(--muted);font-size:.92rem;line-height:1.5;margin-bottom:10px}
+    [data-theme="light"]{
+      --bg:#f6f7fb;
+      --surface:#ffffff;
+      --surface2:#f1f3fb;
+      --border: rgba(0,0,0,.10);
+      --text:#101323;
+      --muted:#54607a;
+      --accent:#2f6bff;
+      --accent2:#7a4cff;
+      --shadow: 0 18px 55px rgba(10,15,30,.12);
+      --glass: rgba(0,0,0,.04);
+      --glass2: rgba(0,0,0,.06);
+    }
 
-  .pillrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-  .pill{
-    border:1px solid var(--border);
-    background: rgba(255,255,255,.03);
-    padding:10px 12px;border-radius:14px;
-    display:flex;gap:10px;align-items:center;
-    cursor:pointer;transition:.2s;
-    min-width: 180px;
-  }
-  .pill:hover{border-color: rgba(124,159,255,.45); transform: translateY(-1px)}
-  .pill b{font-weight:600}
-  .pill span{color:var(--muted);font-size:.86rem}
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:"DM Sans",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background: radial-gradient(900px 500px at 15% -10%, rgba(124,159,255,.20), transparent 55%),
+                  radial-gradient(900px 500px at 85% 0%, rgba(184,157,255,.16), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
 
-  /* Panels */
-  .panel{display:none}
-  .panel.active{display:block}
+    .app{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px 14px 90px;
+    }
 
-  /* Inputs */
-  textarea,input[type=text],input[type=password]{
-    width:100%;
-    background: rgba(255,255,255,.04);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px 14px;
-    color: var(--text);
-    outline:none;
-    font-size: .95rem;
-    line-height: 1.6;
-    transition: .2s;
-  }
-  textarea{min-height:140px;resize:vertical}
-  textarea:focus,input:focus{border-color: rgba(124,159,255,.55)}
+    header{
+      position: sticky;
+      top:0;
+      z-index: 30;
+      backdrop-filter: blur(12px);
+      background: linear-gradient(to bottom, rgba(0,0,0,.35), transparent);
+      padding: 14px 0 10px;
+    }
+    [data-theme="light"] header{
+      background: linear-gradient(to bottom, rgba(246,247,251,.85), rgba(246,247,251,.35), transparent);
+    }
 
-  .btn{
-    width:100%;
-    margin-top:10px;
-    border:none;
-    border-radius:14px;
-    padding:12px 14px;
-    cursor:pointer;
-    font-weight:600;
-    font-size:.95rem;
-    transition:.2s;
-    display:flex;align-items:center;justify-content:center;gap:10px;
-  }
-  .btn.primary{
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #0f0f14;
-  }
-  .btn.primary:hover{opacity:.92}
-  .btn.ghost{
-    background: rgba(255,255,255,.04);
-    border:1px solid var(--border);
-    color:var(--text);
-  }
-  .btn.ghost:hover{border-color: rgba(124,159,255,.45)}
-  .btn.danger{
-    background: rgba(255,107,107,.10);
-    border:1px solid rgba(255,107,107,.35);
-    color:#ffb3b3;
-  }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding: 8px 10px;
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--glass);
+      box-shadow: var(--shadow);
+    }
 
-  .ai{
-    margin-top:12px;
-    border:1px solid rgba(124,159,255,.25);
-    background: linear-gradient(135deg, rgba(124,159,255,.08), rgba(184,157,255,.06));
-    border-radius: 14px;
-    padding:14px;
-    display:none;
-  }
-  .ai.visible{display:block}
-  .ai .label{
-    font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--accent);margin-bottom:8px;
-  }
-  .ai .text{line-height:1.75;font-size:.95rem}
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width: 180px;
+    }
+    .logo{
+      width:42px;height:42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(124,159,255,.35), rgba(184,157,255,.25));
+      border: 1px solid var(--border);
+      display:grid; place-items:center;
+      font-weight:800;
+      color: var(--text);
+    }
+    .title{
+      line-height:1.05;
+    }
+    .title h1{
+      margin:0;
+      font-family:"Playfair Display",serif;
+      font-weight:700;
+      letter-spacing:.2px;
+      font-size: 22px;
+    }
+    .title p{
+      margin:2px 0 0;
+      color:var(--muted);
+      font-size: 12px;
+    }
 
-  .loading{
-    display:none;
-    align-items:center;gap:10px;
-    margin-top:10px;
-    color:var(--muted);
-    font-size:.9rem;
-  }
-  .loading.visible{display:flex}
-  .dot{width:6px;height:6px;border-radius:999px;background:var(--accent);opacity:.35;animation:pulse 1.1s infinite}
-  .dot:nth-child(2){animation-delay:.15s}
-  .dot:nth-child(3){animation-delay:.30s}
-  @keyframes pulse{0%,100%{transform:scale(.85);opacity:.25}50%{transform:scale(1.25);opacity:1}}
+    .controls{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
 
-  .crisis{
-    display:none;
-    margin-top:12px;
-    background: rgba(255,107,107,.10);
-    border: 1px solid rgba(255,107,107,.35);
-    border-radius: 14px;
-    padding: 14px;
-  }
-  .crisis.visible{display:block}
-  .crisis b{color:var(--danger)}
-  .crisis p{color:#ffb3b3;margin-top:6px;line-height:1.6;font-size:.92rem}
+    .pill{
+      display:flex;
+      gap:6px;
+      padding: 6px;
+      border:1px solid var(--border);
+      border-radius: 999px;
+      background: var(--glass);
+    }
+    .btn{
+      border:1px solid var(--border);
+      background: var(--glass2);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 999px;
+      cursor:pointer;
+      font-weight:600;
+      transition: transform .08s ease, background .15s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:hover{ transform: translateY(-1px); }
+    .btn.active{
+      background: linear-gradient(135deg, rgba(124,159,255,.35), rgba(184,157,255,.25));
+      border-color: rgba(124,159,255,.35);
+    }
+    .btn.ghost{
+      background: transparent;
+    }
 
-  /* Entries */
-  .entry{
-    background: rgba(255,255,255,.03);
-    border:1px solid var(--border);
-    border-radius:14px;
-    padding:12px;
-    margin-top:8px;
-  }
-  .entry .date{color:var(--muted);font-size:.8rem;margin-bottom:4px}
-  .entry .prev{font-size:.92rem;line-height:1.5}
+    .card{
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, var(--glass), rgba(255,255,255,.03));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
 
-  /* Bottom Tabs */
-  nav{
-    position:fixed;left:0;right:0;bottom:0;
-    background: rgba(15,15,20,.92);
-    backdrop-filter: blur(14px);
-    border-top:1px solid var(--border);
-    z-index:60;
-  }
-  .nav-inner{
-    max-width:980px;margin:0 auto;
-    display:flex;gap:6px;
-    padding:10px 10px;
-  }
-  .tab{
-    flex:1;
-    border:1px solid transparent;
-    border-radius: 14px;
-    padding:10px 10px;
-    background: rgba(255,255,255,.02);
-    color:var(--muted);
-    cursor:pointer;
-    display:flex;align-items:center;justify-content:center;gap:8px;
-    transition:.2s;
-    font-weight:600;
-  }
-  .tab:hover{color:var(--text);border-color:rgba(255,255,255,.06)}
-  .tab.active{
-    color:var(--accent);
-    border-color: rgba(124,159,255,.45);
-    background: rgba(124,159,255,.08);
-  }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    @media(max-width: 900px){
+      .grid{ grid-template-columns: 1fr; }
+    }
 
-  /* Responsive */
-  @media (min-width: 820px){
-    .card.split{grid-column: span 6}
-    .card.third{grid-column: span 4}
-  }
-</style>
+    .sectionTitle{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
+    }
+    .sectionTitle h2{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:.2px;
+    }
+    .sectionTitle small{
+      color: var(--muted);
+    }
+
+    .tabs{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top: 12px;
+    }
+
+    .moduleGrid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    @media(max-width: 900px){
+      .moduleGrid{ grid-template-columns: repeat(2, 1fr); }
+    }
+    @media(max-width: 420px){
+      .moduleGrid{ grid-template-columns: 1fr; }
+    }
+
+    .tile{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      border-radius: 16px;
+      padding: 12px;
+      cursor:pointer;
+      transition: transform .08s ease, background .15s ease;
+      min-height: 92px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+    .tile:hover{ transform: translateY(-1px); background: rgba(255,255,255,.06); }
+    .tile.active{
+      background: linear-gradient(135deg, rgba(124,159,255,.25), rgba(184,157,255,.18));
+      border-color: rgba(124,159,255,.35);
+    }
+    .tile .name{
+      font-weight:800;
+      font-size: 14px;
+    }
+    .tile .desc{
+      color: var(--muted);
+      font-size: 12px;
+      line-height:1.25;
+      margin-top: 6px;
+    }
+
+    textarea{
+      width:100%;
+      min-height: 170px;
+      border-radius: 16px;
+      padding: 12px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline:none;
+      resize: vertical;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    [data-theme="light"] textarea{
+      background: rgba(255,255,255,.8);
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top: 10px;
+    }
+
+    .primary{
+      background: linear-gradient(135deg, rgba(124,159,255,.45), rgba(184,157,255,.30));
+      border-color: rgba(124,159,255,.45);
+    }
+    .danger{
+      background: rgba(255,107,107,.18);
+      border-color: rgba(255,107,107,.28);
+    }
+
+    .output{
+      margin-top: 12px;
+      border-radius: 16px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.15);
+      padding: 12px;
+      min-height: 120px;
+      color: var(--text);
+      line-height: 1.55;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+    [data-theme="light"] .output{
+      background: rgba(255,255,255,.7);
+    }
+    .muted{ color: var(--muted); }
+    .spinner{
+      display:none;
+      gap:8px;
+      align-items:center;
+      color: var(--muted);
+      font-weight:600;
+      margin-top:10px;
+    }
+    .spinner.visible{ display:flex; }
+    .dot{
+      width:8px;height:8px;border-radius:50%;
+      background: var(--accent);
+      animation: pulse 1s infinite ease-in-out;
+    }
+    .dot:nth-child(2){ animation-delay:.15s; opacity:.75; }
+    .dot:nth-child(3){ animation-delay:.30s; opacity:.55; }
+    @keyframes pulse{
+      0%,100%{ transform: translateY(0); }
+      50%{ transform: translateY(-4px); }
+    }
+
+    /* Bottom Nav (mobile-first) */
+    .bottomNav{
+      position: fixed;
+      left:0; right:0; bottom:0;
+      z-index: 50;
+      padding: 10px 10px 14px;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.15), transparent);
+    }
+    [data-theme="light"] .bottomNav{
+      background: linear-gradient(to top, rgba(246,247,251,.95), rgba(246,247,251,.55), transparent);
+    }
+    .bottomNav .bar{
+      max-width: 1100px;
+      margin: 0 auto;
+      border:1px solid var(--border);
+      background: var(--glass);
+      border-radius: 999px;
+      display:flex;
+      gap:8px;
+      padding: 8px;
+      box-shadow: var(--shadow);
+      justify-content:space-between;
+    }
+    .navBtn{
+      flex:1;
+      text-align:center;
+      padding: 10px 8px;
+      border-radius: 999px;
+      border:1px solid transparent;
+      cursor:pointer;
+      font-weight:800;
+      color: var(--muted);
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .navBtn.active{
+      color: var(--text);
+      border-color: rgba(124,159,255,.25);
+      background: linear-gradient(135deg, rgba(124,159,255,.25), rgba(184,157,255,.18));
+    }
+
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top: 10px;
+    }
+    .entry{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      border-radius: 14px;
+      padding: 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      cursor:pointer;
+    }
+    .entry:hover{ background: rgba(255,255,255,.06); }
+    .entry .meta{
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+      min-width: 0;
+    }
+    .entry .meta b{
+      font-size: 13px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .entry .meta small{
+      color: var(--muted);
+    }
+    .entry .x{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor:pointer;
+      font-weight:900;
+    }
+    .entry .x:hover{ color: var(--text); }
+
+    .crisis{
+      display:none;
+      margin-top: 10px;
+      border-radius: 16px;
+      border:1px solid rgba(255,107,107,.35);
+      background: rgba(255,107,107,.12);
+      padding: 12px;
+    }
+    .crisis.visible{ display:block; }
+    .crisis b{ color: var(--danger); }
+  </style>
 </head>
 
-<body>
-
-<header>
-  <div class="head-inner">
-    <div class="brand">
-      <div class="logo">MindReflect</div>
-      <div class="tagline" data-i18n="tagline">Psychologische App für Wachstum & Reflexion</div>
-    </div>
-    <div class="langs">
-      <div class="lang active" data-lang="de">DE</div>
-      <div class="lang" data-lang="en">EN</div>
-      <div class="lang" data-lang="pl">PL</div>
-      <div class="lang" data-lang="es">ES</div>
-      <div class="lang" data-lang="ru">RU</div>
-      <div class="lang" data-lang="zh">ZH</div>
-    </div>
-  </div>
-</header>
-
-<div class="wrap">
-
-  <!-- START -->
-  <section class="panel active" id="panel-start">
-    <div class="card">
-      <h2 data-i18n="start_title">Willkommen</h2>
-      <div class="sub" data-i18n="start_sub">
-        Wähle einen Bereich. Die KI antwortet automatisch in deiner Sprache und passt sich dem Schwerpunkt an.
-      </div>
-
-      <div class="pillrow">
-        <div class="pill" onclick="openPanel('journal')">
-          <div>📓</div>
-          <div><b data-i18n="nav_journal">Tagebuch</b><br><span data-i18n="start_journal">Freies Schreiben + Reflexion</span></div>
+<body data-theme="dark">
+  <div class="app">
+    <header>
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo">MR</div>
+          <div class="title">
+            <h1 id="appName">MindReflect</h1>
+            <p id="appTagline">Psychologische App für Wachstum & Reflexion</p>
+          </div>
         </div>
 
-        <div class="pill" onclick="openPanel('focus')">
-          <div>🎯</div>
-          <div><b data-i18n="nav_focus">Fokus</b><br><span data-i18n="start_focus">Schwerpunkte & Module</span></div>
-        </div>
+        <div class="controls">
+          <div class="pill" id="langPill"></div>
 
-        <div class="pill" onclick="openPanel('cbt')">
-          <div>🧠</div>
-          <div><b data-i18n="nav_cbt">CBT</b><br><span data-i18n="start_cbt">Übungen & Umstrukturierung</span></div>
-        </div>
-
-        <div class="pill" onclick="openPanel('settings')">
-          <div>⚙️</div>
-          <div><b data-i18n="nav_settings">Einstellungen</b><br><span data-i18n="start_settings">API & Daten</span></div>
+          <div class="pill">
+            <button class="btn ghost" id="themeBtn">🌙</button>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </header>
 
-  <!-- JOURNAL -->
-  <section class="panel" id="panel-journal">
+    <!-- Main Screens -->
     <div class="grid">
-      <div class="card split">
-        <h2 data-i18n="journal_title">Tagebuch</h2>
-        <div class="sub" data-i18n="journal_sub">Schreib frei. Die KI spiegelt deine Gedanken zurück.</div>
-
-        <textarea id="journalInput" data-i18n-placeholder="journal_ph" placeholder="Wie war dein Tag?"></textarea>
-        <button class="btn primary" onclick="analyze('journal')">✨ <span data-i18n="btn_reflect">Reflektieren</span></button>
-        <button class="btn ghost" onclick="saveEntry()">💾 <span data-i18n="btn_save">Speichern</span></button>
-
-        <div class="loading" id="load-journal"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span data-i18n="loading">KI denkt nach…</span></div>
-
-        <div class="crisis" id="crisis">
-          <b>⚠️ <span data-i18n="crisis_title">Wir machen uns Sorgen um dich</span></b>
-          <p data-i18n="crisis_text">
-            Bitte wende dich an professionelle Hilfe:<br><br>
-            🇩🇪 <strong>0800 111 0 111</strong> (kostenlos, 24/7)<br>
-            🇦🇹 <strong>142</strong> · 🇨🇭 <strong>143</strong> · 🇵🇱 <strong>116 123</strong> · 🇪🇸 <strong>717 003 717</strong>
-          </p>
+      <!-- Left -->
+      <div class="card" id="screenCard">
+        <div class="sectionTitle">
+          <h2 id="screenTitle">Willkommen</h2>
+          <small id="screenHint" class="muted"></small>
         </div>
 
-        <div class="ai" id="ai-journal">
-          <div class="label">MindReflect</div>
-          <div class="text" id="out-journal"></div>
+        <!-- START -->
+        <div id="screen-start" class="screen">
+          <div class="tabs">
+            <button class="btn active" data-quick="journal" id="quickJournal">📝 Tagebuch</button>
+            <button class="btn" data-quick="focus" id="quickFocus">🎯 Fokus</button>
+            <button class="btn" data-quick="cbt" id="quickCBT">🧠 CBT</button>
+          </div>
+
+          <div style="margin-top:12px" class="muted" id="welcomeText">
+            Wähle unten einen Bereich. Du kannst Texte speichern und als PDF exportieren.
+          </div>
+        </div>
+
+        <!-- JOURNAL -->
+        <div id="screen-journal" class="screen" style="display:none;">
+          <div class="sectionTitle">
+            <h2 id="journalTitle">Tagebuch</h2>
+            <small id="journalHint" class="muted">Schreib frei – dann „Reflektieren“</small>
+          </div>
+
+          <textarea id="input" placeholder="Was beschäftigt dich gerade?"></textarea>
+
+          <div class="row">
+            <button class="btn primary" id="reflectBtn">✨ Reflektieren</button>
+            <button class="btn" id="saveBtn">💾 Speichern</button>
+            <button class="btn" id="pdfBtn">📄 PDF Export</button>
+            <button class="btn danger" id="clearBtn">🗑️ Löschen</button>
+          </div>
+
+          <div class="spinner" id="loading">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span id="loadingText">Denke nach …</span>
+          </div>
+
+          <div class="crisis" id="crisisBox">
+            <b id="crisisTitle">Wichtiger Hinweis</b>
+            <div id="crisisText" style="margin-top:6px"></div>
+          </div>
+
+          <div class="output" id="output"></div>
+        </div>
+
+        <!-- FOKUS -->
+        <div id="screen-focus" class="screen" style="display:none;">
+          <div class="sectionTitle">
+            <h2 id="focusTitle">Fokus</h2>
+            <small id="focusHint" class="muted">Wähle einen Schwerpunkt</small>
+          </div>
+
+          <div class="moduleGrid" id="moduleGrid"></div>
+
+          <!-- Paar-Untertabs -->
+          <div id="pairSubTabs" style="display:none; margin-top:10px;">
+            <div class="tabs">
+              <button class="btn active" data-pair="conflict" id="pairConflict">Paarkonflikte</button>
+              <button class="btn" data-pair="comms" id="pairComms">Paarkommunikation</button>
+              <button class="btn" data-pair="sexual" id="pairSexual">Sexualität</button>
+            </div>
+          </div>
+
+          <div style="margin-top:10px;">
+            <textarea id="focusInput" placeholder="Beschreibe deine Situation …"></textarea>
+
+            <div class="row">
+              <button class="btn primary" id="focusRun">✨ Analysieren</button>
+              <button class="btn" id="focusSave">💾 Speichern</button>
+              <button class="btn" id="focusPdf">📄 PDF Export</button>
+            </div>
+
+            <div class="spinner" id="focusLoading">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span id="focusLoadingText">Analysiere …</span>
+            </div>
+
+            <div class="crisis" id="focusCrisisBox">
+              <b id="focusCrisisTitle">Wichtiger Hinweis</b>
+              <div id="focusCrisisText" style="margin-top:6px"></div>
+            </div>
+
+            <div class="output" id="focusOutput"></div>
+          </div>
+        </div>
+
+        <!-- CBT -->
+        <div id="screen-cbt" class="screen" style="display:none;">
+          <div class="sectionTitle">
+            <h2 id="cbtTitle">CBT Übungen</h2>
+            <small id="cbtHint" class="muted">Gedanken prüfen – alternative Sicht</small>
+          </div>
+
+          <textarea id="cbtInput" placeholder="Welche Situation / welcher Gedanke beschäftigt dich?"></textarea>
+
+          <div class="row">
+            <button class="btn primary" id="cbtRun">✨ CBT bearbeiten</button>
+            <button class="btn" id="cbtSave">💾 Speichern</button>
+            <button class="btn" id="cbtPdf">📄 PDF Export</button>
+          </div>
+
+          <div class="spinner" id="cbtLoading">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span id="cbtLoadingText">Arbeite daran …</span>
+          </div>
+
+          <div class="crisis" id="cbtCrisisBox">
+            <b id="cbtCrisisTitle">Wichtiger Hinweis</b>
+            <div id="cbtCrisisText" style="margin-top:6px"></div>
+          </div>
+
+          <div class="output" id="cbtOutput"></div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="screen-settings" class="screen" style="display:none;">
+          <div class="sectionTitle">
+            <h2 id="settingsTitle">Einstellungen</h2>
+            <small class="muted" id="settingsHint">Deine Daten bleiben auf deinem Gerät</small>
+          </div>
+
+          <div class="row">
+            <button class="btn" id="wipeBtn">🧹 Alle Einträge löschen</button>
+            <button class="btn" id="exportJsonBtn">⬇️ Backup (JSON)</button>
+            <label class="btn" style="cursor:pointer;">
+              ⬆️ Import (JSON)
+              <input type="file" id="importJson" accept="application/json" style="display:none;">
+            </label>
+          </div>
+
+          <div class="muted" style="margin-top:10px; line-height:1.45" id="privacyText">
+            Hinweis: Diese App speichert Einträge lokal (LocalStorage). Keine Registrierung nötig.
+          </div>
         </div>
       </div>
 
-      <div class="card split">
-        <h2 data-i18n="recent_title">Letzte Einträge</h2>
-        <div class="sub" data-i18n="recent_sub">Lokal gespeichert (nur auf deinem Gerät).</div>
-        <div id="entries"></div>
-        <button class="btn danger" onclick="clearData()">🗑️ <span data-i18n="btn_clear">Alle Daten löschen</span></button>
+      <!-- Right (History) -->
+      <div class="card">
+        <div class="sectionTitle">
+          <h2 id="historyTitle">Verlauf</h2>
+          <small class="muted" id="historyHint">Tippe zum Laden</small>
+        </div>
+        <div class="list" id="historyList"></div>
+        <div class="muted" id="historyEmpty" style="margin-top:10px; display:none;">
+          Noch keine Einträge gespeichert.
+        </div>
       </div>
     </div>
-  </section>
-
-  <!-- FOCUS -->
-  <section class="panel" id="panel-focus">
-    <div class="card">
-      <h2 data-i18n="focus_title">Fokus</h2>
-      <div class="sub" data-i18n="focus_sub">Wähle einen Schwerpunkt. Die Antworten sind gezielt & professionell.</div>
-
-      <div class="pillrow">
-        <div class="pill" onclick="setFocus('self_reflection')">🪞 <div><b data-i18n="f_self_reflection">Selbstreflexion</b><br><span data-i18n="f_self_reflection_s">Klarheit, Werte, Entscheidungen</span></div></div>
-        <div class="pill" onclick="setFocus('self_awareness')">👁️ <div><b data-i18n="f_self_awareness">Selbstwahrnehmung</b><br><span data-i18n="f_self_awareness_s">Gefühle, Körper, Muster</span></div></div>
-        <div class="pill" onclick="setFocus('couple_conflict')">💥 <div><b data-i18n="f_couple_conflict">Paarkonflikte</b><br><span data-i18n="f_couple_conflict_s">Deeskalation & Bedürfnisse</span></div></div>
-        <div class="pill" onclick="setFocus('couple_communication')">💬 <div><b data-i18n="f_couple_comm">Paarkommunikation</b><br><span data-i18n="f_couple_comm_s">Ich-Botschaften & Zuhören</span></div></div>
-        <div class="pill" onclick="setFocus('sexuality')">❤️ <div><b data-i18n="f_sexuality">Sexualität</b><br><span data-i18n="f_sexuality_s">Wünsche, Grenzen, Sicherheit</span></div></div>
-        <div class="pill" onclick="setFocus('self_esteem')">⭐ <div><b data-i18n="f_self_esteem">Selbstwertgefühl</b><br><span data-i18n="f_self_esteem_s">Selbstkritik → Selbstmitgefühl</span></div></div>
-        <div class="pill" onclick="setFocus('freud')">🧩 <div><b data-i18n="f_freud">Es • Ich • Über-Ich</b><br><span data-i18n="f_freud_s">Drei-Instanzen-Modell anwenden</span></div></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2 data-i18n="focus_work_title">Arbeitsfeld</h2>
-      <div class="sub" id="focusHint"></div>
-
-      <textarea id="focusInput" data-i18n-placeholder="focus_ph" placeholder="Beschreibe kurz deine Situation…"></textarea>
-      <button class="btn primary" onclick="analyze('focus')">🎯 <span data-i18n="btn_start">Starten</span></button>
-
-      <div class="loading" id="load-focus"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span data-i18n="loading">KI denkt nach…</span></div>
-
-      <div class="ai" id="ai-focus">
-        <div class="label">MindReflect</div>
-        <div class="text" id="out-focus"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CBT -->
-  <section class="panel" id="panel-cbt">
-    <div class="card">
-      <h2 data-i18n="cbt_title">CBT-Übungen</h2>
-      <div class="sub" data-i18n="cbt_sub">Kognitive Verhaltenstherapie – strukturiert, freundlich, ohne Diagnosen.</div>
-
-      <div class="pillrow">
-        <div class="pill" onclick="selectCBT('ABC')">📊 <div><b>ABC</b><br><span data-i18n="cbt_abc">Situation → Gedanke → Gefühl</span></div></div>
-        <div class="pill" onclick="selectCBT('TRAPS')">🪤 <div><b data-i18n="cbt_traps">Gedankenfallen</b><br><span data-i18n="cbt_traps_s">Verzerrungen erkennen</span></div></div>
-        <div class="pill" onclick="selectCBT('REFRAME')">🔄 <div><b data-i18n="cbt_reframe">Umstrukturierung</b><br><span data-i18n="cbt_reframe_s">Alternative, realistische Sicht</span></div></div>
-        <div class="pill" onclick="selectCBT('EXPERIMENT')">🧪 <div><b data-i18n="cbt_exp">Experiment</b><br><span data-i18n="cbt_exp_s">Annahme testen</span></div></div>
-      </div>
-
-      <textarea id="cbtInput" data-i18n-placeholder="cbt_ph" placeholder="Beschreibe eine Situation…"></textarea>
-      <button class="btn primary" onclick="analyze('cbt')">🧠 <span data-i18n="btn_start">Starten</span></button>
-
-      <div class="loading" id="load-cbt"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span data-i18n="loading">KI denkt nach…</span></div>
-
-      <div class="ai" id="ai-cbt">
-        <div class="label">MindReflect</div>
-        <div class="text" id="out-cbt"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SETTINGS -->
-  <section class="panel" id="panel-settings">
-    <div class="card">
-      <h2 data-i18n="settings_title">Einstellungen</h2>
-      <div class="sub" data-i18n="settings_sub">Netlify Function nutzt den API-Key aus Netlify-Umgebungsvariablen.</div>
-
-      <div class="sub" style="margin-top:8px" data-i18n="settings_note">
-        💡 Hinweis: Du musst den OpenAI API Key in Netlify unter „Environment variables“ setzen (OPENAI_API_KEY).
-      </div>
-    </div>
-  </section>
-
-</div>
-
-<nav>
-  <div class="nav-inner">
-    <button class="tab active" id="tab-start" onclick="openPanel('start')">🏠 <span data-i18n="nav_start">Start</span></button>
-    <button class="tab" id="tab-journal" onclick="openPanel('journal')">📓 <span data-i18n="nav_journal">Tagebuch</span></button>
-    <button class="tab" id="tab-focus" onclick="openPanel('focus')">🎯 <span data-i18n="nav_focus">Fokus</span></button>
-    <button class="tab" id="tab-cbt" onclick="openPanel('cbt')">🧠 <span data-i18n="nav_cbt">CBT</span></button>
-    <button class="tab" id="tab-settings" onclick="openPanel('settings')">⚙️ <span data-i18n="nav_settings">Settings</span></button>
   </div>
-</nav>
+
+  <div class="bottomNav">
+    <div class="bar">
+      <div class="navBtn active" data-screen="start" id="navStart">🏠 Start</div>
+      <div class="navBtn" data-screen="journal" id="navJournal">📝 Journal</div>
+      <div class="navBtn" data-screen="focus" id="navFocus">🎯 Fokus</div>
+      <div class="navBtn" data-screen="cbt" id="navCBT">🧠 CBT</div>
+      <div class="navBtn" data-screen="settings" id="navSettings">⚙️</div>
+    </div>
+  </div>
 
 <script>
-  // ---------- i18n ----------
-  const i18n = {
+  // -----------------------
+  // i18n
+  // -----------------------
+  const I18N = {
     de: {
-      tagline:"Psychologische App für Wachstum & Reflexion",
-      nav_start:"Start", nav_journal:"Tagebuch", nav_focus:"Fokus", nav_cbt:"CBT", nav_settings:"Einstellungen",
-      start_title:"Willkommen",
-      start_sub:"Wähle einen Bereich. Die KI antwortet automatisch in deiner Sprache und passt sich dem Schwerpunkt an.",
-      start_journal:"Freies Schreiben + Reflexion",
-      start_focus:"Schwerpunkte & Module",
-      start_cbt:"Übungen & Umstrukturierung",
-      start_settings:"API & Daten",
-      journal_title:"Tagebuch", journal_sub:"Schreib frei. Die KI spiegelt deine Gedanken zurück.",
-      btn_reflect:"Reflektieren", btn_save:"Speichern", btn_start:"Starten", loading:"KI denkt nach…",
-      recent_title:"Letzte Einträge", recent_sub:"Lokal gespeichert (nur auf deinem Gerät).",
-      btn_clear:"Alle Daten löschen",
-      crisis_title:"Wir machen uns Sorgen um dich",
-      crisis_text:"Bitte wende dich an professionelle Hilfe:<br><br>🇩🇪 <strong>0800 111 0 111</strong> (kostenlos, 24/7)<br>🇦🇹 <strong>142</strong> · 🇨🇭 <strong>143</strong> · 🇵🇱 <strong>116 123</strong> · 🇪🇸 <strong>717 003 717</strong>",
-      journal_ph:"Wie war dein Tag? Was beschäftigt dich?",
-      focus_title:"Fokus", focus_sub:"Wähle einen Schwerpunkt. Die Antworten sind gezielt & professionell.",
-      focus_work_title:"Arbeitsfeld", focus_ph:"Beschreibe kurz deine Situation…",
-      f_self_reflection:"Selbstreflexion", f_self_reflection_s:"Klarheit, Werte, Entscheidungen",
-      f_self_awareness:"Selbstwahrnehmung", f_self_awareness_s:"Gefühle, Körper, Muster",
-      f_couple_conflict:"Paarkonflikte", f_couple_conflict_s:"Deeskalation & Bedürfnisse",
-      f_couple_comm:"Paarkommunikation", f_couple_comm_s:"Ich-Botschaften & Zuhören",
-      f_sexuality:"Sexualität", f_sexuality_s:"Wünsche, Grenzen, Sicherheit",
-      f_self_esteem:"Selbstwertgefühl", f_self_esteem_s:"Selbstkritik → Selbstmitgefühl",
-      f_freud:"Es • Ich • Über-Ich", f_freud_s:"Drei-Instanzen-Modell anwenden",
-      cbt_title:"CBT-Übungen", cbt_sub:"Kognitive Verhaltenstherapie – strukturiert, freundlich, ohne Diagnosen.",
-      cbt_abc:"Situation → Gedanke → Gefühl",
-      cbt_traps:"Gedankenfallen", cbt_traps_s:"Verzerrungen erkennen",
-      cbt_reframe:"Umstrukturierung", cbt_reframe_s:"Alternative, realistische Sicht",
-      cbt_exp:"Experiment", cbt_exp_s:"Annahme testen",
-      cbt_ph:"Beschreibe eine Situation…",
-      settings_title:"Einstellungen", settings_sub:"Netlify Function nutzt den API-Key aus Netlify-Umgebungsvariablen.",
-      settings_note:"💡 Hinweis: Du musst den OpenAI API Key in Netlify unter „Environment variables“ setzen (OPENAI_API_KEY).",
-      no_entries:"Noch keine Einträge."
+      appTagline: "Psychologische App für Wachstum & Reflexion",
+      welcome: "Willkommen",
+      welcomeText: "Wähle unten einen Bereich. Du kannst Texte speichern und als PDF exportieren.",
+      journal: "Tagebuch",
+      focus: "Fokus",
+      cbt: "CBT Übungen",
+      settings: "Einstellungen",
+      history: "Verlauf",
+      historyHint: "Tippe zum Laden",
+      inputPH: "Was beschäftigt dich gerade?",
+      focusPH: "Beschreibe deine Situation …",
+      cbtPH: "Welche Situation / welcher Gedanke beschäftigt dich?",
+      reflect: "Reflektieren",
+      analyze: "Analysieren",
+      cbtRun: "CBT bearbeiten",
+      save: "Speichern",
+      pdf: "PDF Export",
+      clear: "Löschen",
+      loading: "Denke nach …",
+      analyzing: "Analysiere …",
+      working: "Arbeite daran …",
+      privacy: "Hinweis: Diese App speichert Einträge lokal (LocalStorage). Keine Registrierung nötig.",
+      crisisTitle: "Wichtiger Hinweis",
+      wipe: "Alle Einträge löschen",
+      backup: "Backup (JSON)",
+      import: "Import (JSON)"
     },
     en: {
-      tagline:"A psychology app for growth & reflection",
-      nav_start:"Start", nav_journal:"Journal", nav_focus:"Focus", nav_cbt:"CBT", nav_settings:"Settings",
-      start_title:"Welcome",
-      start_sub:"Choose a module. The AI replies in your language and adapts to the topic.",
-      start_journal:"Free writing + reflection",
-      start_focus:"Focus areas & modules",
-      start_cbt:"Exercises & reframing",
-      start_settings:"API & data",
-      journal_title:"Journal", journal_sub:"Write freely. The AI reflects your thoughts.",
-      btn_reflect:"Reflect", btn_save:"Save", btn_start:"Start", loading:"AI is thinking…",
-      recent_title:"Recent entries", recent_sub:"Stored locally (only on your device).",
-      btn_clear:"Delete all data",
-      crisis_title:"We’re concerned about you",
-      crisis_text:"Please reach out for professional help:<br><br>🇩🇪 <strong>0800 111 0 111</strong> (free, 24/7)<br>🇦🇹 <strong>142</strong> · 🇨🇭 <strong>143</strong> · 🇵🇱 <strong>116 123</strong> · 🇪🇸 <strong>717 003 717</strong>",
-      journal_ph:"How was your day? What’s on your mind?",
-      focus_title:"Focus", focus_sub:"Pick a focus area. Answers are targeted & professional.",
-      focus_work_title:"Workspace", focus_ph:"Briefly describe your situation…",
-      f_self_reflection:"Self-reflection", f_self_reflection_s:"Clarity, values, decisions",
-      f_self_awareness:"Self-awareness", f_self_awareness_s:"Emotions, body, patterns",
-      f_couple_conflict:"Couple conflicts", f_couple_conflict_s:"De-escalation & needs",
-      f_couple_comm:"Couple communication", f_couple_comm_s:"I-statements & listening",
-      f_sexuality:"Sexuality", f_sexuality_s:"Desires, boundaries, safety",
-      f_self_esteem:"Self-esteem", f_self_esteem_s:"Self-criticism → self-compassion",
-      f_freud:"Id • Ego • Superego", f_freud_s:"Apply Freud’s model",
-      cbt_title:"CBT Exercises", cbt_sub:"CBT—structured, supportive, no diagnoses.",
-      cbt_abc:"Situation → thought → emotion",
-      cbt_traps:"Thought traps", cbt_traps_s:"Spot distortions",
-      cbt_reframe:"Reframing", cbt_reframe_s:"Balanced alternative view",
-      cbt_exp:"Experiment", cbt_exp_s:"Test an assumption",
-      cbt_ph:"Describe a situation…",
-      settings_title:"Settings", settings_sub:"Netlify function uses the API key from Netlify environment variables.",
-      settings_note:"💡 Set your OpenAI API key in Netlify → Environment variables (OPENAI_API_KEY).",
-      no_entries:"No entries yet."
+      appTagline: "Psychology app for growth & reflection",
+      welcome: "Welcome",
+      welcomeText: "Choose a section below. You can save texts and export as PDF.",
+      journal: "Journal",
+      focus: "Focus",
+      cbt: "CBT Exercises",
+      settings: "Settings",
+      history: "History",
+      historyHint: "Tap to load",
+      inputPH: "What’s on your mind?",
+      focusPH: "Describe your situation …",
+      cbtPH: "What situation / thought is bothering you?",
+      reflect: "Reflect",
+      analyze: "Analyze",
+      cbtRun: "CBT rewrite",
+      save: "Save",
+      pdf: "PDF Export",
+      clear: "Clear",
+      loading: "Thinking …",
+      analyzing: "Analyzing …",
+      working: "Working …",
+      privacy: "Note: This app stores entries locally (LocalStorage). No sign-up required.",
+      crisisTitle: "Important note",
+      wipe: "Delete all entries",
+      backup: "Backup (JSON)",
+      import: "Import (JSON)"
     },
     pl: {
-      tagline:"Aplikacja psychologiczna do rozwoju i refleksji",
-      nav_start:"Start", nav_journal:"Dziennik", nav_focus:"Fokus", nav_cbt:"CBT", nav_settings:"Ustawienia",
-      start_title:"Witaj",
-      start_sub:"Wybierz moduł. AI odpowiada w Twoim języku i dopasowuje się do tematu.",
-      start_journal:"Pisanie + refleksja",
-      start_focus:"Obszary i moduły",
-      start_cbt:"Ćwiczenia i restrukturyzacja",
-      start_settings:"API i dane",
-      journal_title:"Dziennik", journal_sub:"Pisz swobodnie. AI odbija Twoje myśli.",
-      btn_reflect:"Reflektuj", btn_save:"Zapisz", btn_start:"Start", loading:"AI myśli…",
-      recent_title:"Ostatnie wpisy", recent_sub:"Zapisane lokalnie (tylko na Twoim urządzeniu).",
-      btn_clear:"Usuń wszystkie dane",
-      crisis_title:"Martwimy się o Ciebie",
-      crisis_text:"Skontaktuj się z pomocą:<br><br>🇵🇱 <strong>116 123</strong> (24/7)<br>🇩🇪 <strong>0800 111 0 111</strong> · 🇪🇸 <strong>717 003 717</strong>",
-      journal_ph:"Jak minął dzień? Co Cię zajmuje?",
-      focus_title:"Fokus", focus_sub:"Wybierz obszar. Odpowiedzi są konkretne i profesjonalne.",
-      focus_work_title:"Pole pracy", focus_ph:"Krótko opisz sytuację…",
-      f_self_reflection:"Autorefleksja", f_self_reflection_s:"Jasność, wartości, decyzje",
-      f_self_awareness:"Samoświadomość", f_self_awareness_s:"Emocje, ciało, wzorce",
-      f_couple_conflict:"Konflikty w parze", f_couple_conflict_s:"Deeskalacja i potrzeby",
-      f_couple_comm:"Komunikacja w parze", f_couple_comm_s:"Komunikaty „ja” i słuchanie",
-      f_sexuality:"Seksualność", f_sexuality_s:"Pragnienia, granice, bezpieczeństwo",
-      f_self_esteem:"Poczucie własnej wartości", f_self_esteem_s:"Krytyk → współczucie",
-      f_freud:"Id • Ego • Superego", f_freud_s:"Zastosuj model Freuda",
-      cbt_title:"Ćwiczenia CBT", cbt_sub:"CBT — strukturalnie, wspierająco, bez diagnoz.",
-      cbt_abc:"Sytuacja → myśl → emocja",
-      cbt_traps:"Pułapki myśli", cbt_traps_s:"Zniekształcenia",
-      cbt_reframe:"Restrukturyzacja", cbt_reframe_s:"Zrównoważona alternatywa",
-      cbt_exp:"Eksperyment", cbt_exp_s:"Test założenia",
-      cbt_ph:"Opisz sytuację…",
-      settings_title:"Ustawienia", settings_sub:"Funkcja Netlify używa klucza API z Environment variables.",
-      settings_note:"💡 Ustaw klucz OpenAI w Netlify → Environment variables (OPENAI_API_KEY).",
-      no_entries:"Brak wpisów."
-    },
-    es: {
-      tagline:"App psicológica para crecimiento y reflexión",
-      nav_start:"Inicio", nav_journal:"Diario", nav_focus:"Foco", nav_cbt:"TCC", nav_settings:"Ajustes",
-      start_title:"Bienvenido/a",
-      start_sub:"Elige un módulo. La IA responde en tu idioma y se adapta al tema.",
-      start_journal:"Escritura + reflexión",
-      start_focus:"Áreas y módulos",
-      start_cbt:"Ejercicios y reencuadre",
-      start_settings:"API y datos",
-      journal_title:"Diario", journal_sub:"Escribe libremente. La IA refleja tus pensamientos.",
-      btn_reflect:"Reflexionar", btn_save:"Guardar", btn_start:"Empezar", loading:"La IA está pensando…",
-      recent_title:"Entradas recientes", recent_sub:"Guardado localmente (solo en tu dispositivo).",
-      btn_clear:"Borrar todos los datos",
-      crisis_title:"Nos preocupa tu seguridad",
-      crisis_text:"Busca ayuda profesional:<br><br>🇪🇸 <strong>717 003 717</strong> (24/7)<br>🇩🇪 <strong>0800 111 0 111</strong> · 🇵🇱 <strong>116 123</strong>",
-      journal_ph:"¿Cómo fue tu día? ¿Qué te preocupa?",
-      focus_title:"Foco", focus_sub:"Elige un foco. Respuestas precisas y profesionales.",
-      focus_work_title:"Espacio de trabajo", focus_ph:"Describe brevemente tu situación…",
-      f_self_reflection:"Autorreflexión", f_self_reflection_s:"Claridad, valores, decisiones",
-      f_self_awareness:"Autopercepción", f_self_awareness_s:"Emociones, cuerpo, patrones",
-      f_couple_conflict:"Conflictos de pareja", f_couple_conflict_s:"Desescalada y necesidades",
-      f_couple_comm:"Comunicación de pareja", f_couple_comm_s:"Mensajes en primera persona",
-      f_sexuality:"Sexualidad", f_sexuality_s:"Deseos, límites, seguridad",
-      f_self_esteem:"Autoestima", f_self_esteem_s:"Autocrítica → compasión",
-      f_freud:"Ello • Yo • Superyó", f_freud_s:"Aplicar el modelo de Freud",
-      cbt_title:"Ejercicios TCC", cbt_sub:"TCC — estructurado, amable, sin diagnósticos.",
-      cbt_abc:"Situación → pensamiento → emoción",
-      cbt_traps:"Trampas mentales", cbt_traps_s:"Distorsiones",
-      cbt_reframe:"Reencuadre", cbt_reframe_s:"Alternativa equilibrada",
-      cbt_exp:"Experimento", cbt_exp_s:"Probar una creencia",
-      cbt_ph:"Describe una situación…",
-      settings_title:"Ajustes", settings_sub:"La función Netlify usa la clave de variables de entorno.",
-      settings_note:"💡 Configura tu clave OpenAI en Netlify → Environment variables (OPENAI_API_KEY).",
-      no_entries:"Aún no hay entradas."
+      appTagline: "Aplikacja psychologiczna do rozwoju i refleksji",
+      welcome: "Witaj",
+      welcomeText: "Wybierz sekcję. Możesz zapisywać teksty i eksportować PDF.",
+      journal: "Dziennik",
+      focus: "Fokus",
+      cbt: "Ćwiczenia CBT",
+      settings: "Ustawienia",
+      history: "Historia",
+      historyHint: "Kliknij, aby wczytać",
+      inputPH: "Co Cię teraz zajmuje?",
+      focusPH: "Opisz swoją sytuację …",
+      cbtPH: "Jaka sytuacja / myśl Cię martwi?",
+      reflect: "Refleksja",
+      analyze: "Analiza",
+      cbtRun: "CBT przeróbka",
+      save: "Zapisz",
+      pdf: "Eksport PDF",
+      clear: "Wyczyść",
+      loading: "Myślę …",
+      analyzing: "Analizuję …",
+      working: "Pracuję …",
+      privacy: "Uwaga: Dane są przechowywane lokalnie (LocalStorage). Bez rejestracji.",
+      crisisTitle: "Ważna informacja",
+      wipe: "Usuń wszystkie wpisy",
+      backup: "Kopia (JSON)",
+      import: "Import (JSON)"
     },
     ru: {
-      tagline:"Психологическое приложение для роста и рефлексии",
-      nav_start:"Старт", nav_journal:"Дневник", nav_focus:"Фокус", nav_cbt:"КПТ", nav_settings:"Настройки",
-      start_title:"Добро пожаловать",
-      start_sub:"Выберите модуль. ИИ отвечает на вашем языке и подстраивается под тему.",
-      start_journal:"Письмо + рефлексия",
-      start_focus:"Темы и модули",
-      start_cbt:"Упражнения и переоценка",
-      start_settings:"API и данные",
-      journal_title:"Дневник", journal_sub:"Пишите свободно. ИИ мягко отражает ваши мысли.",
-      btn_reflect:"Рефлексия", btn_save:"Сохранить", btn_start:"Начать", loading:"ИИ думает…",
-      recent_title:"Последние записи", recent_sub:"Сохранено локально (только на вашем устройстве).",
-      btn_clear:"Удалить все данные",
-      crisis_title:"Мы беспокоимся о вас",
-      crisis_text:"Пожалуйста, обратитесь за профессиональной помощью:<br><br>🇩🇪 <strong>0800 111 0 111</strong> (24/7)<br>🇦🇹 <strong>142</strong> · 🇨🇭 <strong>143</strong> · 🇵🇱 <strong>116 123</strong> · 🇪🇸 <strong>717 003 717</strong>",
-      journal_ph:"Как прошёл день? Что вас волнует?",
-      focus_title:"Фокус", focus_sub:"Выберите тему. Ответы будут точными и профессиональными.",
-      focus_work_title:"Рабочее поле", focus_ph:"Кратко опишите ситуацию…",
-      f_self_reflection:"Саморефлексия", f_self_reflection_s:"Ясность, ценности, решения",
-      f_self_awareness:"Самоосознание", f_self_awareness_s:"Эмоции, тело, паттерны",
-      f_couple_conflict:"Конфликты в паре", f_couple_conflict_s:"Деэскалация и потребности",
-      f_couple_comm:"Коммуникация в паре", f_couple_comm_s:"Я-сообщения и слушание",
-      f_sexuality:"Сексуальность", f_sexuality_s:"Желания, границы, безопасность",
-      f_self_esteem:"Самооценка", f_self_esteem_s:"Самокритика → сострадание",
-      f_freud:"Оно • Я • Сверх-Я", f_freud_s:"Применить модель Фрейда",
-      cbt_title:"Упражнения КПТ", cbt_sub:"КПТ — структурно, поддерживающе, без диагнозов.",
-      cbt_abc:"Ситуация → мысль → эмоция",
-      cbt_traps:"Когнитивные ловушки", cbt_traps_s:"Искажения мышления",
-      cbt_reframe:"Переоценка", cbt_reframe_s:"Сбалансированная альтернатива",
-      cbt_exp:"Эксперимент", cbt_exp_s:"Проверить убеждение",
-      cbt_ph:"Опишите ситуацию…",
-      settings_title:"Настройки", settings_sub:"Функция Netlify использует ключ из переменных окружения.",
-      settings_note:"💡 Установите ключ OpenAI в Netlify → Environment variables (OPENAI_API_KEY).",
-      no_entries:"Пока нет записей."
+      appTagline: "Психологическое приложение для роста и рефлексии",
+      welcome: "Добро пожаловать",
+      welcomeText: "Выберите раздел. Можно сохранять тексты и экспортировать PDF.",
+      journal: "Дневник",
+      focus: "Фокус",
+      cbt: "Упражнения CBT",
+      settings: "Настройки",
+      history: "История",
+      historyHint: "Нажмите, чтобы загрузить",
+      inputPH: "Что вас сейчас беспокоит?",
+      focusPH: "Опишите ситуацию …",
+      cbtPH: "Какая ситуация / мысль вас тревожит?",
+      reflect: "Рефлексия",
+      analyze: "Анализ",
+      cbtRun: "CBT переработка",
+      save: "Сохранить",
+      pdf: "Экспорт PDF",
+      clear: "Очистить",
+      loading: "Думаю …",
+      analyzing: "Анализирую …",
+      working: "Работаю …",
+      privacy: "Примечание: записи хранятся локально (LocalStorage). Регистрация не нужна.",
+      crisisTitle: "Важное сообщение",
+      wipe: "Удалить все записи",
+      backup: "Резерв (JSON)",
+      import: "Импорт (JSON)"
+    },
+    es: {
+      appTagline: "App psicológica para crecimiento y reflexión",
+      welcome: "Bienvenido/a",
+      welcomeText: "Elige una sección. Puedes guardar textos y exportar PDF.",
+      journal: "Diario",
+      focus: "Foco",
+      cbt: "Ejercicios CBT",
+      settings: "Ajustes",
+      history: "Historial",
+      historyHint: "Toca para cargar",
+      inputPH: "¿Qué tienes en mente ahora?",
+      focusPH: "Describe tu situación …",
+      cbtPH: "¿Qué situación / pensamiento te preocupa?",
+      reflect: "Reflexionar",
+      analyze: "Analizar",
+      cbtRun: "CBT reescribir",
+      save: "Guardar",
+      pdf: "Exportar PDF",
+      clear: "Borrar",
+      loading: "Pensando …",
+      analyzing: "Analizando …",
+      working: "Trabajando …",
+      privacy: "Nota: esta app guarda en local (LocalStorage). Sin registro.",
+      crisisTitle: "Aviso importante",
+      wipe: "Borrar todas las entradas",
+      backup: "Copia (JSON)",
+      import: "Importar (JSON)"
     },
     zh: {
-      tagline:"用于成长与反思的心理应用",
-      nav_start:"开始", nav_journal:"日记", nav_focus:"聚焦", nav_cbt:"CBT", nav_settings:"设置",
-      start_title:"欢迎",
-      start_sub:"选择一个模块。AI 会用你的语言回答，并根据主题调整方式。",
-      start_journal:"自由书写 + 反思",
-      start_focus:"主题与模块",
-      start_cbt:"练习与重构",
-      start_settings:"API 与数据",
-      journal_title:"日记", journal_sub:"自由书写。AI 会温和地反映你的想法。",
-      btn_reflect:"反思", btn_save:"保存", btn_start:"开始", loading:"AI 正在思考…",
-      recent_title:"最近记录", recent_sub:"本地保存（仅在你的设备上）。",
-      btn_clear:"删除所有数据",
-      crisis_title:"我们担心你的安全",
-      crisis_text:"请寻求专业帮助：<br><br>🇩🇪 <strong>0800 111 0 111</strong> (24/7)<br>🇦🇹 <strong>142</strong> · 🇨🇭 <strong>143</strong> · 🇵🇱 <strong>116 123</strong> · 🇪🇸 <strong>717 003 717</strong>",
-      journal_ph:"今天过得怎么样？你在想什么？",
-      focus_title:"聚焦", focus_sub:"选择一个主题。回答会更精准、更专业。",
-      focus_work_title:"工作区", focus_ph:"简要描述你的情况…",
-      f_self_reflection:"自我反思", f_self_reflection_s:"清晰、价值、决策",
-      f_self_awareness:"自我觉察", f_self_awareness_s:"情绪、身体、模式",
-      f_couple_conflict:"伴侣冲突", f_couple_conflict_s:"降温与需要",
-      f_couple_comm:"伴侣沟通", f_couple_comm_s:"我讯息与倾听",
-      f_sexuality:"性与亲密", f_sexuality_s:"愿望、边界、安全",
-      f_self_esteem:"自尊", f_self_esteem_s:"自我批评 → 自我慈悲",
-      f_freud:"本我•自我•超我", f_freud_s:"应用弗洛伊德模型",
-      cbt_title:"CBT 练习", cbt_sub:"结构化、支持性、无诊断。",
-      cbt_abc:"情境 → 想法 → 情绪",
-      cbt_traps:"思维陷阱", cbt_traps_s:"识别认知偏差",
-      cbt_reframe:"重构", cbt_reframe_s:"更平衡的替代观点",
-      cbt_exp:"实验", cbt_exp_s:"测试一个假设",
-      cbt_ph:"描述一个情境…",
-      settings_title:"设置", settings_sub:"Netlify 函数使用环境变量中的 API Key。",
-      settings_note:"💡 在 Netlify → Environment variables 中设置 OpenAI Key（OPENAI_API_KEY）。",
-      no_entries:"暂无记录。"
+      appTagline: "用于成长与反思的心理应用",
+      welcome: "欢迎",
+      welcomeText: "请选择一个模块。你可以保存文本并导出 PDF。",
+      journal: "日记",
+      focus: "聚焦",
+      cbt: "CBT 练习",
+      settings: "设置",
+      history: "历史",
+      historyHint: "点击加载",
+      inputPH: "你现在在想什么？",
+      focusPH: "描述你的情况 …",
+      cbtPH: "哪个情境/想法困扰你？",
+      reflect: "反思",
+      analyze: "分析",
+      cbtRun: "CBT 重写",
+      save: "保存",
+      pdf: "导出 PDF",
+      clear: "清空",
+      loading: "思考中 …",
+      analyzing: "分析中 …",
+      working: "处理中 …",
+      privacy: "提示：内容保存在本机（LocalStorage），无需注册。",
+      crisisTitle: "重要提示",
+      wipe: "删除所有记录",
+      backup: "备份 (JSON)",
+      import: "导入 (JSON)"
     }
   };
 
-  let lang = localStorage.getItem("mr_lang") || "de";
-  let focus = localStorage.getItem("mr_focus") || "self_reflection";
-  let cbtMode = localStorage.getItem("mr_cbt") || "ABC";
-  let entries = JSON.parse(localStorage.getItem("mr_entries") || "[]");
+  const LANGS = [
+    { code:"de", label:"DE" },
+    { code:"en", label:"EN" },
+    { code:"pl", label:"PL" },
+    { code:"ru", label:"RU" },
+    { code:"es", label:"ES" },
+    { code:"zh", label:"ZH" },
+  ];
 
-  function t(k){
-    return (i18n[lang] && i18n[lang][k]) || i18n.de[k] || k;
+  // -----------------------
+  // Modules / Topics (C)
+  // -----------------------
+  const MODULES = [
+    { id:"self_reflection", name:{de:"Selbstreflexion",en:"Self-Reflection",pl:"Samo-refleksja",ru:"Саморефлексия",es:"Autorreflexión",zh:"自我反思"},
+      desc:{de:"Emotionen, Muster, Bedürfnisse erkennen.",en:"Understand emotions, patterns, needs.",pl:"Rozpoznaj emocje i wzorce.",ru:"Понять эмоции и паттерны.",es:"Entender emociones y patrones.",zh:"理解情绪与模式。"} },
+
+    { id:"self_awareness", name:{de:"Selbstwahrnehmung",en:"Self-Awareness",pl:"Samoświadomość",ru:"Самоосознание",es:"Autoconciencia",zh:"自我觉察"},
+      desc:{de:"Körper, Gedanken & Gefühle präzise beobachten.",en:"Observe body, thoughts & feelings.",pl:"Obserwuj ciało, myśli i uczucia.",ru:"Наблюдать тело/мысли/чувства.",es:"Observar cuerpo, pensamientos y emociones.",zh:"观察身体与想法。"} },
+
+    { id:"self_worth", name:{de:"Selbstwertgefühl",en:"Self-Worth",pl:"Poczucie własnej wartości",ru:"Самооценка",es:"Autoestima",zh:"自我价值"},
+      desc:{de:"Innere Kritiker beruhigen, neue Sicht stärken.",en:"Soothe inner critic, build a new view.",pl:"Uspokój krytyka wewnętrznego.",ru:"Смягчить внутреннего критика.",es:"Calmar el crítico interno.",zh:"安抚内在批评。"} },
+
+    { id:"pair_module", name:{de:"Beziehung / Paar",en:"Couple / Relationship",pl:"Związek / Para",ru:"Пара / Отношения",es:"Pareja / Relación",zh:"伴侣关系"},
+      desc:{de:"Konflikt, Kommunikation, Sexualität.",en:"Conflict, communication, sexuality.",pl:"Konflikt, komunikacja, seksualność.",ru:"Конфликт, коммуникация, сексуальность.",es:"Conflicto, comunicación, sexualidad.",zh:"冲突、沟通与亲密。"} },
+
+    { id:"freud_model", name:{de:"Freud: Es–Ich–Über-Ich",en:"Freud: Id–Ego–Superego",pl:"Freud: Id–Ego–Superego",ru:"Фрейд: Ид–Эго–Суперэго",es:"Freud: Ello–Yo–Superyó",zh:"弗洛伊德：本我-自我-超我"},
+      desc:{de:"Strukturmodell + dynamischer Konflikt.",en:"Structural model + dynamic conflict.",pl:"Model strukturalny i konflikt.",ru:"Структура и внутренний конфликт.",es:"Modelo estructural y conflicto.",zh:"结构模型与冲突。"} },
+  ];
+
+  // Pair subtopics
+  const PAIR = [
+    { key:"conflict", label:{de:"Paarkonflikte",en:"Conflicts",pl:"Konflikty",ru:"Конфликты",es:"Conflictos",zh:"冲突"} },
+    { key:"comms", label:{de:"Paarkommunikation",en:"Communication",pl:"Komunikacja",ru:"Коммуникация",es:"Comunicación",zh:"沟通"} },
+    { key:"sexual", label:{de:"Sexualität",en:"Sexuality",pl:"Seksualność",ru:"Сексуальность",es:"Sexualidad",zh:"亲密/性"} },
+  ];
+
+  // -----------------------
+  // State
+  // -----------------------
+  const state = {
+    lang: localStorage.getItem("mr_lang") || "de",
+    theme: localStorage.getItem("mr_theme") || "dark",
+    screen: localStorage.getItem("mr_screen") || "start",
+    module: localStorage.getItem("mr_module") || "self_reflection",
+    pair: localStorage.getItem("mr_pair") || "conflict",
+    entries: []
+  };
+
+  const el = (id)=>document.getElementById(id);
+
+  function setTheme(theme){
+    state.theme = theme;
+    document.body.setAttribute("data-theme", theme);
+    localStorage.setItem("mr_theme", theme);
+    el("themeBtn").textContent = theme === "dark" ? "🌙" : "☀️";
+  }
+
+  function setLang(lang){
+    state.lang = lang;
+    localStorage.setItem("mr_lang", lang);
+    applyI18n();
+    renderLangButtons();
+    renderModules();
+    renderPairTabs();
+    renderHistory();
+  }
+
+  function t(key){
+    return (I18N[state.lang] && I18N[state.lang][key]) || (I18N.de[key] || key);
   }
 
   function applyI18n(){
-    document.documentElement.lang = lang;
-    document.querySelectorAll("[data-i18n]").forEach(el => el.innerHTML = t(el.getAttribute("data-i18n")));
-    document.querySelectorAll("[data-i18n-placeholder]").forEach(el => el.placeholder = t(el.getAttribute("data-i18n-placeholder")));
-    document.querySelectorAll(".lang").forEach(b => b.classList.toggle("active", b.dataset.lang === lang));
-    document.getElementById("focusHint").innerHTML = focusHintText();
-    renderEntries();
+    el("appTagline").textContent = t("appTagline");
+    el("screenTitle").textContent = t(state.screen === "start" ? "welcome" : state.screen);
+    el("welcomeText").textContent = t("welcomeText");
+
+    el("journalTitle").textContent = t("journal");
+    el("focusTitle").textContent = t("focus");
+    el("cbtTitle").textContent = t("cbt");
+    el("settingsTitle").textContent = t("settings");
+    el("historyTitle").textContent = t("history");
+    el("historyHint").textContent = t("historyHint");
+
+    el("input").placeholder = t("inputPH");
+    el("focusInput").placeholder = t("focusPH");
+    el("cbtInput").placeholder = t("cbtPH");
+
+    el("reflectBtn").textContent = "✨ " + t("reflect");
+    el("focusRun").textContent = "✨ " + t("analyze");
+    el("cbtRun").textContent = "✨ " + t("cbtRun");
+
+    el("saveBtn").textContent = "💾 " + t("save");
+    el("focusSave").textContent = "💾 " + t("save");
+    el("cbtSave").textContent = "💾 " + t("save");
+
+    el("pdfBtn").textContent = "📄 " + t("pdf");
+    el("focusPdf").textContent = "📄 " + t("pdf");
+    el("cbtPdf").textContent = "📄 " + t("pdf");
+
+    el("clearBtn").textContent = "🗑️ " + t("clear");
+
+    el("loadingText").textContent = t("loading");
+    el("focusLoadingText").textContent = t("analyzing");
+    el("cbtLoadingText").textContent = t("working");
+
+    el("crisisTitle").textContent = t("crisisTitle");
+    el("focusCrisisTitle").textContent = t("crisisTitle");
+    el("cbtCrisisTitle").textContent = t("crisisTitle");
+
+    el("privacyText").textContent = t("privacy");
+
+    el("wipeBtn").textContent = "🧹 " + t("wipe");
+    el("exportJsonBtn").textContent = "⬇️ " + t("backup");
   }
 
-  function focusHintText(){
-    const map = {
-      self_reflection: "f_self_reflection_s",
-      self_awareness: "f_self_awareness_s",
-      couple_conflict: "f_couple_conflict_s",
-      couple_communication: "f_couple_comm_s",
-      sexuality: "f_sexuality_s",
-      self_esteem: "f_self_esteem_s",
-      freud: "f_freud_s"
-    };
-    return "🎯 " + t(map[focus] || "f_self_reflection_s");
-  }
-
-  document.querySelectorAll(".lang").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-      lang = btn.dataset.lang;
-      localStorage.setItem("mr_lang", lang);
-      applyI18n();
+  function renderLangButtons(){
+    const pill = el("langPill");
+    pill.innerHTML = "";
+    LANGS.forEach(l=>{
+      const b = document.createElement("button");
+      b.className = "btn" + (state.lang===l.code ? " active" : "");
+      b.textContent = l.label;
+      b.onclick = ()=>setLang(l.code);
+      pill.appendChild(b);
     });
+  }
+
+  function setScreen(screen){
+    state.screen = screen;
+    localStorage.setItem("mr_screen", screen);
+
+    // hide all screens
+    ["start","journal","focus","cbt","settings"].forEach(s=>{
+      el("screen-"+s).style.display = (s===screen ? "block" : "none");
+    });
+
+    // nav active
+    document.querySelectorAll(".navBtn").forEach(n=>{
+      n.classList.toggle("active", n.dataset.screen===screen);
+    });
+
+    el("screenTitle").textContent = t(screen==="start" ? "welcome" : screen);
+  }
+
+  // -----------------------
+  // Rendering: Modules & Pair subtabs
+  // -----------------------
+  function renderModules(){
+    const grid = el("moduleGrid");
+    grid.innerHTML = "";
+    MODULES.forEach(m=>{
+      const div = document.createElement("div");
+      div.className = "tile" + (state.module===m.id ? " active" : "");
+      div.onclick = ()=>{
+        state.module = m.id;
+        localStorage.setItem("mr_module", m.id);
+        renderModules();
+        renderPairTabs();
+      };
+      div.innerHTML = `
+        <div class="name">${m.name[state.lang] || m.name.de}</div>
+        <div class="desc">${m.desc[state.lang] || m.desc.de}</div>
+      `;
+      grid.appendChild(div);
+    });
+    renderPairTabs();
+  }
+
+  function renderPairTabs(){
+    const show = state.module === "pair_module";
+    el("pairSubTabs").style.display = show ? "block" : "none";
+    if(!show) return;
+
+    // label buttons
+    el("pairConflict").textContent = PAIR[0].label[state.lang] || PAIR[0].label.de;
+    el("pairComms").textContent = PAIR[1].label[state.lang] || PAIR[1].label.de;
+    el("pairSexual").textContent = PAIR[2].label[state.lang] || PAIR[2].label.de;
+
+    document.querySelectorAll("[data-pair]").forEach(b=>{
+      b.classList.toggle("active", b.dataset.pair === state.pair);
+    });
+  }
+
+  document.querySelectorAll("[data-pair]").forEach(b=>{
+    b.onclick = ()=>{
+      state.pair = b.dataset.pair;
+      localStorage.setItem("mr_pair", state.pair);
+      renderPairTabs();
+    };
   });
 
-  function openPanel(name){
-    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
-    document.getElementById("panel-"+name).classList.add("active");
-    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-    document.getElementById("tab-"+name).classList.add("active");
-    window.scrollTo({top:0,behavior:"smooth"});
+  // -----------------------
+  // History (D)
+  // -----------------------
+  function loadEntries(){
+    try{
+      state.entries = JSON.parse(localStorage.getItem("mr_entries")||"[]");
+    }catch{ state.entries=[]; }
+  }
+  function saveEntries(){
+    localStorage.setItem("mr_entries", JSON.stringify(state.entries));
   }
 
-  function setFocus(k){
-    focus = k;
-    localStorage.setItem("mr_focus", focus);
-    document.getElementById("focusHint").innerHTML = focusHintText();
-    openPanel("focus");
+  function addEntry({screen, module, pair, text, output}){
+    const now = new Date();
+    const item = {
+      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random(),
+      ts: now.toISOString(),
+      screen, module, pair,
+      lang: state.lang,
+      text, output
+    };
+    state.entries.unshift(item);
+    saveEntries();
+    renderHistory();
   }
 
-  function selectCBT(m){
-    cbtMode = m;
-    localStorage.setItem("mr_cbt", cbtMode);
-    openPanel("cbt");
-  }
+  function renderHistory(){
+    const list = el("historyList");
+    list.innerHTML = "";
+    const empty = el("historyEmpty");
+    empty.style.display = state.entries.length ? "none" : "block";
 
-  function saveEntry(){
-    const text = document.getElementById("journalInput").value.trim();
-    if(!text) return;
-    entries.unshift({
-      text,
-      date: new Date().toLocaleDateString(lang, {weekday:"long", year:"numeric", month:"long", day:"numeric"}),
-      ts: Date.now()
+    state.entries.forEach(item=>{
+      const d = new Date(item.ts);
+      const title = (item.screen==="journal" ? "Journal" : item.screen==="focus" ? "Fokus" : item.screen==="cbt" ? "CBT" : "Entry");
+      const mod = item.module ? (" • " + item.module.replaceAll("_"," ")) : "";
+      const line1 = (item.text||"").trim().slice(0,70) || "(leer)";
+      const row = document.createElement("div");
+      row.className = "entry";
+      row.innerHTML = `
+        <div class="meta">
+          <b>${title}${mod}</b>
+          <small>${d.toLocaleString()} • ${item.lang?.toUpperCase?.() || ""}</small>
+          <small>${escapeHtml(line1)}</small>
+        </div>
+        <button class="x" title="Delete">×</button>
+      `;
+      row.onclick = (e)=>{
+        if(e.target.classList.contains("x")) return;
+        // load into correct screen
+        setScreen(item.screen);
+        if(item.screen==="journal"){
+          el("input").value = item.text || "";
+          el("output").innerHTML = mdToHtml(item.output || "");
+        }
+        if(item.screen==="focus"){
+          state.module = item.module || state.module;
+          state.pair = item.pair || state.pair;
+          localStorage.setItem("mr_module", state.module);
+          localStorage.setItem("mr_pair", state.pair);
+          renderModules(); renderPairTabs();
+          el("focusInput").value = item.text || "";
+          el("focusOutput").innerHTML = mdToHtml(item.output || "");
+        }
+        if(item.screen==="cbt"){
+          el("cbtInput").value = item.text || "";
+          el("cbtOutput").innerHTML = mdToHtml(item.output || "");
+        }
+      };
+      row.querySelector(".x").onclick = (e)=>{
+        e.stopPropagation();
+        state.entries = state.entries.filter(x=>x.id!==item.id);
+        saveEntries();
+        renderHistory();
+      };
+      list.appendChild(row);
     });
-    if(entries.length > 60) entries.pop();
-    localStorage.setItem("mr_entries", JSON.stringify(entries));
-    document.getElementById("journalInput").value="";
-    renderEntries();
   }
 
-  function renderEntries(){
-    const box = document.getElementById("entries");
-    if(!box) return;
-    if(!entries.length){
-      box.innerHTML = `<div class="sub">${t("no_entries")}</div>`;
-      return;
-    }
-    box.innerHTML = entries.slice(0,8).map(e=>`
-      <div class="entry">
-        <div class="date">${e.date}</div>
-        <div class="prev">${escapeHtml(e.text).slice(0,160)}${e.text.length>160?"…":""}</div>
-      </div>
-    `).join("");
+  // -----------------------
+  // Markdown-ish rendering (simple)
+  // -----------------------
+  function escapeHtml(s){
+    return (s||"")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;");
   }
 
-  function clearData(){
-    if(confirm("OK?")){
-      entries = [];
-      localStorage.removeItem("mr_entries");
-      renderEntries();
-    }
+  function mdToHtml(md){
+    const safe = escapeHtml(md);
+    // headings
+    let html = safe
+      .replace(/^###\s?(.*)$/gm, "<h3>$1</h3>")
+      .replace(/^##\s?(.*)$/gm, "<h2>$1</h2>")
+      .replace(/^#\s?(.*)$/gm, "<h1>$1</h1>");
+    // bold
+    html = html.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+    // lists
+    html = html.replace(/^\-\s(.+)$/gm, "• $1");
+    // line breaks
+    html = html.replace(/\n/g, "<br>");
+    return html;
   }
 
-  function escapeHtml(str){
-    return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-  }
-
-  async function callAI(payload){
-    const r = await fetch("/.netlify/functions/reflect",{
+  // -----------------------
+  // AI call
+  // -----------------------
+  async function callAI({text, mode, topic}){
+    const res = await fetch("/.netlify/functions/reflect",{
       method:"POST",
       headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        text,
+        lang: state.lang,
+        mode,
+        topic
+      })
     });
-    if(!r.ok) throw new Error("API "+r.status);
-    return await r.json();
+    const data = await res.json();
+    if(!res.ok) throw new Error(data?.error || "Server error");
+    return data;
   }
 
-  async function analyze(kind){
-    const crisisEl = document.getElementById("crisis");
-    if(crisisEl) crisisEl.classList.remove("visible");
-
-    const load = document.getElementById("load-"+kind);
-    const ai = document.getElementById("ai-"+kind);
-    const out = document.getElementById("out-"+kind);
-
-    let text = "";
-    let mode = kind;
-
-    if(kind === "journal"){
-      text = document.getElementById("journalInput").value.trim();
-      mode = "journal";
+  function showCrisis(boxId, titleId, textId, message){
+    const box = el(boxId);
+    if(!message){
+      box.classList.remove("visible");
+      el(textId).textContent = "";
+      return;
     }
-    if(kind === "focus"){
-      text = document.getElementById("focusInput").value.trim();
-      mode = focus; // <-- Schwerpunkt
-    }
-    if(kind === "cbt"){
-      text = document.getElementById("cbtInput").value.trim();
-      mode = "cbt_" + cbtMode; // <-- CBT Mode
-    }
+    box.classList.add("visible");
+    el(titleId).textContent = t("crisisTitle");
+    el(textId).textContent = message;
+  }
 
+  // -----------------------
+  // Buttons
+  // -----------------------
+  el("themeBtn").onclick = ()=>{
+    setTheme(state.theme==="dark" ? "light" : "dark");
+  };
+
+  // bottom nav
+  document.querySelectorAll(".navBtn").forEach(b=>{
+    b.onclick = ()=>setScreen(b.dataset.screen);
+  });
+
+  // quick buttons on start
+  document.querySelectorAll("[data-quick]").forEach(b=>{
+    b.onclick = ()=>{
+      setScreen(b.dataset.quick);
+      document.querySelectorAll("[data-quick]").forEach(x=>x.classList.toggle("active", x===b));
+    };
+  });
+
+  // JOURNAL actions
+  el("reflectBtn").onclick = async ()=>{
+    const text = el("input").value.trim();
+    if(!text) return;
+    el("loading").classList.add("visible");
+    showCrisis("crisisBox","crisisTitle","crisisText", null);
+    try{
+      const data = await callAI({ text, mode:"journal_reflect", topic:"self_reflection" });
+      if(data.crisis){
+        showCrisis("crisisBox","crisisTitle","crisisText", data.crisis_message || "");
+      }
+      el("output").innerHTML = mdToHtml(data.output || "");
+    }catch(e){
+      el("output").innerHTML = "⚠️ " + escapeHtml(e.message);
+    }finally{
+      el("loading").classList.remove("visible");
+    }
+  };
+
+  el("saveBtn").onclick = ()=>{
+    const text = el("input").value.trim();
+    const out = el("output").textContent.trim();
+    if(!text && !out) return;
+    addEntry({ screen:"journal", module:"self_reflection", pair:null, text, output: out });
+  };
+
+  el("clearBtn").onclick = ()=>{
+    el("input").value = "";
+    el("output").innerHTML = "";
+    showCrisis("crisisBox","crisisTitle","crisisText", null);
+  };
+
+  el("pdfBtn").onclick = ()=>{
+    exportPDF({
+      title: "MindReflect – Journal",
+      body: el("input").value,
+      output: el("output").textContent
+    });
+  };
+
+  // FOCUS actions
+  el("focusRun").onclick = async ()=>{
+    const text = el("focusInput").value.trim();
     if(!text) return;
 
-    load.classList.add("visible");
-    ai.classList.remove("visible");
+    el("focusLoading").classList.add("visible");
+    showCrisis("focusCrisisBox","focusCrisisTitle","focusCrisisText", null);
+
+    const topic = (state.module==="pair_module")
+      ? ("pair_" + state.pair)
+      : state.module;
 
     try{
-      const data = await callAI({ text, lang, mode });
+      const data = await callAI({ text, mode:"focus_module", topic });
+      if(data.crisis){
+        showCrisis("focusCrisisBox","focusCrisisTitle","focusCrisisText", data.crisis_message || "");
+      }
+      el("focusOutput").innerHTML = mdToHtml(data.output || "");
+    }catch(e){
+      el("focusOutput").innerHTML = "⚠️ " + escapeHtml(e.message);
+    }finally{
+      el("focusLoading").classList.remove("visible");
+    }
+  };
 
-      if(data.crisis === true && crisisEl){
-        load.classList.remove("visible");
-        crisisEl.classList.add("visible");
-        return;
+  el("focusSave").onclick = ()=>{
+    const text = el("focusInput").value.trim();
+    const out = el("focusOutput").textContent.trim();
+    if(!text && !out) return;
+
+    addEntry({
+      screen:"focus",
+      module: state.module,
+      pair: state.module==="pair_module" ? state.pair : null,
+      text,
+      output: out
+    });
+  };
+
+  el("focusPdf").onclick = ()=>{
+    const topic = (state.module==="pair_module")
+      ? ("Beziehung – " + (PAIR.find(p=>p.key===state.pair)?.label[state.lang] || ""))
+      : (MODULES.find(m=>m.id===state.module)?.name[state.lang] || "");
+
+    exportPDF({
+      title: "MindReflect – Fokus: " + topic,
+      body: el("focusInput").value,
+      output: el("focusOutput").textContent
+    });
+  };
+
+  // CBT actions
+  el("cbtRun").onclick = async ()=>{
+    const text = el("cbtInput").value.trim();
+    if(!text) return;
+
+    el("cbtLoading").classList.add("visible");
+    showCrisis("cbtCrisisBox","cbtCrisisTitle","cbtCrisisText", null);
+
+    try{
+      const data = await callAI({ text, mode:"cbt", topic:"cbt" });
+      if(data.crisis){
+        showCrisis("cbtCrisisBox","cbtCrisisTitle","cbtCrisisText", data.crisis_message || "");
+      }
+      el("cbtOutput").innerHTML = mdToHtml(data.output || "");
+    }catch(e){
+      el("cbtOutput").innerHTML = "⚠️ " + escapeHtml(e.message);
+    }finally{
+      el("cbtLoading").classList.remove("visible");
+    }
+  };
+
+  el("cbtSave").onclick = ()=>{
+    const text = el("cbtInput").value.trim();
+    const out = el("cbtOutput").textContent.trim();
+    if(!text && !out) return;
+    addEntry({ screen:"cbt", module:"cbt", pair:null, text, output: out });
+  };
+
+  el("cbtPdf").onclick = ()=>{
+    exportPDF({
+      title: "MindReflect – CBT",
+      body: el("cbtInput").value,
+      output: el("cbtOutput").textContent
+    });
+  };
+
+  // Settings
+  el("wipeBtn").onclick = ()=>{
+    if(!confirm("Wirklich alle Einträge löschen?")) return;
+    state.entries = [];
+    saveEntries();
+    renderHistory();
+  };
+
+  el("exportJsonBtn").onclick = ()=>{
+    const blob = new Blob([JSON.stringify(state.entries, null, 2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "mindreflect-backup.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  el("importJson").addEventListener("change", async (e)=>{
+    const file = e.target.files?.[0];
+    if(!file) return;
+    const txt = await file.text();
+    try{
+      const data = JSON.parse(txt);
+      if(!Array.isArray(data)) throw new Error("Invalid file");
+      state.entries = data;
+      saveEntries();
+      renderHistory();
+      alert("Import ok ✅");
+    }catch{
+      alert("Import fehlgeschlagen ❌");
+    }finally{
+      e.target.value = "";
+    }
+  });
+
+  // -----------------------
+  // PDF Export (D)
+  // -----------------------
+  function exportPDF({title, body, output}){
+    try{
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit:"pt", format:"a4" });
+
+      const margin = 42;
+      const width = doc.internal.pageSize.getWidth() - margin*2;
+      let y = margin;
+
+      doc.setFont("helvetica","bold");
+      doc.setFontSize(16);
+      doc.text(title, margin, y);
+      y += 18;
+
+      doc.setFont("helvetica","normal");
+      doc.setFontSize(10);
+      doc.text(new Date().toLocaleString(), margin, y);
+      y += 18;
+
+      doc.setFontSize(12);
+      doc.setFont("helvetica","bold");
+      doc.text("Eingabe", margin, y);
+      y += 14;
+
+      doc.setFont("helvetica","normal");
+      const bodyLines = doc.splitTextToSize((body||"").trim() || "-", width);
+      doc.text(bodyLines, margin, y);
+      y += bodyLines.length * 14 + 18;
+
+      doc.setFont("helvetica","bold");
+      doc.text("Antwort", margin, y);
+      y += 14;
+
+      doc.setFont("helvetica","normal");
+      const outLines = doc.splitTextToSize((output||"").trim() || "-", width);
+      // add pages if needed
+      for(const line of outLines){
+        if(y > doc.internal.pageSize.getHeight() - margin){
+          doc.addPage();
+          y = margin;
+        }
+        doc.text(line, margin, y);
+        y += 14;
       }
 
-      out.innerHTML = (data.output || "").replace(/\n/g,"<br>");
-      ai.classList.add("visible");
-    }catch(e){
-      out.innerHTML = "⚠️ " + e.message;
-      ai.classList.add("visible");
-    }finally{
-      load.classList.remove("visible");
+      doc.save("mindreflect.pdf");
+    }catch(err){
+      // fallback: print
+      const w = window.open("", "_blank");
+      w.document.write(`<pre>${escapeHtml(title)}\n\n${escapeHtml(body)}\n\n---\n\n${escapeHtml(output)}</pre>`);
+      w.print();
+      w.close();
     }
   }
 
+  // -----------------------
   // Init
-  applyI18n();
-</script>
+  // -----------------------
+  function init(){
+    setTheme(state.theme);
+    renderLangButtons();
+    applyI18n();
 
+    loadEntries();
+    renderHistory();
+
+    renderModules();
+    renderPairTabs();
+
+    setScreen(state.screen);
+
+    // Ensure language in <html>
+    document.documentElement.lang = state.lang;
+  }
+
+  init();
+</script>
 </body>
 </html>
