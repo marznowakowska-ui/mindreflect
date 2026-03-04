@@ -1450,8 +1450,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const data = await response.json();
-
-    alert(data.analysis);
+    document.getElementById("output").innerText = data.analysis;
 
   });
 
