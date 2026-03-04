@@ -821,9 +821,46 @@
     pair: localStorage.getItem("mr_pair") || "conflict",
     entries: []
   };
+ function getToken(){
+  const user = window.netlifyIdentity && window.netlifyIdentity.currentUser();
+  return user ? user.token.access_token : null;
+}  
 
+async function loadEntriesCloud(){
+  const token = getToken();
+  if(!token) return null;
+
+  const r = await fetch("/.netlify/functions/loadEntries",{
+    headers:{
+      Authorization:"Bearer "+token
+    }
+  });
+
+  if(!r.ok) return null;
+
+  const data = await r.json();
+  return data.entries || [];
+}
+
+async function saveEntriesCloud(entries){
+  const token = getToken();
+  if(!token) return false;
+
+  const r = await fetch("/.netlify/functions/saveEntries",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:"Bearer "+token
+    },
+    body:JSON.stringify({entries})
+  });
+
+  return r.ok;
+}
+
+ 
   const el = (id)=>document.getElementById(id);
-
+  
   function setTheme(theme){
     state.theme = theme;
     document.body.setAttribute("data-theme", theme);
