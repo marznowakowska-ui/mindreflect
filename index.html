@@ -1415,7 +1415,6 @@ pill.appendChild(loginBtn);
 </script>
 
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-
 <script>
   if (window.netlifyIdentity) {
     window.netlifyIdentity.on("init", (user) => {
@@ -1427,34 +1426,60 @@ pill.appendChild(loginBtn);
     });
   }
 </script>
-  
+
 <script>
-
 document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("reflectBtn");
+  const input = document.getElementById("input");
+  const output = document.getElementById("output");
+  const loading = document.getElementById("loading");
 
-  const analyzeBtn = document.querySelector("button");
-  const textarea = document.querySelector("textarea");
+  if (!btn || !input || !output) {
+    console.warn("UI-Elemente nicht gefunden: reflectBtn/input/output");
+    return;
+  }
 
-  analyzeBtn.addEventListener("click", async () => {
+  const setLoading = (isLoading) => {
+    if (loading) loading.style.display = isLoading ? "block" : "none";
+    btn.disabled = isLoading;
+  };
 
-    const text = textarea.value;
+  btn.addEventListener("click", async () => {
+    const text = (input.value || "").trim();
 
-    const response = await fetch("/.netlify/functions/analyze", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        text: text
-      })
-    });
+    if (!text) {
+      output.innerText = "Bitte erst einen Text eingeben.";
+      return;
+    }
 
-    const data = await response.json();
-    document.getElementById("output").innerText = data.analysis;
+    try {
+      setLoading(true);
+      output.innerText = "Analysiere…";
 
+      const response = await fetch("/.netlify/functions/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error("Server-Fehler: " + response.status + " " + errText);
+      }
+
+      const data = await response.json();
+
+      // Professionell: schön im rechten Feld anzeigen
+      output.innerText = data.analysis || "Keine Analyse erhalten.";
+    } catch (e) {
+      console.error(e);
+      output.innerText = "Fehler bei der Analyse: " + (e.message || e);
+    } finally {
+      setLoading(false);
+    }
   });
-
 });
+</script>
 
 </script>
 
