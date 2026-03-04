@@ -901,10 +901,16 @@
     });
   
   const loginBtn = document.createElement("button");
-loginBtn.textContent = "Login";
-loginBtn.onclick = () => netlifyIdentity.open();
 
-el("langPill").appendChild(loginBtn);
+if (window.netlifyIdentity && netlifyIdentity.currentUser()) {
+  loginBtn.textContent = "Logout";
+  loginBtn.onclick = () => netlifyIdentity.logout();
+} else {
+  loginBtn.textContent = "Login";
+  loginBtn.onclick = () => netlifyIdentity.open();
+}
+
+pill.appendChild(loginBtn);
 }
 
   function setScreen(screen){
@@ -1383,6 +1389,13 @@ el("langPill").appendChild(loginBtn);
       }
     });
   }
-</script>  
+</script>
+netlifyIdentity.on("login", () => {
+  location.reload();
+});
+
+netlifyIdentity.on("logout", () => {
+  location.reload();
+});
 </body>
 </html>
