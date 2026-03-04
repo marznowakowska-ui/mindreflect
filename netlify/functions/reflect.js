@@ -11,24 +11,32 @@ export default async (req) => {
       body: JSON.stringify({
         model: "gpt-4.1",
         max_output_tokens: 2000,
-        input: `Analysiere den folgenden Text tiefenpsychologisch nach dem Modell von Freud.
+        input: `Analysiere den folgenden Text tiefenpsychologisch.
 
-Struktur der Antwort:
+Schritte der Analyse:
 
-1. Kurze Zusammenfassung der Situation.
+1. Sprache erkennen  
+Bestimme zuerst die Sprache des Textes und antworte ausschließlich in dieser Sprache.
 
-2. Analyse nach Freud:
-- Es (Id): Welche Wünsche, Bedürfnisse oder Ängste könnten hier wirken?
+2. Kurze Zusammenfassung  
+Fasse die Situation kurz zusammen.
+
+3. Emotionale Analyse  
+Welche Emotionen sind im Text erkennbar? (z.B. Angst, Wut, Traurigkeit, Schuld, Unsicherheit).
+
+4. Analyse nach Freud  
+- Es (Id): Welche Wünsche, Bedürfnisse oder Ängste wirken hier?
 - Ich (Ego): Wie versucht die Person mit der Realität umzugehen?
-- Über-Ich (Superego): Welche inneren Regeln, Schuldgefühle oder Erwartungen könnten eine Rolle spielen?
+- Über-Ich (Superego): Welche inneren Regeln, Schuldgefühle oder Erwartungen wirken?
 
-3. Psychologische Interpretation:
-Erkläre mögliche innere Konflikte, Emotionen und unbewusste Dynamiken.
+5. Psychologische Interpretation  
+Erkläre mögliche innere Konflikte, unbewusste Dynamiken und Spannungen zwischen Es, Ich und Über-Ich.
 
-4. Vorschläge:
-Gib konkrete, hilfreiche psychologische Vorschläge zur Selbstreflexion oder zum Umgang mit der Situation.
+6. Kognitive Analyse (CBT)  
+Welche Gedankenmuster oder Denkfehler könnten vorhanden sein?
 
-Antworte in der gleichen Sprache wie der Text.
+7. Vorschläge  
+Gib konkrete, hilfreiche psychologische Vorschläge zur Selbstreflexion und zum Umgang mit der Situation.
 
 Text:
 ${text}`
