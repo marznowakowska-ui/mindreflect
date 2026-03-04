@@ -1,7 +1,11 @@
 exports.handler = async (event) => {
 
-  const data = JSON.parse(event.body);
-  const text = data.text;
+  let text = "No text provided";
+
+  if (event.body) {
+    const data = JSON.parse(event.body);
+    text = data.text || text;
+  }
 
   return {
     statusCode: 200,
