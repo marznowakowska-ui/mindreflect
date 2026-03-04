@@ -1470,10 +1470,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
 
       // Professionell: schön im rechten Feld anzeigen
-      output.innerText = data.analysis || "Keine Analyse erhalten.";
+      document.getElementById("output").innerHTML = data.analysis || "Keine Analyse erhalten.";
     } catch (e) {
       console.error(e);
-      output.innerText = "Fehler bei der Analyse: " + (e.message || e);
+      document.getElementById("output").innerHTML = "Fehler bei der Analyse: " + (e.message || e);
     } finally {
       setLoading(false);
     }
