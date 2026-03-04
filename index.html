@@ -1471,6 +1471,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Professionell: schön im rechten Feld anzeigen
       document.getElementById("output").innerHTML = data.analysis || "Keine Analyse erhalten.";
+
+      addToHistory({
+  text,
+  focus: focusKey,
+  lang,
+  analysis: data.analysis
+});
     } catch (e) {
       console.error(e);
       document.getElementById("output").innerHTML = "Fehler bei der Analyse: " + (e.message || e);
