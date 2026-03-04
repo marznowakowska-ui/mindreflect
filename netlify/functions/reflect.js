@@ -19,6 +19,11 @@ Write interpretations carefully as hypotheses, not as diagnoses.
         
 The response must be written completely in this language: ${lang}.
 
+Consider the emotional context and possible patterns in the person's thoughts.
+If previous reflections are available, take them into account to identify recurring themes or emotional dynamics.
+
+Focus on understanding the deeper psychological meaning of the text rather than giving quick advice.
+
 Structure the analysis as follows:
 1. Language detection
 2. Short summary
