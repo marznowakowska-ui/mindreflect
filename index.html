@@ -899,7 +899,13 @@
       b.onclick = ()=>setLang(l.code);
       pill.appendChild(b);
     });
-  }
+  
+  const loginBtn = document.createElement("button");
+loginBtn.textContent = "Login";
+loginBtn.onclick = () => netlifyIdentity.open();
+
+el("langPill").appendChild(loginBtn);
+}
 
   function setScreen(screen){
     state.screen = screen;
@@ -1377,9 +1383,6 @@
       }
     });
   }
-</script>
-  
-<button onclick="netlifyIdentity.open()">Login</button>
-  
+</script>  
 </body>
 </html>
