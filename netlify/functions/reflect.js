@@ -12,6 +12,11 @@ const { text, lang, mode, topic, history } = await req.json();
         max_output_tokens: 3000,
         input: `Analyze the following text with deep psychological reflection.
 
+Write the analysis with empathy and psychological depth.
+Avoid generic advice and try to understand the emotional meaning behind the text.
+
+Write interpretations carefully as hypotheses, not as diagnoses.
+        
 The response must be written completely in this language: ${lang}.
 
 Structure the analysis as follows:
@@ -22,9 +27,18 @@ Structure the analysis as follows:
 5. Psychological interpretation
 6. Cognitive analysis (CBT)
 7. Suggestions
-8. Psychological patterns
-9. Reflection questions
+8. Inner child analysis
+9. Psychological patterns
+10. Reflection questions
+Inner child analysis:
+Explore whether the emotions in the text could relate to earlier
+emotional experiences or unmet childhood needs.
 
+Describe possible reactions of the "inner child", such as:
+fear of rejection, need for safety, desire for approval,
+or feelings of abandonment.
+
+Write this carefully as a hypothesis, not as a diagnosis.
 Text:
 ${text}
 `
