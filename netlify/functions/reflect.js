@@ -16,8 +16,14 @@ export default async (req) => {
 Schritte der Analyse:
 
 1. Sprache erkennen  
-Bestimme zuerst die Sprache des Textes und antworte ausschließlich in dieser Sprache.
+Bestimme zuerst die Sprache des Textes.
 
+WICHTIG:
+Die gesamte Analyse muss vollständig in dieser Sprache sein.
+Wenn der Text Spanisch ist, antworte nur auf Spanisch.
+Wenn der Text Polnisch ist, antworte nur auf Polnisch.
+Wenn der Text Englisch ist, antworte nur auf Englisch.
+Verwende niemals Deutsch, außer der Text ist Deutsch.
 2. Kurze Zusammenfassung  
 Fasse die Situation kurz zusammen.
 
