@@ -9,9 +9,30 @@ export default async (req) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "gpt-4.1-mini",
-        input: `Bitte reflektiere diesen Text empathisch:\n\n${text}`
-      })
+        model: "gpt-4.1",
+        max_output_tokens: 2000,
+        input: `Analysiere den folgenden Text tiefenpsychologisch nach dem Modell von Freud.
+
+Struktur der Antwort:
+
+1. Kurze Zusammenfassung der Situation.
+
+2. Analyse nach Freud:
+- Es (Id): Welche Wünsche, Bedürfnisse oder Ängste könnten hier wirken?
+- Ich (Ego): Wie versucht die Person mit der Realität umzugehen?
+- Über-Ich (Superego): Welche inneren Regeln, Schuldgefühle oder Erwartungen könnten eine Rolle spielen?
+
+3. Psychologische Interpretation:
+Erkläre mögliche innere Konflikte, Emotionen und unbewusste Dynamiken.
+
+4. Vorschläge:
+Gib konkrete, hilfreiche psychologische Vorschläge zur Selbstreflexion oder zum Umgang mit der Situation.
+
+Antworte in der gleichen Sprache wie der Text.
+
+Text:
+${text}`
+})
     });
 
     const data = await response.json();
