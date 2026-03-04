@@ -1427,12 +1427,37 @@ pill.appendChild(loginBtn);
     });
   }
 </script>
-netlifyIdentity.on("login", () => {
-  location.reload();
+  
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const analyzeBtn = document.querySelector("button");
+  const textarea = document.querySelector("textarea");
+
+  analyzeBtn.addEventListener("click", async () => {
+
+    const text = textarea.value;
+
+    const response = await fetch("/.netlify/functions/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        text: text
+      })
+    });
+
+    const data = await response.json();
+
+    alert(data.analysis);
+
+  });
+
 });
 
-netlifyIdentity.on("logout", () => {
-  location.reload();
-});
+</script>
+
 </body>
 </html>
