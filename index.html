@@ -1078,7 +1078,7 @@ pill.appendChild(loginBtn);
           localStorage.setItem("mr_pair", state.pair);
           renderModules(); renderPairTabs();
           el("focusInput").value = item.text || "";
-          el("focusOutput").innerHTML = mdToHtml(item.output || "");
+          document.getElementById("resultOutput").innerHTML = mdToHtml(item.output || "");
         }
         if(item.screen==="cbt"){
           el("cbtInput").value = item.text || "";
