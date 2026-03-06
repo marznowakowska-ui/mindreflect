@@ -1542,15 +1542,15 @@ document.getElementById("emotionTags").innerHTML = data.emotions.map(e => `<span
  renderHistory();
   function formatAnalysis(text){
 
-const parts = text.split(/\n\d+\.\s/);
+const parts = text.match(/\d+\.\s[\s\S]*?(?=\n\d+\.\s|$)/g) || [];
 
 let html = "";
 
 parts.forEach(p=>{
 if(!p.trim()) return;
 
-const lines = p.split("\n");
-const title = lines.shift();
+const lines = p.trim().split("\n");
+const title = lines.shift().replace(/^\d+\.\s*/, "");
 
 html += `
 <div class="analysisBlock">
