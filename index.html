@@ -1239,7 +1239,7 @@ pill.appendChild(loginBtn);
 
   el("focusSave").onclick = ()=>{
     const text = el("focusInput").value.trim();
-    const out = el("focusOutput").textContent.trim();
+   const out = document.getElementById("resultOutput").textContent.trim();
     if(!text && !out) return;
 
     addEntry({
