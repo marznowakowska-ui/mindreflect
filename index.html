@@ -1229,9 +1229,9 @@ pill.appendChild(loginBtn);
       if(data.crisis){
         showCrisis("focusCrisisBox","focusCrisisTitle","focusCrisisText", data.crisis_message || "");
       }
-      el("focusOutput").innerHTML = mdToHtml(data.output || "");
+      document.getElementById("resultOutput").innerHTML = mdToHtml(data.output || "");
     }catch(e){
-      el("focusOutput").innerHTML = "⚠️ " + escapeHtml(e.message);
+      document.getElementById("resultOutput").innerHTML = "⚠️ " + escapeHtml(e.message);
     }finally{
       el("focusLoading").classList.remove("visible");
     }
