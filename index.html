@@ -1217,6 +1217,8 @@ pill.appendChild(loginBtn);
     const text = el("focusInput").value.trim();
     if(!text) return;
 
+    document.getElementById("resultOutput").innerHTML = "";
+
     el("focusLoading").classList.add("visible");
     showCrisis("focusCrisisBox","focusCrisisTitle","focusCrisisText", null);
 
@@ -1472,7 +1474,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
 
       // Professionell: schön im rechten Feld anzeigen
-      document.getElementById("output").innerHTML = data.analysis || "Keine Analyse erhalten.";
+      document.getElementById("resultOutput").innerText = data.analysis || "Keine Analyse erhalten.";
       addEntry({
   screen: "focus",
   module: focusKey,
@@ -1483,7 +1485,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } catch (e) {
       console.error(e);
-      document.getElementById("output").innerHTML = "Fehler bei der Analyse: " + (e.message || e);
+      document.getElementById("resultOutput").innerText = "Fehler bei der Analyse: " + (e.message || e);
     } finally {
       setLoading(false);
     }
