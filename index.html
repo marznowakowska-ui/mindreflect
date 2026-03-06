@@ -579,6 +579,10 @@
   <div class="sectionTitle">
     <h2>Analyse</h2>
     <small class="muted">KI-Reflexion erscheint hier</small>
+
+    <div id="emotionTags" class="muted" style="margin-top:8px; margin-bottom:10px;">
+  Noch keine Emotionen erkannt.
+</div>
   </div>
 
 <div id="resultOutput" class="output"></div>
@@ -1475,6 +1479,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Professionell: schön im rechten Feld anzeigen
       document.getElementById("resultOutput").innerText = data.analysis || "Keine Analyse erhalten.";
+
+      if(data.emotions){
+document.getElementById("emotionTags").innerText = "Emotionen erkannt: " + data.emotions.join(", ");
+}
       addEntry({
   screen: "focus",
   module: focusKey,
