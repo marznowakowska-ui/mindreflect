@@ -1221,7 +1221,7 @@ pill.appendChild(loginBtn);
     el("loading").classList.add("visible");
     showCrisis("crisisBox","crisisTitle","crisisText", null);
     try{
-      const data = await callAI({ text, mode:"journal_reflect", topic:"self_reflection" });
+      const data = await callAI({ text, mode:"journal_reflect", topic:"self_reflection", lang: state.lang });
       if(data.crisis){
         showCrisis("crisisBox","crisisTitle","crisisText", data.crisis_message || "");
       }
