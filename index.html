@@ -311,6 +311,14 @@
       0%,100%{ transform: translateY(0); }
       50%{ transform: translateY(-4px); }
     }
+    .emotion-tag{display:inline-block;padding:4px 10px;border-radius:999px;margin:4px 6px 0 0;font-size:12px;font-weight:600}
+.emotion-traurigkeit{background:rgba(220,80,80,0.18)}
+.emotion-angst{background:rgba(230,190,70,0.18)}
+.emotion-hoffnungslosigkeit{background:rgba(160,100,220,0.18)}
+.emotion-erschöpfung{background:rgba(90,140,220,0.18)}
+.emotion-wut{background:rgba(255,120,80,0.18)}
+.emotion-ruhe{background:rgba(80,190,140,0.18)}
+.emotion-hoffnung{background:rgba(100,210,120,0.18)}
 
     /* Bottom Nav (mobile-first) */
     .bottomNav{
@@ -1481,7 +1489,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("resultOutput").innerText = data.analysis || "Keine Analyse erhalten.";
 
       if(data.emotions){
-document.getElementById("emotionTags").innerText = "Emotionen erkannt: " + data.emotions.join(", ");
+document.getElementById("emotionTags").innerHTML = data.emotions.map(e => `<span class="emotion-tag emotion-${e.toLowerCase()}">${e}</span>`).join("");
 }
       addEntry({
   screen: "focus",
