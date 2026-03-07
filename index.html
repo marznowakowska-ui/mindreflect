@@ -271,6 +271,56 @@
 .analysisBlock p{
   line-height:1.5;
 }
+    .emotionWrap{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:8px 0 14px 0;
+}
+
+.emotionTag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(124,159,255,0.14);
+  border:1px solid rgba(124,159,255,0.28);
+  color:#e8e8f0;
+  font-size:12px;
+  font-weight:700;
+}
+
+.emotionTitle{
+  margin:0 0 8px 0;
+  font-size:14px;
+  color:#fff;
+}
+    .emotionWrap{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:8px 0 14px 0;
+}
+
+.emotionTag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(124,159,255,0.14);
+  border:1px solid rgba(124,159,255,0.28);
+  color:#e8e8f0;
+  font-size:12px;
+  font-weight:700;
+}
+
+.emotionTitle{
+  margin:0 0 8px 0;
+  font-size:14px;
+  color:#fff;
+}
     textarea{
       width:100%;
       min-height: 170px;
@@ -1489,6 +1539,26 @@ document.addEventListener("DOMContentLoaded", () => {
     if (loading) loading.style.display = isLoading ? "block" : "none";
     btn.disabled = isLoading;
   };
+function detectEmotions(text){
+  const t = (text || "").toLowerCase();
+
+  const emotionMap = [
+    { key: "Traurigkeit", icon: "😔", words: ["traurig", "traurigkeit", "niedergeschlagen", "leer", "melancholie"] },
+    { key: "Hoffnungslosigkeit", icon: "😞", words: ["hoffnungslos", "hoffnungslosigkeit", "ausweglos"] },
+    { key: "Erschöpfung", icon: "😴", words: ["erschöpft", "erschöpfung", "müde", "kraftlos", "ausgebrannt"] },
+    { key: "Angst", icon: "😰", words: ["angst", "ängstlich", "sorge", "unsicherheit", "panik"] },
+    { key: "Wut", icon: "😠", words: ["wut", "ärger", "zorn", "frustriert", "aggression"] },
+    { key: "Scham", icon: "😳", words: ["scham", "schuldig", "schuld", "peinlich", "wertlos"] },
+    { key: "Einsamkeit", icon: "🥺", words: ["einsam", "isolation", "isoliert", "allein", "verlassen"] },
+    { key: "Überforderung", icon: "😵", words: ["überfordert", "überforderung", "zu viel", "belastung", "druck"] }
+  ];
+
+  const found = emotionMap.filter(e =>
+    e.words.some(word => t.includes(word))
+  );
+
+  return found.slice(0, 5);
+}
 
   btn.addEventListener("click", async () => {
     const text = (input.value || "").trim();
@@ -1545,6 +1615,18 @@ document.getElementById("emotionTags").innerHTML = data.emotions.map(e => `<span
 const parts = text.match(/\d+\.\s[\s\S]*?(?=\n\d+\.\s|$)/g) || [];
 
 let html = "";
+    const emotions = detectEmotions(text);
+
+if(emotions.length){
+  html += `
+  <div class="analysisBlock">
+    <h3 class="emotionTitle">Erkannte Emotionen</h3>
+    <div class="emotionWrap">
+      ${emotions.map(e => `<span class="emotionTag">${e.icon} ${e.key}</span>`).join("")}
+    </div>
+  </div>
+  `;
+}
 
 parts.forEach(p=>{
 if(!p.trim()) return;
