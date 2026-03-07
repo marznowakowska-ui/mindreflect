@@ -1587,11 +1587,12 @@ function detectEmotions(text){
       document.getElementById("resultOutput").innerText = data.analysis || "Keine Analyse erhalten.";
 
       const emotions = detectEmotions(data.analysis || "");
+      
+     document.getElementById("emotionTags").innerHTML =
+emotions.length
+? emotions.map(e => `<span class="emotionTag">${e.icon} ${e.key}</span>`).join("")
+: "Keine Emotionen erkannt."; 
 
-if (emotions.length) {
-document.getElementById("emotionTags").innerHTML =
-emotions.map(e => `<span class="emotionTag">${e.icon} ${e.key}</span>`).join("");
-}
       addEntry({
   screen: "focus",
   module: focusKey,
