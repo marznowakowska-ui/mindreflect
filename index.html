@@ -671,9 +671,7 @@
     <div id="emotionTags" class="muted" style="margin-top:8px; margin-bottom:10px;">
   Noch keine Emotionen erkannt.
 </div>
-  </div>
-
-<div id="resultOutput" class="output"></div>
+    <div id="resultOutput" class="output"></div>
 
 <div class="muted" style="margin-top:10px;">
 Noch keine Analyse. Links Text eingeben und auf „Analysieren“ klicken.
@@ -1588,8 +1586,11 @@ function detectEmotions(text){
       // Professionell: schön im rechten Feld anzeigen
       document.getElementById("resultOutput").innerText = data.analysis || "Keine Analyse erhalten.";
 
-      if(data.emotions){
-document.getElementById("emotionTags").innerHTML = data.emotions.map(e => `<span class="emotion-tag emotion-${e.toLowerCase()}">${e}</span>`).join("");
+      const emotions = detectEmotions(data.analysis || "");
+
+if (emotions.length) {
+document.getElementById("emotionTags").innerHTML =
+emotions.map(e => `<span class="emotionTag">${e.icon} ${e.key}</span>`).join("");
 }
       addEntry({
   screen: "focus",
