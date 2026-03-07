@@ -1231,7 +1231,7 @@ empty.style.display = state.entries.length ? "none" : "block";
   // AI call
   // -----------------------
   async function callAI({text, mode, topic}){
-    const res = await fetch("/.netlify/functions/reflect",{
+    const res = await fetch("https://mindreflect-app.netlify.app/.netlify/functions/reflect",{
       method:"POST",
       headers:{ "Content-Type":"application/json" },
       body: JSON.stringify({
@@ -1350,8 +1350,8 @@ const emotionBox = document.getElementById("focusEmotionBox");
 
 if (emotionBox) {
   emotionBox.innerHTML = emotions.length
-    ? emotions.map(e => `<span class="emotionTag">${e.icon} ${e.key}</span>`).join("")
-    : `<span class="muted">Noch keine Emotionen erkannt.</span>`;
+  ? emotions.map(e => `<span class="emotionTag">${e.icon} ${e.key}</span>`).join("")
+  : '<span class="muted">' + t("noEmotions") + '</span>';
 }
     if(!text) return;
 
