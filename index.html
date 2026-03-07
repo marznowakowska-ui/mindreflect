@@ -971,51 +971,54 @@ async function saveEntriesCloud(entries){
   }
 
   function applyI18n(){
-    el("appTagline").textContent = t("appTagline");
-    el("screenTitle").textContent = t(state.screen === "start" ? "welcome" : state.screen);
-    el("welcomeText").textContent = t("welcomeText");
+    if (el("appTagline")) el("appTagline").textContent = t("appTagline");
+    if (el("screenTitle")) el("screenTitle").textContent = t(state.screen === "start" ? "welcome" : state.screen);
+    if (el("welcomeText")) el("welcomeText").textContent = t("welcomeText");
 
-    el("journalTitle").textContent = t("journal");
-    el("focusTitle").textContent = t("focus");
-    el("cbtTitle").textContent = t("cbt");
-    el("settingsTitle").textContent = t("settings");
-    el("historyTitle").textContent = t("history");
-    el("historyHint").textContent = t("historyHint");
+    if (el("journalTitle")) el("journalTitle").textContent = t("journal");
+    if (el("focusTitle")) el("focusTitle").textContent = t("focus");
+    if (el("cbtTitle")) el("cbtTitle").textContent = t("cbt");
+    if (el("settingsTitle")) el("settingsTitle").textContent = t("settings");
+    if (el("historyTitle")) el("historyTitle").textContent = t("history");
+    if (el("historyHint")) el("historyHint").textContent = t("historyHint");
 
-    el("input").placeholder = t("inputPH");
-    el("focusInput").placeholder = t("focusPH");
-    el("cbtInput").placeholder = t("cbtPH");
+    if (el("input")) el("input").placeholder = t("inputPH");
+    if (el("focusInput")) el("focusInput").placeholder = t("focusPH");
+    if (el("cbtInput")) el("cbtInput").placeholder = t("cbtPH");
 
-    el("reflectBtn").textContent = "✨ " + t("reflect");
+    if (el("reflectBtn")) el("reflectBtn").textContent = " ✨ " + t("reflect");
     el("focusRun").textContent = "✨ " + t("analyze");
     el("cbtRun").textContent = "✨ " + t("cbtRun");
 
-    el("saveBtn").textContent = "💾 " + t("save");
+    if (el("saveBtn")) el("saveBtn").textContent = " 💾 " + t("save");
     el("focusSave").textContent = "💾 " + t("save");
     el("cbtSave").textContent = "💾 " + t("save");
 
-    el("pdfBtn").textContent = "📄 " + t("pdf");
+    if (el("pdfBtn")) el("pdfBtn").textContent = " 📄 " + t("pdf");
     el("focusPdf").textContent = "📄 " + t("pdf");
     el("cbtPdf").textContent = "📄 " + t("pdf");
 
-    el("clearBtn").textContent = "🗑️ " + t("clear");
+    if (el("clearBtn")) el("clearBtn").textContent = " 🗑 " + t("clear");
 
-    el("loadingText").textContent = t("loading");
+    if (el("loadingText")) el("loadingText").textContent = t("loading");
     el("focusLoadingText").textContent = t("analyzing");
     el("cbtLoadingText").textContent = t("working");
 
-    el("crisisTitle").textContent = t("crisisTitle");
+    if (el("crisisTitle")) el("crisisTitle").textContent = t("crisisTitle");
     el("focusCrisisTitle").textContent = t("crisisTitle");
     el("cbtCrisisTitle").textContent = t("crisisTitle");
 
-    el("privacyText").textContent = t("privacy");
+   if (el("privacyText")) el("privacyText").textContent = t("privacy");
 
-    el("wipeBtn").textContent = "🧹 " + t("wipe");
-    el("exportJsonBtn").textContent = "⬇️ " + t("backup");
+    if (el("wipeBtn")) el("wipeBtn").textContent = " 🧹 " + t("wipe");
+    if (el("exportJsonBtn")) el("exportJsonBtn").textContent = " ⬇️ " + t("backup");
   }
 
   function renderLangButtons(){
-    const pill = el("langPill");
+  const pill = el("langPill");
+    if (!pill) return;
+pill.innerHTML = "";
+
     pill.innerHTML = "";
     LANGS.forEach(l=>{
       const b = document.createElement("button");
@@ -1044,7 +1047,8 @@ pill.appendChild(loginBtn);
 
     // hide all screens
     ["start","journal","focus","cbt","settings"].forEach(s=>{
-      el("screen-"+s).style.display = (s===screen ? "block" : "none");
+     const scr = el("screen-"+s);
+if (scr) scr.style.display = (s===screen ? "block" : "none");
     });
 
     // nav active
@@ -1052,7 +1056,7 @@ pill.appendChild(loginBtn);
       n.classList.toggle("active", n.dataset.screen===screen);
     });
 
-    el("screenTitle").textContent = t(screen==="start" ? "welcome" : screen);
+    if (el("screenTitle")) el("screenTitle").textContent = t(screen==="start" ? "welcome" : screen);
   }
 
   // -----------------------
@@ -1130,9 +1134,11 @@ pill.appendChild(loginBtn);
 
   function renderHistory(){
     const list = el("historyList");
-    list.innerHTML = "";
-    const empty = el("historyEmpty");
-    empty.style.display = state.entries.length ? "none" : "block";
+const empty = el("historyEmpty");
+if (!list || !empty) return;
+
+list.innerHTML = "";
+empty.style.display = state.entries.length ? "none" : "block";
 
     state.entries.forEach(item=>{
       const d = new Date(item.ts);
@@ -1228,23 +1234,28 @@ pill.appendChild(loginBtn);
 
   function showCrisis(boxId, titleId, textId, message){
     const box = el(boxId);
-    if(!message){
-      box.classList.remove("visible");
-      el(textId).textContent = "";
-      return;
-    }
-    box.classList.add("visible");
-    el(titleId).textContent = t("crisisTitle");
-    el(textId).textContent = message;
+    const title = el(titleId);
+    const textEl = el(textId);
+    if (!box || !title || !textEl) return;
+
+    if (!message) {
+     box.classList.remove("visible");
+    textEl.textContent = "";
+    return;
+}
+box.classList.add("visible");
+title.textContent = t("crisisTitle");
+textEl.textContent = message;
   }
 
   // -----------------------
   // Buttons
   // -----------------------
-  el("themeBtn").onclick = ()=>{
-    setTheme(state.theme==="dark" ? "light" : "dark");
+  if (el("themeBtn")) {
+  el("themeBtn").onclick = () => {
+    setTheme(state.theme === "dark" ? "light" : "dark");
   };
-
+}
   // bottom nav
   document.querySelectorAll(".navBtn").forEach(b=>{
     b.onclick = ()=>setScreen(b.dataset.screen);
