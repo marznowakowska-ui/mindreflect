@@ -591,7 +591,7 @@
 
           <div style="margin-top:10px;">
             <textarea id="focusInput" placeholder="Beschreibe deine Situation …"></textarea>
-
+            <div id="focusEmotionBox" class="emotionWrap"></div>
             <div class="row">
               <button class="btn primary" id="focusRun">✨ Analysieren</button>
               <button class="btn" id="focusSave">💾 Speichern</button>
@@ -1565,8 +1565,14 @@ function detectEmotions(text){
 }
 
   btn.addEventListener("click", async () => {
-    const text = (input.value || "").trim();
-
+    const text = (focusInput.value || "").trim();
+    const emotions = detectEmotions(text);
+const emotionBox = document.getElementById("focusEmotionBox");
+if (emotionBox) {
+  emotionBox.innerHTML = emotions.length
+    ? emotions.map(e => `<span class="emotionTag">${e.icon} ${e.key}</span>`).join("")
+    : `<span class="muted">Noch keine Emotionen erkannt.</span>`;
+}
     if (!text) {
       output.innerText = "Bitte erst einen Text eingeben.";
       return;
