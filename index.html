@@ -1586,7 +1586,7 @@ function detectEmotions(text){
       // Professionell: schön im rechten Feld anzeigen
       document.getElementById("resultOutput").innerText = data.analysis || "Keine Analyse erhalten.";
 
-      const emotions = detectEmotions(data.analysis || "");
+      const emotions = detectEmotions(text);
       
      document.getElementById("emotionTags").innerHTML =
 emotions.length
