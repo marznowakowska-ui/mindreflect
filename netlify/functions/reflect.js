@@ -27,7 +27,8 @@ Avoid generic advice and try to understand the emotional meaning behind the text
 
 Write interpretations carefully as hypotheses, not as diagnoses.
         
-The response must be written completely in this language: ${replyLanguage}.
+The response MUST be written ONLY in this language: ${replyLanguage}. 
+Do not use any other language.
 
 Consider the emotional context and possible patterns in the person's thoughts.
 If previous reflections are available, take them into account to identify recurring themes or emotional dynamics.
