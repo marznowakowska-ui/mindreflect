@@ -1326,6 +1326,14 @@ textEl.textContent = message;
   // FOCUS actions
   el("focusRun").onclick = async ()=>{
     const text = el("focusInput").value.trim();
+    const emotions = detectEmotions(text);
+const emotionBox = document.getElementById("focusEmotionBox");
+
+if (emotionBox) {
+  emotionBox.innerHTML = emotions.length
+    ? emotions.map(e => `<span class="emotionTag">${e.icon} ${e.key}</span>`).join("")
+    : `<span class="muted">Noch keine Emotionen erkannt.</span>`;
+}
     if(!text) return;
 
     document.getElementById("resultOutput").innerHTML = "";
