@@ -1325,16 +1325,16 @@ textEl.textContent = message;
 function detectEmotions(text){
   const t = (text || "").toLowerCase();
 
-  const emotionMap = [
-    { key: "Traurigkeit", icon: "😢", words: ["traurig", "traurigkeit", "niedergeschlagen", "leer", "melancholie", "depressiv", "depression"] },
-    { key: "Hoffnungslosigkeit", icon: "🫥", words: ["hoffnungslos", "hoffnungslosigkeit", "ausweglos"] },
-    { key: "Erschöpfung", icon: "🔥", words: ["erschöpft", "erschöpfung", "müde", "kraftlos", "ausgebrannt"] },
-    { key: "Angst", icon: "😰", words: ["angst", "ängstlich", "sorge", "unsicherheit", "panik"] },
-    { key: "Wut", icon: "😠", words: ["wut", "ärger", "zorn", "frustriert", "aggression"] },
-    { key: "Scham", icon: "😳", words: ["scham", "schuldig", "schuld", "peinlich", "wertlos"] },
-    { key: "Einsamkeit", icon: "🥺", words: ["einsam", "isolation", "isoliert", "allein", "verlassen"] },
-    { key: "Überforderung", icon: "😵", words: ["überfordert", "überforderung", "zu viel", "belastung", "druck"] }
-  ];
+ const emotionMap = [
+  { key: "Traurigkeit", icon: "😢", words: ["traurig", "traurigkeit", "niedergeschlagen", "leer", "melancholie", "depressiv", "depression", "smutna", "smutny", "smutek", "depresyjna", "depresyjny", "depresja"] },
+  { key: "Hoffnungslosigkeit", icon: "🕳️", words: ["hoffnungslos", "hoffnungslosigkeit", "ausweglos"] },
+  { key: "Erschöpfung", icon: "🔥", words: ["erschöpft", "erschöpfung", "müde", "kraftlos", "ausgebrannt", "zmęczona", "zmęczony", "wyczerpana", "wyczerpany"] },
+  { key: "Angst", icon: "😰", words: ["angst", "ängstlich", "sorge", "unsicherheit", "panik"] },
+  { key: "Wut", icon: "😡", words: ["wut", "ärger", "zorn", "frustriert", "aggression"] },
+  { key: "Scham", icon: "😞", words: ["scham", "schuldig", "schuld", "peinlich", "wertlos"] },
+  { key: "Einsamkeit", icon: "🥺", words: ["einsam", "isolation", "isoliert", "allein", "verlassen", "samotna", "samotny", "samotność"] },
+  { key: "Überforderung", icon: "😵‍💫", words: ["überfordert", "überforderung", "zu viel", "belastung", "druck"] }
+];
 
   const found = emotionMap.filter(e =>
     e.words.some(word => t.includes(word))
