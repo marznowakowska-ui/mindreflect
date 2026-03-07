@@ -1,6 +1,16 @@
 export default async (req) => {
   try {
 const { text, lang, mode, topic, history } = await req.json();
+    const languageMap = {
+  de: "German",
+  en: "English",
+  pl: "Polish",
+  ru: "Russian",
+  es: "Spanish",
+  zh: "Chinese"
+};
+
+const replyLanguage = languageMap[lang] || "German";
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
@@ -17,7 +27,7 @@ Avoid generic advice and try to understand the emotional meaning behind the text
 
 Write interpretations carefully as hypotheses, not as diagnoses.
         
-The response must be written completely in this language: ${lang}.
+The response must be written completely in this language: ${replyLanguage}.
 
 Consider the emotional context and possible patterns in the person's thoughts.
 If previous reflections are available, take them into account to identify recurring themes or emotional dynamics.
