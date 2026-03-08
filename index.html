@@ -1037,7 +1037,8 @@ async function saveEntriesCloud(entries){
    if (el("privacyText")) el("privacyText").textContent = t("privacy");
 
     if (el("wipeBtn")) el("wipeBtn").textContent = " 🧹 " + t("wipe");
-    if (el("exportJsonBtn")) el("exportJsonBtn").textContent = " ⬇️ " + t("backup");
+if (el("exportJsonBtn")) el("exportJsonBtn").textContent = " ⬇️ " + t("backup");
+if (el("noAnalysisText")) el("noAnalysisText").textContent = t("noAnalysis");
   }
 
   function renderLangButtons(){
