@@ -1294,7 +1294,7 @@ textEl.textContent = message;
       if(data.crisis){
         showCrisis("crisisBox","crisisTitle","crisisText", data.crisis_message || "");
       }
-      el("output").innerHTML = formatAnalysis(data.output || "");
+      el("output").innerHTML = formatAnalysis(data.output ||t("noAnalysis"));
     }catch(e){
       el("output").innerHTML = "⚠️ " + escapeHtml(e.message);
     }finally{
@@ -1369,7 +1369,7 @@ if (emotionBox) {
       if(data.crisis){
         showCrisis("focusCrisisBox","focusCrisisTitle","focusCrisisText", data.crisis_message || "");
       }
-      document.getElementById("resultOutput").innerHTML = mdToHtml(data.output || "");
+      document.getElementById("resultOutput").innerHTML = mdToHtml(data.output ||t("noAnalysis"));
     }catch(e){
       document.getElementById("resultOutput").innerHTML = "⚠️ " + escapeHtml(e.message);
     }finally{
