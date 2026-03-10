@@ -2023,7 +2023,8 @@ for (const emotion of emotionMap) {
       score += 2;
     }
 
-    const pattern = new RegExp(`(^|\\s)${word}($|\\s)`, "i");
+    const safeWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const pattern = new RegExp(`(^|\\s)${safeWord}($|\\s)`, "i");
     if (pattern.test(t)) {
       score += 2;
     }
