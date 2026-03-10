@@ -685,7 +685,8 @@
     <div id="emotionTags" class="emotionWrap"></div>
     <div id="resultOutput" class="output"></div>
 
-<div class="muted" style="margin-top:10px;">
+<div class="muted" style="margin-top:10px;"
+  id="noAnalysisText">
 Noch keine Analyse. Links Text eingeben und auf „Analysieren“ klicken.
 </div>
   
@@ -715,6 +716,7 @@ Noch keine Analyse. Links Text eingeben und auf „Analysieren“ klicken.
       cbt: "CBT Übungen",
       settings: "Einstellungen",
       history: "Verlauf",
+      noAnalysis: "Noch keine Analyse. Links Text eingeben und auf „Analysieren“ klicken.",
       historyHint: "Tippe zum Laden",
       inputPH: "Was beschäftigt dich gerade?",
       focusPH: "Beschreibe deine Situation …",
@@ -745,6 +747,7 @@ noEmotions: "Noch keine Emotionen erkannt.",
       cbt: "CBT Exercises",
       settings: "Settings",
       history: "History",
+      noAnalysis: "No analysis yet. Enter text on the left and click Analyze.",
       historyHint: "Tap to load",
       inputPH: "What’s on your mind?",
       focusPH: "Describe your situation …",
@@ -775,6 +778,7 @@ noEmotions: "No emotions detected yet.",
       cbt: "Ćwiczenia CBT",
       settings: "Ustawienia",
       history: "Historia",
+      noAnalysis: "Brak analizy. Wpisz tekst po lewej stronie i kliknij „Analizuj”.",
       historyHint: "Kliknij, aby wczytać",
       inputPH: "Co Cię teraz zajmuje?",
       focusPH: "Opisz swoją sytuację …",
@@ -805,6 +809,7 @@ noEmotions: "Nie wykryto jeszcze emocji.",
       cbt: "Упражнения CBT",
       settings: "Настройки",
       history: "История",
+      noAnalysis: "Пока нет анализа. Введите текст слева и нажмите «Анализировать».",
       historyHint: "Нажмите, чтобы загрузить",
       inputPH: "Что вас сейчас беспокоит?",
       focusPH: "Опишите ситуацию …",
@@ -835,6 +840,7 @@ noEmotions: "Эмоции пока не распознаны.",
       cbt: "Ejercicios CBT",
       settings: "Ajustes",
       history: "Historial",
+      noAnalysis: "Aún no hay análisis. Escribe texto a la izquierda y pulsa «Analizar».",
       historyHint: "Toca para cargar",
       inputPH: "¿Qué tienes en mente ahora?",
       focusPH: "Describe tu situación …",
@@ -865,6 +871,7 @@ noEmotions: "Aún no se detectaron emociones.",
       cbt: "CBT 练习",
       settings: "设置",
       history: "历史",
+      noAnalysis: "暂无分析，请在左侧输入文本并点击“分析”。",
       historyHint: "点击加载",
       inputPH: "你现在在想什么？",
       focusPH: "描述你的情况 …",
@@ -1007,6 +1014,8 @@ async function saveEntriesCloud(entries){
     if (el("settingsTitle")) el("settingsTitle").textContent = t("settings");
     if (el("historyTitle")) el("historyTitle").textContent = t("history");
     if (el("historyHint")) el("historyHint").textContent = t("historyHint");
+
+    if (el("noAnalysisText")) el("noAnalysisText").textContent = t("noAnalysis");
 
     if (el("input")) el("input").placeholder = t("inputPH");
     if (el("focusInput")) el("focusInput").placeholder = t("focusPH");
