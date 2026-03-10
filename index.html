@@ -1339,21 +1339,707 @@ function detectEmotions(text){
   const t = (text || "").toLowerCase();
 
  const emotionMap = [
-  { key: "Traurigkeit", icon: "😢", words: ["traurig", "traurigkeit", "niedergeschlagen", "leer", "melancholie", "depressiv", "depression", "smutna", "smutny", "smutek", "depresyjna", "depresyjny", "depresja"] },
-  { key: "Hoffnungslosigkeit", icon: "🕳️", words: ["hoffnungslos", "hoffnungslosigkeit", "ausweglos"] },
-  { key: "Erschöpfung", icon: "🔥", words: ["erschöpft", "erschöpfung", "müde", "kraftlos", "ausgebrannt", "zmęczona", "zmęczony", "wyczerpana", "wyczerpany"] },
-  { key: "Angst", icon: "😰", words: ["angst", "ängstlich", "sorge", "unsicherheit", "panik"] },
-  { key: "Wut", icon: "😡", words: ["wut", "ärger", "zorn", "frustriert", "aggression"] },
-  { key: "Scham", icon: "😞", words: ["scham", "schuldig", "schuld", "peinlich", "wertlos"] },
-  { key: "Einsamkeit", icon: "🥺", words: ["einsam", "isolation", "isoliert", "allein", "verlassen", "samotna", "samotny", "samotność"] },
-  { key: "Überforderung", icon: "😵‍💫", words: ["überfordert", "überforderung", "zu viel", "belastung", "druck"] }
+  {
+    id: "sadness",
+    icon: "😢",
+    label: { de: "Traurigkeit", en: "Sadness", pl: "Smutek", ru: "Грусть", es: "Tristeza", zh: "悲伤" },
+    words: ["traurig","traurigkeit","sad","sadness","smutny","smutna","smutek","грустный","грусть","triste","tristeza","悲伤","难过"]
+  },
+  {
+    id: "loneliness",
+    icon: "🥺",
+    label: { de: "Einsamkeit", en: "Loneliness", pl: "Samotność", ru: "Одиночество", es: "Soledad", zh: "孤独" },
+    words: ["einsam","allein","isoliert","lonely","alone","isolated","samotny","samotna","samotność","одинокий","одиночество","solo","soledad","孤独","寂寞"]
+  },
+  {
+    id: "depression",
+    icon: "🫥",
+    label: { de: "Depression", en: "Depression", pl: "Depresja", ru: "Депрессия", es: "Depresión", zh: "抑郁" },
+    words: ["depressiv","depression","depressed","depressive","depresja","depresyjny","depresyjna","депрессия","депрессивный","depresión","deprimido","抑郁","沮丧"]
+  },
+  {
+    id: "hopelessness",
+    icon: "🕳️",
+    label: { de: "Hoffnungslosigkeit", en: "Hopelessness", pl: "Beznadzieja", ru: "Безнадёжность", es: "Desesperanza", zh: "绝望" },
+    words: ["hoffnungslos","hoffnungslosigkeit","ausweglos","hopeless","hopelessness","helpless","beznadziejny","beznadzieja","безнадёжность","безысходность","desesperanza","sin esperanza","绝望","无望"]
+  },
+  {
+    id: "despair",
+    icon: "😭",
+    label: { de: "Verzweiflung", en: "Despair", pl: "Rozpacz", ru: "Отчаяние", es: "Desesperación", zh: "绝望感" },
+    words: ["verzweifelt","verzweiflung","despair","desperate","rozpacz","zrozpaczony","отчаяние","отчаянный","desesperación","desesperado","绝望感","崩溃"]
+  },
+  {
+    id: "grief",
+    icon: "🖤",
+    label: { de: "Trauer", en: "Grief", pl: "Żałoba", ru: "Горе", es: "Duelo", zh: "哀伤" },
+    words: ["trauer","trauere","verlustschmerz","grief","mourning","bereaved","żałoba","smutek po stracie","горе","скорбь","duelo","luto","哀伤","悲痛"]
+  },
+  {
+    id: "heartbreak",
+    icon: "💔",
+    label: { de: "Herzschmerz", en: "Heartbreak", pl: "Złamane serce", ru: "Разбитое сердце", es: "Corazón roto", zh: "心碎" },
+    words: ["herzschmerz","gebrochenes herz","heartbreak","heartbroken","broken heart","złamane serce","разбитое сердце","corazón roto","心碎"]
+  },
+  {
+    id: "emptiness",
+    icon: "🫙",
+    label: { de: "Leere", en: "Emptiness", pl: "Pustka", ru: "Пустота", es: "Vacío", zh: "空虚" },
+    words: ["leer","leere","innerlich leer","empty","emptiness","numb inside","pustka","pusty","пустота","пустой внутри","vacío","vacío interior","空虚","内心空荡"]
+  },
+  {
+    id: "numbness",
+    icon: "😶",
+    label: { de: "Gefühllosigkeit", en: "Numbness", pl: "Odrętwienie", ru: "Онемение", es: "Entumecimiento", zh: "麻木" },
+    words: ["gefühllos","taub","abgestumpft","numb","emotionally numb","detached","odrętwiały","odrętwienie","онемение","бесчувственный","entumecido","insensible","麻木","无感"]
+  },
+  {
+    id: "melancholy",
+    icon: "🌧️",
+    label: { de: "Melancholie", en: "Melancholy", pl: "Melancholia", ru: "Меланхолия", es: "Melancolía", zh: "忧郁" },
+    words: ["melancholie","melancholisch","melancholy","wistful","melancholia","меланхолия","melancolía","忧郁","惆怅"]
+  },
+
+  {
+    id: "fear",
+    icon: "😨",
+    label: { de: "Angst", en: "Fear", pl: "Strach", ru: "Страх", es: "Miedo", zh: "恐惧" },
+    words: ["angst","fürchte","furcht","fear","afraid","scared","strach","boję","страх","боюсь","miedo","temor","恐惧","害怕"]
+  },
+  {
+    id: "anxiety",
+    icon: "😰",
+    label: { de: "Ängstlichkeit", en: "Anxiety", pl: "Lęk", ru: "Тревога", es: "Ansiedad", zh: "焦虑" },
+    words: ["ängstlich","unsicher","sorge","anxiety","anxious","worried","lęk","lękowy","тревога","тревожный","ansiedad","ansioso","焦虑","不安"]
+  },
+  {
+    id: "panic",
+    icon: "😱",
+    label: { de: "Panik", en: "Panic", pl: "Panika", ru: "Паника", es: "Pánico", zh: "恐慌" },
+    words: ["panik","panisch","panic","panicking","panika","паника","pánico","恐慌","惊慌"]
+  },
+  {
+    id: "worry",
+    icon: "😟",
+    label: { de: "Sorge", en: "Worry", pl: "Zmartwienie", ru: "Беспокойство", es: "Preocupación", zh: "担忧" },
+    words: ["sorge","besorgt","worry","worried","concerned","zmartwienie","martwię","беспокойство","волнуюсь","preocupación","preocupado","担忧","担心"]
+  },
+  {
+    id: "terror",
+    icon: "🫨",
+    label: { de: "Entsetzen", en: "Terror", pl: "Przerażenie", ru: "Ужас", es: "Terror", zh: "惊恐" },
+    words: ["entsetzen","schockangst","terror","terrified","horrified","przerażenie","ужас","в ужасе","terror","aterrado","惊恐","吓坏"]
+  },
+  {
+    id: "insecurity",
+    icon: "🫤",
+    label: { de: "Unsicherheit", en: "Insecurity", pl: "Niepewność", ru: "Неуверенность", es: "Inseguridad", zh: "不安全感" },
+    words: ["unsicherheit","unsicher","insecurity","insecure","self-doubt","niepewność","неуверенность","inseguridad","不安全感","没安全感"]
+  },
+  {
+    id: "dread",
+    icon: "🌫️",
+    label: { de: "Beklemmung", en: "Dread", pl: "Lęk przed czymś", ru: "Тягостное ожидание", es: "Aprensión", zh: "惴惴不安" },
+    words: ["beklemmung","grauen","dread","foreboding","aprensión","apprehension","niepokój","тягостное ожидание","惴惴不安"]
+  },
+  {
+    id: "overthinking",
+    icon: "🌀",
+    label: { de: "Gedankenkreisen", en: "Overthinking", pl: "Natłok myśli", ru: "Навязчивые мысли", es: "Sobrepensar", zh: "过度思考" },
+    words: ["gedankenkreisen","grübeln","overthinking","ruminating","rumination","natłok myśli","rozmyślanie","навязчивые мысли","sobrepensar","过度思考","想太多"]
+  },
+  {
+    id: "paranoia",
+    icon: "👁️",
+    label: { de: "Paranoia", en: "Paranoia", pl: "Paranoja", ru: "Паранойя", es: "Paranoia", zh: "偏执" },
+    words: ["paranoia","paranoid","paranoja","паранойя","paranoia","偏执","疑神疑鬼"]
+  },
+  {
+    id: "suspicion",
+    icon: "🤨",
+    label: { de: "Misstrauen", en: "Suspicion", pl: "Podejrzliwość", ru: "Подозрительность", es: "Sospecha", zh: "猜疑" },
+    words: ["misstrauen","misstrauisch","suspicion","suspicious","podejrzliwość","подозрительность","sospecha","猜疑","怀疑"]
+  },
+
+  {
+    id: "anger",
+    icon: "😡",
+    label: { de: "Wut", en: "Anger", pl: "Złość", ru: "Гнев", es: "Ira", zh: "愤怒" },
+    words: ["wut","wütend","ärger","anger","angry","mad","złość","zły","гнев","злой","ira","enojado","愤怒","生气"]
+  },
+  {
+    id: "rage",
+    icon: "🤬",
+    label: { de: "Zorn", en: "Rage", pl: "Furia", ru: "Ярость", es: "Rabia", zh: "暴怒" },
+    words: ["zorn","rasend","rage","furious","fury","furia","ярость","rabia","furioso","暴怒","狂怒"]
+  },
+  {
+    id: "irritation",
+    icon: "😤",
+    label: { de: "Genervtsein", en: "Irritation", pl: "Irytacja", ru: "Раздражение", es: "Irritación", zh: "烦躁" },
+    words: ["genervt","gereizt","irritation","irritated","annoyed","irytacja","раздражение","irritación","烦躁","不耐烦"]
+  },
+  {
+    id: "frustration",
+    icon: "😣",
+    label: { de: "Frustration", en: "Frustration", pl: "Frustracja", ru: "Фрустрация", es: "Frustración", zh: "挫败" },
+    words: ["frustration","frustriert","frustrated","frustrating","frustracja","фрустрация","frustración","挫败","受挫"]
+  },
+  {
+    id: "resentment",
+    icon: "🧨",
+    label: { de: "Verbitterung", en: "Resentment", pl: "Ur aza", ru: "Обида/озлобленность", es: "Resentimiento", zh: "怨恨" },
+    words: ["verbittert","verbitterung","resentment","bitter","uraza","обида","озлобленность","resentimiento","怨恨","愤懑"]
+  },
+  {
+    id: "envy",
+    icon: "🟢",
+    label: { de: "Neid", en: "Envy", pl: "Zazdrość", ru: "Зависть", es: "Envidia", zh: "嫉妒" },
+    words: ["neid","neidisch","envy","envious","zazdrość","зависть","envidia","嫉妒"]
+  },
+  {
+    id: "jealousy",
+    icon: "💚",
+    label: { de: "Eifersucht", en: "Jealousy", pl: "Zazdrość partnerska", ru: "Ревность", es: "Celos", zh: "吃醋" },
+    words: ["eifersucht","eifersüchtig","jealous","jealousy","celos","ревность","吃醋","妒忌"]
+  },
+  {
+    id: "hatred",
+    icon: "🖤",
+    label: { de: "Hass", en: "Hatred", pl: "Nienawiść", ru: "Ненависть", es: "Odio", zh: "仇恨" },
+    words: ["hass","hasse","hatred","hate","nienawiść","ненависть","odio","仇恨"]
+  },
+  {
+    id: "bitterness",
+    icon: "🥀",
+    label: { de: "Bitterkeit", en: "Bitterness", pl: "Gorycz", ru: "Горечь", es: "Amargura", zh: "苦涩" },
+    words: ["bitterkeit","bitter","bitterness","gorycz","горечь","amargura","苦涩"]
+  },
+  {
+    id: "indignation",
+    icon: "⚡",
+    label: { de: "Empörung", en: "Indignation", pl: "Oburzenie", ru: "Возмущение", es: "Indignación", zh: "愤慨" },
+    words: ["empörung","empört","indignation","outraged","oburzenie","возмущение","indignación","愤慨"]
+  },
+
+  {
+    id: "shame",
+    icon: "😳",
+    label: { de: "Scham", en: "Shame", pl: "Wstyd", ru: "Стыд", es: "Vergüenza", zh: "羞耻" },
+    words: ["scham","schäme","peinlich","shame","ashamed","embarrassed","wstyd","стыд","vergüenza","avergonzado","羞耻","丢脸"]
+  },
+  {
+    id: "guilt",
+    icon: "😔",
+    label: { de: "Schuldgefühl", en: "Guilt", pl: "Poczucie winy", ru: "Вина", es: "Culpa", zh: "内疚" },
+    words: ["schuld","schuldig","schuldgefühl","guilt","guilty","poczucie winy","wina","вина","culpa","culpable","内疚"]
+  },
+  {
+    id: "embarrassment",
+    icon: "🫣",
+    label: { de: "Verlegenheit", en: "Embarrassment", pl: "Zakłopotanie", ru: "Смущение", es: "Vergüenza ajena", zh: "尴尬" },
+    words: ["verlegen","verlegenheit","embarrassed","embarrassment","awkward","zakłopotanie","смущение","vergüenza","尴尬"]
+  },
+  {
+    id: "humiliation",
+    icon: "🧎",
+    label: { de: "Demütigung", en: "Humiliation", pl: "Upokorzenie", ru: "Унижение", es: "Humillación", zh: "羞辱" },
+    words: ["gedemütigt","demütigung","humiliated","humiliation","upokorzenie","унижение","humillación","羞辱"]
+  },
+  {
+    id: "worthlessness",
+    icon: "🫥",
+    label: { de: "Wertlosigkeit", en: "Worthlessness", pl: "Bezwartościowość", ru: "Ничтожность", es: "Inutilidad", zh: "一无是处感" },
+    words: ["wertlos","nutzlos","worthless","useless","bezwartościowy","ничтожный","inútil","一无是处","没价值"]
+  },
+  {
+    id: "self_loathing",
+    icon: "💢",
+    label: { de: "Selbsthass", en: "Self-loathing", pl: "Nienawiść do siebie", ru: "Самоненависть", es: "Odio a uno mismo", zh: "自我厌恶" },
+    words: ["selbsthass","ich hasse mich","self-loathing","self hate","nienawiść do siebie","самоненависть","odio a mí mismo","自我厌恶"]
+  },
+  {
+    id: "regret",
+    icon: "⏳",
+    label: { de: "Reue", en: "Regret", pl: "Żal", ru: "Сожаление", es: "Arrepentimiento", zh: "后悔" },
+    words: ["reue","bereue","regret","regretful","żałuję","żal","сожаление","arrepentimiento","后悔"]
+  },
+  {
+    id: "remorse",
+    icon: "🙏",
+    label: { de: "Gewissensbiss", en: "Remorse", pl: "Wyrzuty sumienia", ru: "Раскаяние", es: "Remordimiento", zh: "自责" },
+    words: ["gewissensbisse","gewissensbiss","remorse","remorseful","wyrzuty sumienia","раскаяние","remordimiento","自责"]
+  },
+  {
+    id: "self_doubt",
+    icon: "🤷",
+    label: { de: "Selbstzweifel", en: "Self-doubt", pl: "Zwątpienie w siebie", ru: "Неуверенность в себе", es: "Duda de uno mismo", zh: "自我怀疑" },
+    words: ["selbstzweifel","zweifle an mir","self-doubt","doubt myself","zwątpienie w siebie","неуверенность в себе","duda de mí","自我怀疑"]
+  },
+  {
+    id: "inferiority",
+    icon: "📉",
+    label: { de: "Minderwertigkeit", en: "Inferiority", pl: "Niższość", ru: "Неполноценность", es: "Inferioridad", zh: "自卑" },
+    words: ["minderwertig","minderwertigkeit","inferior","inferiority","niższość","неполноценность","inferioridad","自卑"]
+  },
+
+  {
+    id: "exhaustion",
+    icon: "🥱",
+    label: { de: "Erschöpfung", en: "Exhaustion", pl: "Wyczerpanie", ru: "Истощение", es: "Agotamiento", zh: "筋疲力尽" },
+    words: ["erschöpft","erschöpfung","ausgebrannt","exhausted","exhaustion","drained","wyczerpany","wyczerpanie","истощение","agotado","agotamiento","筋疲力尽","累垮"]
+  },
+  {
+    id: "fatigue",
+    icon: "😴",
+    label: { de: "Müdigkeit", en: "Fatigue", pl: "Zmęczenie", ru: "Усталость", es: "Fatiga", zh: "疲惫" },
+    words: ["müde","müdigkeit","fatigue","tired","worn out","zmęczony","усталость","fatiga","疲惫","累"]
+  },
+  {
+    id: "burnout",
+    icon: "🔥",
+    label: { de: "Burnout", en: "Burnout", pl: "Wypalenie", ru: "Выгорание", es: "Agotamiento emocional", zh: "倦怠" },
+    words: ["burnout","ausgebrannt","burned out","wypalenie","выгорание","agotamiento emocional","倦怠"]
+  },
+  {
+    id: "stress",
+    icon: "😫",
+    label: { de: "Stress", en: "Stress", pl: "Stres", ru: "Стресс", es: "Estrés", zh: "压力" },
+    words: ["stress","gestresst","stress","stressed","stres","стресс","estrés","压力","有压力"]
+  },
+  {
+    id: "overwhelm",
+    icon: "😵‍💫",
+    label: { de: "Überforderung", en: "Overwhelm", pl: "Przytłoczenie", ru: "Перегруженность", es: "Abrumación", zh: "不堪重负" },
+    words: ["überfordert","überforderung","zu viel","overwhelmed","overwhelm","too much","przytłoczony","перегружен","abrumado","不堪重负"]
+  },
+  {
+    id: "tension",
+    icon: "🧷",
+    label: { de: "Anspannung", en: "Tension", pl: "Napięcie", ru: "Напряжение", es: "Tensión", zh: "紧张" },
+    words: ["anspannung","angespannt","tension","tense","napięcie","напряжение","tensión","紧张"]
+  },
+  {
+    id: "restlessness",
+    icon: "🏃",
+    label: { de: "Unruhe", en: "Restlessness", pl: "Niepokój ruchowy", ru: "Нервозность", es: "Inquietud", zh: "坐立不安" },
+    words: ["unruhe","ruhelos","restless","restlessness","agitated","niepokój","нервозность","inquietud","坐立不安"]
+  },
+  {
+    id: "insomnia",
+    icon: "🌙",
+    label: { de: "Schlaflosigkeit", en: "Insomnia", pl: "Bezsenność", ru: "Бессонница", es: "Insomnio", zh: "失眠" },
+    words: ["schlaflos","schlaflosigkeit","insomnia","can't sleep","bezsenność","бессонница","insomnio","失眠","睡不着"]
+  },
+  {
+    id: "brain_fog",
+    icon: "🌫️",
+    label: { de: "Benommenheit", en: "Brain fog", pl: "Mgła umysłowa", ru: "Туман в голове", es: "Niebla mental", zh: "脑雾" },
+    words: ["benommen","brain fog","foggy","mental fog","mgła umysłowa","туман в голове","niebla mental","脑雾"]
+  },
+  {
+    id: "shutdown",
+    icon: "🔌",
+    label: { de: "Abschalten", en: "Shutdown", pl: "Wyłączenie", ru: "Отключение", es: "Bloqueo", zh: "宕机感" },
+    words: ["abschalten","zu","shutdown","shut down","frozen","wyłączony","отключился","bloqueo","卡住","宕机感"]
+  },
+
+  {
+    id: "joy",
+    icon: "😊",
+    label: { de: "Freude", en: "Joy", pl: "Radość", ru: "Радость", es: "Alegría", zh: "快乐" },
+    words: ["freude","fröhlich","joy","happy","glad","radość","радость","alegría","快乐","开心"]
+  },
+  {
+    id: "hope",
+    icon: "🌤️",
+    label: { de: "Hoffnung", en: "Hope", pl: "Nadzieja", ru: "Надежда", es: "Esperanza", zh: "希望" },
+    words: ["hoffnung","hoffnungsvoll","hope","hopeful","nadzieja","надежда","esperanza","希望"]
+  },
+  {
+    id: "relief",
+    icon: "😌",
+    label: { de: "Erleichterung", en: "Relief", pl: "Ulga", ru: "Облегчение", es: "Alivio", zh: "松一口气" },
+    words: ["erleichtert","erleichterung","relief","relieved","ulga","облегчение","alivio","松一口气"]
+  },
+  {
+    id: "gratitude",
+    icon: "🙏",
+    label: { de: "Dankbarkeit", en: "Gratitude", pl: "Wdzięczność", ru: "Благодарность", es: "Gratitud", zh: "感激" },
+    words: ["dankbar","dankbarkeit","grateful","gratitude","wdzięczność","благодарность","gratitud","感激"]
+  },
+  {
+    id: "love",
+    icon: "❤️",
+    label: { de: "Liebe", en: "Love", pl: "Miłość", ru: "Любовь", es: "Amor", zh: "爱" },
+    words: ["liebe","verliebt","love","loving","miłość","любовь","amor","爱"]
+  },
+  {
+    id: "affection",
+    icon: "🤍",
+    label: { de: "Zuneigung", en: "Affection", pl: "Czułość", ru: "Нежность", es: "Cariño", zh: "关爱" },
+    words: ["zuneigung","zärtlich","affection","fondness","czułość","нежность","cariño","关爱"]
+  },
+  {
+    id: "calm",
+    icon: "🧘",
+    label: { de: "Ruhe", en: "Calm", pl: "Spokój", ru: "Спокойствие", es: "Calma", zh: "平静" },
+    words: ["ruhe","ruhig","calm","peaceful","spokój","спокойствие","calma","平静"]
+  },
+  {
+    id: "peace",
+    icon: "🕊️",
+    label: { de: "Frieden", en: "Peace", pl: "Pokój", ru: "Покой", es: "Paz", zh: "安宁" },
+    words: ["frieden","innerer frieden","peace","at peace","pokój","покой","paz","安宁"]
+  },
+  {
+    id: "contentment",
+    icon: "🙂",
+    label: { de: "Zufriedenheit", en: "Contentment", pl: "Zadowolenie", ru: "Удовлетворение", es: "Satisfacción", zh: "满足" },
+    words: ["zufrieden","zufriedenheit","content","contentment","zadowolenie","удовлетворение","satisfacción","满足"]
+  },
+  {
+    id: "optimism",
+    icon: "✨",
+    label: { de: "Optimismus", en: "Optimism", pl: "Optymizm", ru: "Оптимизм", es: "Optimismo", zh: "乐观" },
+    words: ["optimistisch","optimismus","optimistic","optimism","optymizm","оптимизм","optimismo","乐观"]
+  },
+
+  {
+    id: "confusion",
+    icon: "😕",
+    label: { de: "Verwirrung", en: "Confusion", pl: "Dezorientacja", ru: "Растерянность", es: "Confusión", zh: "困惑" },
+    words: ["verwirrt","verwirrung","confused","confusion","dezorientacja","растерянность","confusión","困惑"]
+  },
+  {
+    id: "doubt",
+    icon: "❓",
+    label: { de: "Zweifel", en: "Doubt", pl: "Wątpliwość", ru: "Сомнение", es: "Duda", zh: "怀疑" },
+    words: ["zweifel","zweifle","doubt","doubting","wątpliwość","сомнение","duda","怀疑"]
+  },
+  {
+    id: "uncertainty",
+    icon: "🌁",
+    label: { de: "Ungewissheit", en: "Uncertainty", pl: "Niepewność", ru: "Неопределённость", es: "Incertidumbre", zh: "不确定" },
+    words: ["ungewiss","ungewissheit","uncertain","uncertainty","niepewność","неопределённость","incertidumbre","不确定"]
+  },
+  {
+    id: "disappointment",
+    icon: "😞",
+    label: { de: "Enttäuschung", en: "Disappointment", pl: "Rozczarowanie", ru: "Разочарование", es: "Decepción", zh: "失望" },
+    words: ["enttäuscht","enttäuschung","disappointed","disappointment","rozczarowanie","разочарование","decepción","失望"]
+  },
+  {
+    id: "hurt",
+    icon: "🩹",
+    label: { de: "Verletztheit", en: "Hurt", pl: "Zranienie", ru: "Обида", es: "Dolor emocional", zh: "受伤" },
+    words: ["verletzt","verletztheit","hurt","hurt feelings","zraniony","обида","dolor emocional","受伤","心里受伤"]
+  },
+  {
+    id: "betrayal",
+    icon: "🗡️",
+    label: { de: "Verrat", en: "Betrayal", pl: "Zdrada", ru: "Предательство", es: "Traición", zh: "背叛" },
+    words: ["verrat","betrogen","betrayal","betrayed","zdrada","предательство","traición","背叛"]
+  },
+  {
+    id: "rejection",
+    icon: "🚪",
+    label: { de: "Zurückweisung", en: "Rejection", pl: "Odrzucenie", ru: "Отвержение", es: "Rechazo", zh: "被拒绝" },
+    words: ["zurückgewiesen","zurückweisung","rejection","rejected","odrzucenie","отвержение","rechazo","被拒绝"]
+  },
+  {
+    id: "abandonment",
+    icon: "🧍‍♀️",
+    label: { de: "Verlassenheit", en: "Abandonment", pl: "Opuszczenie", ru: "Покинутость", es: "Abandono", zh: "被抛弃感" },
+    words: ["verlassenheit","verlassen","abandonment","abandoned","opuszczenie","покинутость","abandono","被抛弃"]
+  },
+  {
+    id: "misunderstood",
+    icon: "🫥",
+    label: { de: "Unverstanden", en: "Misunderstood", pl: "Niezrozumienie", ru: "Непонятость", es: "Incomprensión", zh: "不被理解" },
+    words: ["missverstanden","unverstanden","misunderstood","not understood","niezrozumiana","niezrozumiany","непонятый","incomprendido","不被理解"]
+  },
+  {
+    id: "alienation",
+    icon: "👽",
+    label: { de: "Entfremdung", en: "Alienation", pl: "Wyobcowanie", ru: "Отчуждение", es: "Alienación", zh: "疏离" },
+    words: ["entfremdet","entfremdung","alienated","alienation","wyobcowanie","отчуждение","alienación","疏离"]
+  },
+
+  {
+    id: "motivation",
+    icon: "🚀",
+    label: { de: "Motivation", en: "Motivation", pl: "Motywacja", ru: "Мотивация", es: "Motivación", zh: "动力" },
+    words: ["motiviert","motivation","motivated","motivation","motywacja","мотивация","motivación","动力"]
+  },
+  {
+    id: "determination",
+    icon: "💪",
+    label: { de: "Entschlossenheit", en: "Determination", pl: "Determinacja", ru: "Решимость", es: "Determinación", zh: "决心" },
+    words: ["entschlossen","entschlossenheit","determined","determination","determinacja","решимость","determinación","决心"]
+  },
+  {
+    id: "confidence",
+    icon: "😎",
+    label: { de: "Selbstvertrauen", en: "Confidence", pl: "Pewność siebie", ru: "Уверенность", es: "Confianza", zh: "自信" },
+    words: ["selbstvertrauen","selbstsicher","confidence","confident","pewność siebie","уверенность","confianza","自信"]
+  },
+  {
+    id: "pride",
+    icon: "🏅",
+    label: { de: "Stolz", en: "Pride", pl: "Duma", ru: "Гордость", es: "Orgullo", zh: "自豪" },
+    words: ["stolz","pride","proud","duma","гордость","orgullo","自豪"]
+  },
+  {
+    id: "courage",
+    icon: "🛡️",
+    label: { de: "Mut", en: "Courage", pl: "Odwaga", ru: "Мужество", es: "Valentía", zh: "勇气" },
+    words: ["mut","mutig","courage","brave","odwaga","мужество","valentía","勇气"]
+  },
+  {
+    id: "curiosity",
+    icon: "🔍",
+    label: { de: "Neugier", en: "Curiosity", pl: "Ciekawość", ru: "Любопытство", es: "Curiosidad", zh: "好奇" },
+    words: ["neugier","neugierig","curious","curiosity","ciekawość","любопытство","curiosidad","好奇"]
+  },
+  {
+    id: "surprise",
+    icon: "😲",
+    label: { de: "Überraschung", en: "Surprise", pl: "Zaskoczenie", ru: "Удивление", es: "Sorpresa", zh: "惊讶" },
+    words: ["überrascht","überraschung","surprised","surprise","zaskoczenie","удивление","sorpresa","惊讶"]
+  },
+  {
+    id: "awe",
+    icon: "🤩",
+    label: { de: "Ehrfurcht", en: "Awe", pl: "Zachwyt", ru: "Благоговение", es: "Asombro", zh: "敬畏" },
+    words: ["ehrfurcht","staunen","awe","awed","zachwyt","благоговение","asombro","敬畏"]
+  },
+  {
+    id: "inspiration",
+    icon: "💡",
+    label: { de: "Inspiration", en: "Inspiration", pl: "Inspiracja", ru: "Вдохновение", es: "Inspiración", zh: "灵感" },
+    words: ["inspiriert","inspiration","inspired","inspiration","inspiracja","вдохновение","inspiración","灵感"]
+  },
+  {
+    id: "creativity",
+    icon: "🎨",
+    label: { de: "Kreativität", en: "Creativity", pl: "Kreatywność", ru: "Творчество", es: "Creatividad", zh: "创造力" },
+    words: ["kreativ","kreativität","creative","creativity","kreatywność","творчество","creatividad","创造力"]
+  },
+
+  {
+    id: "love_need",
+    icon: "🤲",
+    label: { de: "Bedürfnis nach Nähe", en: "Need for closeness", pl: "Potrzeba bliskości", ru: "Потребность в близости", es: "Necesidad de cercanía", zh: "渴望亲近" },
+    words: ["nähe","sehne mich nach nähe","need closeness","need affection","bliskość","близость","cercanía","渴望亲近"]
+  },
+  {
+    id: "validation_need",
+    icon: "🪞",
+    label: { de: "Bedürfnis nach Bestätigung", en: "Need for validation", pl: "Potrzeba uznania", ru: "Потребность в признании", es: "Necesidad de validación", zh: "渴望被认可" },
+    words: ["bestätigung","anerkennung","validation","validated","uznanie","признание","validación","被认可"]
+  },
+  {
+    id: "security_need",
+    icon: "🏠",
+    label: { de: "Bedürfnis nach Sicherheit", en: "Need for safety", pl: "Potrzeba bezpieczeństwa", ru: "Потребность в безопасности", es: "Necesidad de seguridad", zh: "需要安全感" },
+    words: ["sicherheit","geborgenheit","need safety","safe","bezpieczeństwo","безопасность","seguridad","安全感"]
+  },
+  {
+    id: "control_need",
+    icon: "🎛️",
+    label: { de: "Bedürfnis nach Kontrolle", en: "Need for control", pl: "Potrzeba kontroli", ru: "Потребность в контроле", es: "Necesidad de control", zh: "需要掌控" },
+    words: ["kontrolle","kontrollverlust","need control","out of control","kontrola","контроль","control","掌控","失控"]
+  },
+  {
+    id: "freedom_need",
+    icon: "🕊️",
+    label: { de: "Bedürfnis nach Freiheit", en: "Need for freedom", pl: "Potrzeba wolności", ru: "Потребность в свободе", es: "Necesidad de libertad", zh: "渴望自由" },
+    words: ["freiheit","eingeengt","need freedom","trapped","wolność","свобода","libertad","自由","被困住"]
+  },
+  {
+    id: "rest_need",
+    icon: "🛏️",
+    label: { de: "Bedürfnis nach Ruhe", en: "Need for rest", pl: "Potrzeba odpoczynku", ru: "Потребность в отдыхе", es: "Necesidad de descanso", zh: "需要休息" },
+    words: ["ruhe brauchen","pause","need rest","need a break","odpoczynek","отдых","descanso","需要休息"]
+  },
+  {
+    id: "connection_need",
+    icon: "🔗",
+    label: { de: "Bedürfnis nach Verbindung", en: "Need for connection", pl: "Potrzeba kontaktu", ru: "Потребность в связи", es: "Necesidad de conexión", zh: "需要联结" },
+    words: ["verbindung","kontakt","need connection","need support","kontakt","связь","conexión","联结"]
+  },
+  {
+    id: "belonging_need",
+    icon: "👥",
+    label: { de: "Bedürfnis nach Zugehörigkeit", en: "Need for belonging", pl: "Potrzeba przynależności", ru: "Потребность в принадлежности", es: "Necesidad de pertenencia", zh: "需要归属感" },
+    words: ["zugehörigkeit","dazugehören","belonging","need to belong","przynależność","принадлежность","pertenencia","归属感"]
+  },
+  {
+    id: "understanding_need",
+    icon: "🫂",
+    label: { de: "Bedürfnis verstanden zu werden", en: "Need to be understood", pl: "Potrzeba bycia zrozumianym", ru: "Потребность быть понятым", es: "Necesidad de ser comprendido", zh: "需要被理解" },
+    words: ["verstanden werden","misunderstood","need understanding","zrozumiana","понятым","comprendido","被理解"]
+  },
+  {
+    id: "purpose_need",
+    icon: "🧭",
+    label: { de: "Sinnsuche", en: "Need for purpose", pl: "Potrzeba sensu", ru: "Потребность в смысле", es: "Necesidad de sentido", zh: "需要意义感" },
+    words: ["sinnlos","sinnsuche","purpose","meaning","sens","смысл","sentido","意义感"]
+  },
+
+  {
+    id: "helplessness",
+    icon: "🫳",
+    label: { de: "Hilflosigkeit", en: "Helplessness", pl: "Bezradność", ru: "Беспомощность", es: "Impotencia", zh: "无助" },
+    words: ["hilflos","hilflosigkeit","helpless","helplessness","bezradność","беспомощность","impotencia","无助"]
+  },
+  {
+    id: "powerlessness",
+    icon: "🔒",
+    label: { de: "Ohnmacht", en: "Powerlessness", pl: "Bezsilność", ru: "Бессилие", es: "Impotencia profunda", zh: "无力感" },
+    words: ["ohnmacht","machtlos","powerless","powerlessness","bezsilność","бессилие","impotencia","无力感"]
+  },
+  {
+    id: "withdrawal",
+    icon: "🚷",
+    label: { de: "Rückzug", en: "Withdrawal", pl: "Wycofanie", ru: "Отстранение", es: "Retraimiento", zh: "退缩" },
+    words: ["rückzug","ziehe mich zurück","withdrawal","withdrawing","wycofanie","отстранение","retraimiento","退缩"]
+  },
+  {
+    id: "avoidance",
+    icon: "🙈",
+    label: { de: "Vermeidung", en: "Avoidance", pl: "Unikanie", ru: "Избегание", es: "Evitación", zh: "回避" },
+    words: ["vermeidung","vermeide","avoidance","avoiding","unikanie","избегание","evitación","回避"]
+  },
+  {
+    id: "freeze",
+    icon: "🧊",
+    label: { de: "Erstarrung", en: "Freeze", pl: "Zamrożenie", ru: "Ступор", es: "Parálisis", zh: "僵住" },
+    words: ["erstarrt","erstarrung","freeze","frozen","zamrożenie","ступор","parálisis","僵住"]
+  },
+  {
+    id: "dissociation",
+    icon: "🫥",
+    label: { de: "Dissoziation", en: "Dissociation", pl: "Dysocjacja", ru: "Диссоциация", es: "Disociación", zh: "解离" },
+    words: ["dissoziation","wie neben mir","dissociation","detached from myself","dysocjacja","диссоциация","disociación","解离"]
+  },
+  {
+    id: "rejection_sensitivity",
+    icon: "📡",
+    label: { de: "Zurückweisungssensibilität", en: "Rejection sensitivity", pl: "Wrażliwość na odrzucenie", ru: "Чувствительность к отвержению", es: "Sensibilidad al rechazo", zh: "拒绝敏感" },
+    words: ["zurückweisung","rejection sensitive","wrażliwość na odrzucenie","чувствительность к отвержению","sensibilidad al rechazo","拒绝敏感"]
+  },
+  {
+    id: "attachment_fear",
+    icon: "🪢",
+    label: { de: "Bindungsangst", en: "Fear of attachment", pl: "Lęk przed bliskością", ru: "Страх близости", es: "Miedo al apego", zh: "害怕亲密" },
+    words: ["bindungsangst","angst vor nähe","fear of attachment","fear of intimacy","lęk przed bliskością","страх близости","miedo al apego","害怕亲密"]
+  },
+  {
+    id: "abandonment_fear",
+    icon: "🚶",
+    label: { de: "Verlustangst", en: "Fear of abandonment", pl: "Lęk przed porzuceniem", ru: "Страх быть брошенным", es: "Miedo al abandono", zh: "害怕被抛弃" },
+    words: ["verlustangst","angst verlassen zu werden","fear of abandonment","lęk przed porzuceniem","страх быть брошенным","miedo al abandono","害怕被抛弃"]
+  },
+  {
+    id: "people_pleasing",
+    icon: "🙇",
+    label: { de: "Anpassung", en: "People-pleasing", pl: "Uleganie", ru: "Угодничество", es: "Complacer a todos", zh: "讨好" },
+    words: ["anpassen","allen recht machen","people pleasing","people-pleaser","uleganie","угодничество","complacer a todos","讨好"]
+  },
+
+  {
+    id: "resignation",
+    icon: "🪫",
+    label: { de: "Resignation", en: "Resignation", pl: "Rezygnacja", ru: "Смирение/опущенные руки", es: "Resignación", zh: "认命" },
+    words: ["resignation","resigniert","resigned","giving up","rezygnacja","опустились руки","resignación","认命"]
+  },
+  {
+    id: "surrender",
+    icon: "🏳️",
+    label: { de: "Aufgabe", en: "Surrender", pl: "Poddanie się", ru: "Сдача", es: "Rendición", zh: "放弃抵抗" },
+    words: ["aufgeben","aufgabe","surrender","give up","poddanie się","сдача","rendición","放弃抵抗"]
+  },
+  {
+    id: "vulnerability",
+    icon: "🫀",
+    label: { de: "Verletzlichkeit", en: "Vulnerability", pl: "Wrażliwość", ru: "Уязвимость", es: "Vulnerabilidad", zh: "脆弱" },
+    words: ["verletzlich","verletzlichkeit","vulnerable","vulnerability","wrażliwość","уязвимость","vulnerabilidad","脆弱"]
+  },
+  {
+    id: "tenderness",
+    icon: "🌸",
+    label: { de: "Sanftheit", en: "Tenderness", pl: "Delikatność", ru: "Нежность", es: "Ternura", zh: "温柔" },
+    words: ["sanft","zart","tender","tenderness","delikatność","нежность","ternura","温柔"]
+  },
+  {
+    id: "compassion",
+    icon: "🤲",
+    label: { de: "Mitgefühl", en: "Compassion", pl: "Współczucie", ru: "Сострадание", es: "Compasión", zh: "同情/慈悲" },
+    words: ["mitgefühl","compassion","compassionate","współczucie","сострадание","compasión","同情","慈悲"]
+  },
+  {
+    id: "self_compassion",
+    icon: "🤍",
+    label: { de: "Selbstmitgefühl", en: "Self-compassion", pl: "Współczucie dla siebie", ru: "Самосострадание", es: "Autocompasión", zh: "自我慈悲" },
+    words: ["selbstmitgefühl","self compassion","be kind to myself","самосострадание","autocompasión","自我慈悲"]
+  },
+  {
+    id: "acceptance",
+    icon: "🌿",
+    label: { de: "Akzeptanz", en: "Acceptance", pl: "Akceptacja", ru: "Принятие", es: "Aceptación", zh: "接纳" },
+    words: ["akzeptanz","akzeptiere","acceptance","accepting","akceptacja","принятие","aceptación","接纳"]
+  },
+  {
+    id: "forgiveness",
+    icon: "🕊️",
+    label: { de: "Vergebung", en: "Forgiveness", pl: "Przebaczenie", ru: "Прощение", es: "Perdón", zh: "原谅" },
+    words: ["vergebung","verzeihen","forgive","forgiveness","przebaczenie","прощение","perdón","原谅"]
+  },
+  {
+    id: "trust",
+    icon: "🤝",
+    label: { de: "Vertrauen", en: "Trust", pl: "Zaufanie", ru: "Доверие", es: "Confianza", zh: "信任" },
+    words: ["vertrauen","vertraue","trust","trusting","zaufanie","доверие","confianza","信任"]
+  },
+  {
+    id: "mistrust",
+    icon: "🚫🤝",
+    label: { de: "Misstrauen", en: "Mistrust", pl: "Brak zaufania", ru: "Недоверие", es: "Desconfianza", zh: "不信任" },
+    words: ["misstrauen","mistrust","distrust","brak zaufania","недоверие","desconfianza","不信任"]
+  }
 ];
 
-  const found = emotionMap.filter(e =>
-    e.words.some(word => t.includes(word))
-  );
+const scoreMap = new Map();
 
-  return found.slice(0, 5);
+for (const emotion of emotionMap) {
+  let score = 0;
+
+  for (const word of emotion.words) {
+    if (!word) continue;
+
+    if (t.includes(word.toLowerCase())) {
+      score += 2;
+    }
+
+    const pattern = new RegExp(`(^|\\s)${word}($|\\s)`, "i");
+    if (pattern.test(t)) {
+      score += 2;
+    }
+  }
+
+  if (score > 0) {
+    scoreMap.set(emotion.id, {
+      ...emotion,
+      score
+    });
+  }
+}
+
+return Array.from(scoreMap.values())
+  .sort((a,b)=>b.score-a.score)
+  .slice(0,8); 
 }
   // FOCUS actions
   el("focusRun").onclick = async ()=>{
@@ -1363,7 +2049,7 @@ const emotionBox = document.getElementById("focusEmotionBox");
 
 if (emotionBox) {
   emotionBox.innerHTML = emotions.length
-  ? emotions.map(e => `<span class="emotionTag">${e.icon} ${e.key}</span>`).join("")
+  ? emotions.map(e => `<span class="emotionTag">${e.icon} ${e.label?.[state.lang] || e.id}</span>`).join("")
   : '<span class="muted">' + t("noEmotions") + '</span>';
 }
     if(!text) return;
