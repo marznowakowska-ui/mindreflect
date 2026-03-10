@@ -18,8 +18,8 @@ const replyLanguage = languageMap[lang] || "German";
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "gpt-4.1",
-        max_output_tokens: 3000,
+        model: "gpt-4.1-mini",
+        max_output_tokens: 600,
         input: `Analyze the following text with deep psychological reflection.
 
 Write the analysis with empathy and psychological depth.
