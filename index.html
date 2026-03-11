@@ -40,6 +40,32 @@
 box-sizing:border-box;
 }
     [data-theme="light"]{
+      [data-theme="light"] .topbar,
+[data-theme="light"] .card,
+[data-theme="light"] .bottomNav .bar{
+  background: rgba(255,255,255,.92);
+  border-color: rgba(0,0,0,.10);
+}
+
+[data-theme="light"] .output,
+[data-theme="light"] #resultOutput,
+[data-theme="light"] #focusOutput,
+[data-theme="light"] #cbtOutput,
+[data-theme="light"] textarea,
+[data-theme="light"] input{
+  color: #101323;
+  background: #ffffff;
+}
+
+[data-theme="light"] .muted,
+[data-theme="light"] small{
+  color: #54607a;
+}
+
+[data-theme="light"] .emotionTag{
+  color: #101323;
+}
+
       --bg:#f6f7fb;
       --surface:#ffffff;
       --surface2:#f1f3fb;
@@ -56,7 +82,6 @@ box-sizing:border-box;
     *{ box-sizing:border-box; }
     body{
       overflow-x:hidden;
-    }
       margin:0;
       font-family:"DM Sans",system-ui,-apple-system,Segoe UI,Roboto,Arial;
       background: radial-gradient(900px 500px at 15% -10%, rgba(124,159,255,.20), transparent 55%),
@@ -69,7 +94,7 @@ box-sizing:border-box;
     .app{
       max-width: 1100px;
       margin: 0 auto;
-      padding: 18px 14px 90px;
+      padding: 18px 14px 140px;
     }
 
     header{
@@ -271,8 +296,8 @@ box-sizing:border-box;
 
 #resultOutput{
   min-height:260px;
-  max-height:520px;
-  overflow-y:auto;
+  max-height:none;
+  overflow:visible;
   padding:12px;
   border-radius:14px;
   background:rgba(255,255,255,0.03);
