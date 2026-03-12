@@ -211,7 +211,7 @@ box-sizing:border-box;
       gap: 14px;
       margin-top: 14px;
     }
-  @media (max-width:900px){
+ @media (max-width:900px){
 
   .grid{
     grid-template-columns:1fr;
@@ -219,6 +219,7 @@ box-sizing:border-box;
 
   .topbar{
     display:block;
+    overflow:visible;
   }
 
   .brand{
@@ -229,10 +230,21 @@ box-sizing:border-box;
 
   .langSwitch{
     width:100%;
+    box-sizing:border-box;
+    padding:0 8px;
     display:grid;
     grid-template-columns:repeat(2, minmax(0, 1fr));
     gap:8px;
     margin-bottom:8px;
+    overflow:visible;
+  }
+
+  .langSwitch > *{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    box-sizing:border-box;
+    margin:0 !important;
   }
 
   .langSwitch .btn{
@@ -243,24 +255,22 @@ box-sizing:border-box;
     font-size:14px;
   }
 
-  .langSwitch > *{
-    min-width:0;
-  }
-
   .topbar > .btn,
   .topbar > button{
     display:inline-flex;
     margin-top:6px;
-    margin-right:8px;
+    margin-left:8px;
     padding:8px 10px;
     font-size:14px;
     white-space:nowrap;
+    max-width:calc(100% - 16px);
   }
 
   #resultOutput{
     min-height:320px;
   }
 }
+
     .sectionTitle{
       display:flex;
       align-items:center;
