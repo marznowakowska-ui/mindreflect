@@ -1212,19 +1212,6 @@ pill.innerHTML = "";
       pill.appendChild(b);
     });
   
-  const loginBtn = document.createElement("button");
-
-if (window.netlifyIdentity && netlifyIdentity.currentUser()) {
-  loginBtn.textContent = "Logout";
-  loginBtn.onclick = () => netlifyIdentity.logout();
-} else {
-  loginBtn.textContent = "Login";
-  loginBtn.onclick = () => netlifyIdentity.open();
-}
-
-pill.appendChild(loginBtn);
-}
-
   function setScreen(screen){
     state.screen = screen;
     localStorage.setItem("mr_screen", screen);
