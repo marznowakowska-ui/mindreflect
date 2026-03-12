@@ -220,6 +220,8 @@ box-sizing:border-box;
   .topbar{
     display:block !important;
     overflow:visible !important;
+    padding-left:8px !important;
+    padding-right:8px !important;
   }
 
   .brand{
@@ -228,31 +230,33 @@ box-sizing:border-box;
     margin-bottom:10px !important;
   }
 
-  .langSwitch{
+  .topbar .langSwitch{
     width:100% !important;
-    box-sizing:border-box !important;
-    padding:0 8px !important;
     display:grid !important;
     grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
     gap:8px !important;
-    margin-bottom:8px !important;
-    overflow:visible !important;
+    padding:0 !important;
+    margin:0 0 8px 0 !important;
+    box-sizing:border-box !important;
   }
 
-  .langSwitch > *{
+  .topbar .langSwitch > *{
     width:100% !important;
     max-width:100% !important;
     min-width:0 !important;
-    box-sizing:border-box !important;
     margin:0 !important;
+    box-sizing:border-box !important;
   }
 
-  .langSwitch .btn{
+  .topbar .langSwitch .btn,
+  .topbar .langSwitch button{
     width:100% !important;
     min-width:0 !important;
+    margin:0 !important;
     text-align:center !important;
     padding:8px 0 !important;
     font-size:14px !important;
+    box-sizing:border-box !important;
   }
 
   .topbar > .btn,
