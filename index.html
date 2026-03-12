@@ -211,23 +211,34 @@ box-sizing:border-box;
       gap: 14px;
       margin-top: 14px;
     }
-    @media(max-width: 900px){
-      .grid{ grid-template-columns: 1fr; }
-    }
-  @media (max-width:900px){
+   @media (max-width:900px){
+  .grid{
+    grid-template-columns:1fr;
+  }
 
-  .header{
-    flex-direction:column;
+  .topbar{
+    display:flex;
+    flex-wrap:wrap;
     align-items:center;
+    gap:10px;
+  }
+
+  .brand{
     width:100%;
+    min-width:0;
   }
 
   .langSwitch{
-    flex-wrap:wrap;
-    justify-content:center;
     width:100%;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:flex-start;
+    gap:8px;
   }
 
+  #resultOutput{
+    min-height:320px;
+  }
 }
 
     .sectionTitle{
@@ -295,13 +306,15 @@ box-sizing:border-box;
 /* Analyse Panel */
 
 #resultOutput{
-  min-height:260px;
+  min-height:420px;
   max-height:none;
   overflow:visible;
-  padding:12px;
+  padding:16px;
   border-radius:14px;
   background:rgba(255,255,255,0.03);
   border:1px solid rgba(255,255,255,0.07);
+  line-height:1.7;
+  white-space:pre-wrap;
 }
 
 /* Analyse Blöcke */
@@ -2356,9 +2369,18 @@ if (emotionBox) {
   const result = document.getElementById("resultOutput");
 const hint = document.getElementById("noAnalysisText");
 
-if (result && hint && result.innerText.trim().length > 0) {
-  hint.style.display = "none";
+function toggleNoAnalysisHint(){
+  if (!result || !hint) return;
+  hint.style.display = result.innerText.trim().length > 0 ? "none" : "block";
 }
+
+toggleNoAnalysisHint();
+
+if (result) {
+  const observer = new MutationObserver(toggleNoAnalysisHint);
+  observer.observe(result, { childList: true, subtree: true, characterData: true });
+}
+
   function formatAnalysis(text){
 
 const parts = text.match(/\d+\.\s[\s\S]*?(?=\n\d+\.\s|$)/g) || [];
