@@ -229,12 +229,20 @@ box-sizing:border-box;
   }
 
   .langSwitch{
-    width:100%;
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:flex-start;
-    gap:8px;
-  }
+  flex:1 1 auto;
+  min-width:0;
+  width:auto;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-start;
+  gap:8px;
+}
+
+.topbar > .btn,
+.topbar > button{
+  flex:0 0 auto;
+}
+
 
   #resultOutput{
     min-height:320px;
