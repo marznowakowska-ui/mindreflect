@@ -214,6 +214,11 @@ box-sizing:border-box;
       gap: 14px;
       margin-top: 14px;
     }
+    .topbarActions{
+  display:flex;
+  gap:8px;
+  margin-top:8px;
+}
  @media (max-width:900px){
 
   .grid{
@@ -232,6 +237,20 @@ box-sizing:border-box;
     min-width:0 !important;
     margin-bottom:10px !important;
   }
+
+.controls{
+  width:100% !important;
+  display:block !important;
+}
+
+#langPill{
+  width:100%;
+  margin-bottom:8px;
+}
+
+.topbarActions{
+  width:100% !important;
+}
 
   .topbar .langSwitch{
     width:100% !important;
@@ -633,13 +652,15 @@ box-sizing:border-box;
           </div>
         </div>
 
-        <div class="controls">
-          <div class="pill" id="langPill"></div>
+      <div class="controls">
 
-          <div class="pill">
-            <button class="btn ghost" id="themeBtn">🌙</button>
-          </div>
-        </div>
+  <div class="pill" id="langPill"></div>
+
+  <div class="topbarActions">
+    <button class="btn ghost" id="themeBtn">🌙</button>
+  </div>
+
+</div>
       </div>
     </header>
 
