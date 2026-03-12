@@ -2353,6 +2353,12 @@ if (emotionBox) {
  
  loadEntries();
  renderHistory();
+  const result = document.getElementById("resultOutput");
+const hint = document.getElementById("noAnalysisText");
+
+if (result && hint && result.innerText.trim().length > 0) {
+  hint.style.display = "none";
+}
   function formatAnalysis(text){
 
 const parts = text.match(/\d+\.\s[\s\S]*?(?=\n\d+\.\s|$)/g) || [];
