@@ -1,0 +1,2476 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+  <title>MindReflect</title>
+<link rel="icon" href="data:,">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0f0f14" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- PDF Export -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#0f0f14;
+      --surface:#17171f;
+      --surface2:#1e1e28;
+      --border: rgba(255,255,255,.10);
+      --text:#e8e8f0;
+      --muted:#a8a8b6;
+      --accent:#7c9fff;
+      --accent2:#b89dff;
+      --ok:#6fcf97;
+      --warn:#f2c94c;
+      --danger:#ff6b6b;
+
+      --radius: 18px;
+      --shadow: 0 18px 55px rgba(0,0,0,.35);
+      --glass: rgba(255,255,255,.06);
+      --glass2: rgba(255,255,255,.10);
+    }
+*{
+box-sizing:border-box;
+}
+    [data-theme="light"]{
+      [data-theme="light"] .topbar,
+[data-theme="light"] .card,
+[data-theme="light"] .bottomNav .bar{
+  background: rgba(255,255,255,.92);
+  border-color: rgba(0,0,0,.10);
+}
+
+[data-theme="light"] .output,
+[data-theme="light"] #resultOutput,
+[data-theme="light"] #focusOutput,
+[data-theme="light"] #cbtOutput,
+[data-theme="light"] textarea,
+[data-theme="light"] input{
+  color: #101323;
+  background: #ffffff;
+}
+
+[data-theme="light"] .muted,
+[data-theme="light"] small{
+  color: #54607a;
+}
+
+[data-theme="light"] .emotionTag{
+  color: #101323;
+}
+
+      --bg:#f6f7fb;
+      --surface:#ffffff;
+      --surface2:#f1f3fb;
+      --border: rgba(0,0,0,.10);
+      --text:#101323;
+      --muted:#54607a;
+      --accent:#2f6bff;
+      --accent2:#7a4cff;
+      --shadow: 0 18px 55px rgba(10,15,30,.12);
+      --glass: rgba(0,0,0,.04);
+      --glass2: rgba(0,0,0,.06);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      overflow-x:hidden;
+      margin:0;
+      font-family:"DM Sans",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background: radial-gradient(900px 500px at 15% -10%, rgba(124,159,255,.20), transparent 55%),
+                  radial-gradient(900px 500px at 85% 0%, rgba(184,157,255,.16), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    .app{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px 14px 140px;
+    }
+
+    header{
+  position: sticky;
+  top:0;
+  z-index: 30;
+  backdrop-filter: blur(12px);
+  background: linear-gradient(to bottom, rgba(0,0,0,.35), transparent);
+  padding: 14px 0 10px;
+  max-width:100%;
+  overflow:hidden;
+}
+
+    [data-theme="light"] header{
+      background: linear-gradient(to bottom, rgba(246,247,251,.85), rgba(246,247,251,.35), transparent);
+    }
+
+    .topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding: 8px 10px;
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--glass);
+  box-shadow: var(--shadow);
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  flex-wrap:wrap;
+}
+
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+    .logo{
+      width:42px;height:42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(124,159,255,.35), rgba(184,157,255,.25));
+      border: 1px solid var(--border);
+      display:grid; place-items:center;
+      font-weight:800;
+      color: var(--text);
+    }
+    .title{
+      line-height:1.05;
+    }
+    .title h1{
+      margin:0;
+      font-family:"Playfair Display",serif;
+      font-weight:700;
+      letter-spacing:.2px;
+      font-size: 22px;
+    }
+    .title p{
+      margin:2px 0 0;
+      color:var(--muted);
+      font-size: 12px;
+    }
+
+    .controls{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      display:flex;
+      gap:6px;
+      padding: 6px;
+      border:1px solid var(--border);
+      border-radius: 999px;
+      background: var(--glass);
+    }
+    .btn{
+      border:1px solid var(--border);
+      background: var(--glass2);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 999px;
+      cursor:pointer;
+      font-weight:600;
+      transition: transform .08s ease, background .15s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:hover{ transform: translateY(-1px); }
+    .btn.active{
+      background: linear-gradient(135deg, rgba(124,159,255,.35), rgba(184,157,255,.25));
+      border-color: rgba(124,159,255,.35);
+    }
+    .btn.ghost{
+      background: transparent;
+    }
+
+    .card{
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, var(--glass), rgba(255,255,255,.03));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .topbarActions{
+  display:flex;
+  gap:8px;
+  margin-top:8px;
+}
+ @media (max-width:900px){
+
+  .grid{
+    grid-template-columns:1fr !important;
+  }
+
+  .topbar{
+    display:block !important;
+    overflow:visible !important;
+    padding-left:8px !important;
+    padding-right:8px !important;
+  }
+
+  .brand{
+    width:100% !important;
+    min-width:0 !important;
+    margin-bottom:10px !important;
+  }
+
+.controls{
+  width:100% !important;
+  display:block !important;
+}
+
+#langPill{
+  width:100%;
+  margin-bottom:8px;
+}
+
+.topbarActions{
+  width:100% !important;
+}
+
+  .topbar .langSwitch{
+    width:100% !important;
+    display:grid !important;
+    grid-template-columns:repeat(auto-fit, minmax(70px, 1fr)) !important;
+    gap:8px !important;
+    padding:0 !important;
+    margin:0 0 8px 0 !important;
+    box-sizing:border-box !important;
+  }
+
+  .topbar .langSwitch > *{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    box-sizing:border-box !important;
+  }
+
+  .topbar .langSwitch .btn,
+  .topbar .langSwitch button{
+    width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    text-align:center !important;
+    padding:8px 0 !important;
+    font-size:14px !important;
+    box-sizing:border-box !important;
+  }
+
+   .topbarActions{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+  margin-top:8px !important;
+}
+
+  .topbar > .btn,
+  .topbar > button{
+    display:inline-flex !important;
+    margin-top:6px !important;
+    margin-right:8px !important;
+    margin-left:0 !important;
+    padding:8px 10px !important;
+    font-size:14px !important;
+    white-space:nowrap !important;
+  }
+
+  #resultOutput{
+    min-height:320px !important;
+  }
+}
+    .sectionTitle{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
+    }
+    .sectionTitle h2{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:.2px;
+    }
+    .sectionTitle small{
+      color: var(--muted);
+    }
+
+    .tabs{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top: 12px;
+    }
+
+    .moduleGrid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    @media(max-width: 900px){
+      .moduleGrid{ grid-template-columns: repeat(2, 1fr); }
+    }
+    @media(max-width: 420px){
+      .moduleGrid{ grid-template-columns: 1fr; }
+    }
+
+    .tile{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      border-radius: 16px;
+      padding: 12px;
+      cursor:pointer;
+      transition: transform .08s ease, background .15s ease;
+      min-height: 92px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+    .tile:hover{ transform: translateY(-1px); background: rgba(255,255,255,.06); }
+    .tile.active{
+      background: linear-gradient(135deg, rgba(124,159,255,.25), rgba(184,157,255,.18));
+      border-color: rgba(124,159,255,.35);
+    }
+    .tile .name{
+      font-weight:800;
+      font-size: 14px;
+    }
+    .tile .desc{
+      color: var(--muted);
+      font-size: 12px;
+      line-height:1.25;
+      margin-top: 6px;
+    }
+/* Analyse Panel */
+
+#resultOutput{
+  min-height:420px;
+  max-height:none;
+  overflow:visible;
+  padding:16px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.07);
+  line-height:1.7;
+  white-space:pre-wrap;
+}
+
+/* Analyse Blöcke */
+
+.analysisBlock{
+  background: rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:12px;
+}
+
+.analysisBlock h3{
+  margin:0 0 8px 0;
+  font-size:15px;
+  color:#fff;
+}
+
+.analysisBlock p{
+  line-height:1.5;
+}
+    .emotionWrap{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:8px 0 14px 0;
+}
+
+.emotionTag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(124,159,255,0.14);
+  border:1px solid rgba(124,159,255,0.28);
+  color:#e8e8f0;
+  font-size:12px;
+  font-weight:700;
+}
+
+.emotionTitle{
+  margin:0 0 8px 0;
+  font-size:14px;
+  color:#fff;
+}
+    .emotionWrap{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:8px 0 14px 0;
+}
+
+.emotionTag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(124,159,255,0.14);
+  border:1px solid rgba(124,159,255,0.28);
+  color:#e8e8f0;
+  font-size:12px;
+  font-weight:700;
+}
+
+.emotionTitle{
+  margin:0 0 8px 0;
+  font-size:14px;
+  color:#fff;
+}
+    textarea{
+      width:100%;
+      min-height: 170px;
+      border-radius: 16px;
+      padding: 12px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline:none;
+      resize: vertical;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    [data-theme="light"] textarea{
+      background: rgba(255,255,255,.8);
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top: 10px;
+    }
+
+    .primary{
+      background: linear-gradient(135deg, rgba(124,159,255,.45), rgba(184,157,255,.30));
+      border-color: rgba(124,159,255,.45);
+    }
+    .danger{
+      background: rgba(255,107,107,.18);
+      border-color: rgba(255,107,107,.28);
+    }
+
+    .output{
+      margin-top: 12px;
+      border-radius: 16px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.15);
+      padding: 12px;
+      min-height: 120px;
+      color: var(--text);
+      line-height: 1.55;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+    [data-theme="light"] .output{
+      background: rgba(255,255,255,.7);
+    }
+    .muted{ color: var(--muted); }
+    .spinner{
+      display:none;
+      gap:8px;
+      align-items:center;
+      color: var(--muted);
+      font-weight:600;
+      margin-top:10px;
+    }
+    .spinner.visible{ display:flex; }
+    .dot{
+      width:8px;height:8px;border-radius:50%;
+      background: var(--accent);
+      animation: pulse 1s infinite ease-in-out;
+    }
+    .dot:nth-child(2){ animation-delay:.15s; opacity:.75; }
+    .dot:nth-child(3){ animation-delay:.30s; opacity:.55; }
+    @keyframes pulse{
+      0%,100%{ transform: translateY(0); }
+      50%{ transform: translateY(-4px); }
+    }
+    .emotion-tag{display:inline-block;padding:4px 10px;border-radius:999px;margin:4px 6px 0 0;font-size:12px;font-weight:600}
+.emotion-traurigkeit{background:rgba(220,80,80,0.18)}
+.emotion-angst{background:rgba(230,190,70,0.18)}
+.emotion-hoffnungslosigkeit{background:rgba(160,100,220,0.18)}
+.emotion-erschöpfung{background:rgba(90,140,220,0.18)}
+.emotion-wut{background:rgba(255,120,80,0.18)}
+.emotion-ruhe{background:rgba(80,190,140,0.18)}
+.emotion-hoffnung{background:rgba(100,210,120,0.18)}
+
+    /* Bottom Nav (mobile-first) */
+    .bottomNav{
+      position: fixed;
+      left:0; right:0; bottom:0;
+      z-index: 50;
+      padding: 10px 10px 14px;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.15), transparent);
+    }
+    [data-theme="light"] .bottomNav{
+      background: linear-gradient(to top, rgba(246,247,251,.95), rgba(246,247,251,.55), transparent);
+    }
+    .bottomNav .bar{
+      max-width: 1100px;
+      margin: 0 auto;
+      border:1px solid var(--border);
+      background: var(--glass);
+      border-radius: 999px;
+      display:flex;
+      gap:8px;
+      padding: 8px;
+      box-shadow: var(--shadow);
+      justify-content:space-between;
+    }
+    .navBtn{
+      flex:1;
+      text-align:center;
+      padding: 10px 8px;
+      border-radius: 999px;
+      border:1px solid transparent;
+      cursor:pointer;
+      font-weight:800;
+      color: var(--muted);
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .navBtn.active{
+      color: var(--text);
+      border-color: rgba(124,159,255,.25);
+      background: linear-gradient(135deg, rgba(124,159,255,.25), rgba(184,157,255,.18));
+    }
+
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top: 10px;
+    }
+    .entry{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      border-radius: 14px;
+      padding: 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      cursor:pointer;
+    }
+    .entry:hover{ background: rgba(255,255,255,.06); }
+    .entry .meta{
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+      min-width: 0;
+    }
+    .entry .meta b{
+      font-size: 13px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .entry .meta small{
+      color: var(--muted);
+    }
+    .entry .x{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor:pointer;
+      font-weight:900;
+    }
+    .entry .x:hover{ color: var(--text); }
+
+    .crisis{
+      display:none;
+      margin-top: 10px;
+      border-radius: 16px;
+      border:1px solid rgba(255,107,107,.35);
+      background: rgba(255,107,107,.12);
+      padding: 12px;
+    }
+    .crisis.visible{ display:block; }
+    .crisis b{ color: var(--danger); }
+    .emotionWrap{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:8px;
+}
+
+.emotionTag{
+  background:rgba(124,159,255,.18);
+  border:1px solid rgba(124,159,255,.35);
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:12px;
+}
+  </style>
+</head>
+
+<body data-theme="dark">
+  <div class="app">
+    <header>
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo">MR</div>
+          <div class="title">
+            <h1 id="appName">MindReflect</h1>
+            <p id="appTagline">Psychologische App für Wachstum & Reflexion</p>
+          </div>
+        </div>
+
+     <div class="controls">
+
+  <div class="pill" id="langPill"></div>
+
+  <div class="topbarActions">
+    <button class="btn" id="loginBtn">Login</button>
+    <button class="btn ghost" id="themeBtn">🌙</button>
+  </div>
+
+      </div>
+    </header>
+
+    <!-- Main Screens -->
+    <div class="grid">
+      <!-- Left -->
+      <div class="card" id="screenCard">
+        <div class="sectionTitle">
+          <h2 id="screenTitle">Willkommen</h2>
+          <small id="screenHint" class="muted"></small>
+        </div>
+
+        <!-- START -->
+        <div id="screen-start" class="screen">
+          <div class="tabs">
+            <button class="btn active" data-quick="journal" id="quickJournal">📝 Tagebuch</button>
+            <button class="btn" data-quick="focus" id="quickFocus">🎯 Fokus</button>
+            <button class="btn" data-quick="cbt" id="quickCBT">🧠 CBT</button>
+          </div>
+
+          <div style="margin-top:12px" class="muted" id="welcomeText">
+            Wähle unten einen Bereich. Du kannst Texte speichern und als PDF exportieren.
+          </div>
+        </div>
+
+        <!-- JOURNAL -->
+        <div id="screen-journal" class="screen" style="display:none;">
+          <div class="sectionTitle">
+            <h2 id="journalTitle">Tagebuch</h2>
+            <small id="journalHint" class="muted">Schreib frei – dann „Reflektieren“</small>
+          </div>
+
+          <textarea id="input" placeholder="Was beschäftigt dich gerade?"></textarea>
+
+          <div class="row">
+            <button class="btn primary" id="reflectBtn">✨ Reflektieren</button>
+            <button class="btn" id="saveBtn">💾 Speichern</button>
+            <button class="btn" id="pdfBtn">📄 PDF Export</button>
+            <button class="btn danger" id="clearBtn">🗑️ Löschen</button>
+          </div>
+
+          <div class="spinner" id="loading">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span id="loadingText">Denke nach …</span>
+          </div>
+
+          <div class="crisis" id="crisisBox">
+            <b id="crisisTitle">Wichtiger Hinweis</b>
+            <div id="crisisText" style="margin-top:6px"></div>
+          </div>
+
+        </div>
+
+        <!-- FOKUS -->
+        <div id="screen-focus" class="screen" style="display:none;">
+          <div class="sectionTitle">
+            <h2 id="focusTitle">Fokus</h2>
+            <small id="focusHint" class="muted">Wähle einen Schwerpunkt</small>
+          </div>
+
+          <div class="moduleGrid" id="moduleGrid"></div>
+
+          <!-- Paar-Untertabs -->
+          <div id="pairSubTabs" style="display:none; margin-top:10px;">
+            <div class="tabs">
+              <button class="btn active" data-pair="conflict" id="pairConflict">Paarkonflikte</button>
+              <button class="btn" data-pair="comms" id="pairComms">Paarkommunikation</button>
+              <button class="btn" data-pair="sexual" id="pairSexual">Sexualität</button>
+            </div>
+          </div>
+
+          <div style="margin-top:10px;">
+            <textarea id="focusInput" placeholder="Beschreibe deine Situation …"></textarea>
+            <div id="focusEmotionBox" class="emotionWrap"></div>
+            <div class="row">
+              <button class="btn primary" id="focusRun">✨ Analysieren</button>
+              <button class="btn" id="focusSave">💾 Speichern</button>
+              <button class="btn" id="focusPdf">📄 PDF Export</button>
+            </div>
+
+            <div class="spinner" id="focusLoading">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span id="focusLoadingText">Analysiere …</span>
+            </div>
+
+            <div class="crisis" id="focusCrisisBox">
+              <b id="focusCrisisTitle">Wichtiger Hinweis</b>
+              <div id="focusCrisisText" style="margin-top:6px"></div>
+            </div>
+
+            <div class="output" id="focusOutput"></div>
+          </div>
+        </div>
+
+        <!-- CBT -->
+        <div id="screen-cbt" class="screen" style="display:none;">
+          <div class="sectionTitle">
+            <h2 id="cbtTitle">CBT Übungen</h2>
+            <small id="cbtHint" class="muted">Gedanken prüfen – alternative Sicht</small>
+          </div>
+
+          <textarea id="cbtInput" placeholder="Welche Situation / welcher Gedanke beschäftigt dich?"></textarea>
+
+          <div class="row">
+            <button class="btn primary" id="cbtRun">✨ CBT bearbeiten</button>
+            <button class="btn" id="cbtSave">💾 Speichern</button>
+            <button class="btn" id="cbtPdf">📄 PDF Export</button>
+          </div>
+
+          <div class="spinner" id="cbtLoading">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span id="cbtLoadingText">Arbeite daran …</span>
+          </div>
+
+          <div class="crisis" id="cbtCrisisBox">
+            <b id="cbtCrisisTitle">Wichtiger Hinweis</b>
+            <div id="cbtCrisisText" style="margin-top:6px"></div>
+          </div>
+
+          <div class="output" id="cbtOutput"></div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="screen-settings" class="screen" style="display:none;">
+          <div class="sectionTitle">
+            <h2 id="settingsTitle">Einstellungen</h2>
+            <small class="muted" id="settingsHint">Deine Daten bleiben auf deinem Gerät</small>
+          </div>
+
+          <div class="row">
+            <button class="btn" id="wipeBtn">🧹 Alle Einträge löschen</button>
+            <button class="btn" id="exportJsonBtn">⬇️ Backup (JSON)</button>
+            <label class="btn" style="cursor:pointer;">
+              ⬆️ Import (JSON)
+              <input type="file" id="importJson" accept="application/json" style="display:none;">
+            </label>
+          </div>
+
+          <div class="muted" style="margin-top:10px; line-height:1.45" id="privacyText">
+            Hinweis: Diese App speichert Einträge lokal (LocalStorage). Keine Registrierung nötig.
+          </div>
+        </div>
+      </div>
+
+      <!-- Right (Analyse) -->
+<div class="card">
+  <div class="sectionTitle">
+    <h2 id="analysisTitle">Analyse</h2>
+<small class="muted" id="analysisHint">KI-Reflexion erscheint hier</small>
+  </div>
+    <div id="emotionTags" class="emotionWrap"></div>
+    <div id="resultOutput" class="output"></div>
+
+<div class="muted" style="margin-top:10px;"
+  id="noAnalysisText">
+Noch keine Analyse. Links Text eingeben und auf „Analysieren“ klicken.
+</div>
+  
+  </div>
+
+  <div class="bottomNav">
+    <div class="bar">
+      <div class="navBtn active" data-screen="start" id="navStart">🏠 Start</div>
+      <div class="navBtn" data-screen="journal" id="navJournal">📝 Journal</div>
+      <div class="navBtn" data-screen="focus" id="navFocus">🎯 Fokus</div>
+      <div class="navBtn" data-screen="cbt" id="navCBT">🧠 CBT</div>
+      <div class="navBtn" data-screen="settings" id="navSettings">⚙️</div>
+    </div>
+  </div>
+
+<script>
+  // -----------------------
+  // i18n
+  // -----------------------
+  const I18N = {
+    de: {
+      appTagline: "Psychologische App für Wachstum & Reflexion",
+      welcome: "Willkommen",
+      welcomeText: "Wähle unten einen Bereich. Du kannst Texte speichern und als PDF exportieren.",
+      journal: "Tagebuch",
+      focus: "Fokus",
+      focusHint: "Wähle einen Schwerpunkt",
+      cbt: "CBT Übungen",
+      settings: "Einstellungen",
+      history: "Verlauf",
+      analysisTitle: "Analyse",
+      analysisHint: "KI-Reflexion erscheint hier",
+      noAnalysis: "Noch keine Analyse. Links Text eingeben und auf „Analysieren“ klicken.",
+      historyHint: "Tippe zum Laden",
+      inputPH: "Was beschäftigt dich gerade?",
+      focusPH: "Beschreibe deine Situation …",
+      cbtPH: "Welche Situation / welcher Gedanke beschäftigt dich?",
+      reflect: "Reflektieren",
+      analyze: "Analysieren",
+      cbtRun: "CBT bearbeiten",
+      save: "Speichern",
+      pdf: "PDF Export",
+      clear: "Löschen",
+noEmotions: "Noch keine Emotionen erkannt.",
+      loading: "Denke nach …",
+      analyzing: "Analysiere …",
+      working: "Arbeite daran …",
+      privacy: "Hinweis: Diese App speichert Einträge lokal (LocalStorage). Keine Registrierung nötig.",
+      crisisTitle: "Wichtiger Hinweis",
+      wipe: "Alle Einträge löschen",
+      backup: "Backup (JSON)",
+      import: "Import (JSON)"
+    },
+    en: {
+      appTagline: "Psychology app for growth & reflection",
+      welcome: "Welcome",
+      welcomeText: "Choose a section below. You can save texts and export as PDF.",
+      journal: "Journal",
+      focus: "Focus",
+      focusHint: "Choose a focus area",
+      cbt: "CBT Exercises",
+      settings: "Settings",
+      history: "History",
+      analysisTitle: "Analysis",
+      analysisHint: "AI reflection appears here",
+      noAnalysis: "No analysis yet. Enter text on the left and click Analyze.",
+      historyHint: "Tap to load",
+      inputPH: "What’s on your mind?",
+      focusPH: "Describe your situation …",
+      cbtPH: "What situation / thought is bothering you?",
+      reflect: "Reflect",
+      analyze: "Analyze",
+      cbtRun: "CBT rewrite",
+      save: "Save",
+      pdf: "PDF Export",
+      clear: "Clear",
+      noAnalysis: "No analysis yet. Enter text on the left and click Analyze.",
+noEmotions: "No emotions detected yet.",
+      loading: "Thinking …",
+      analyzing: "Analyzing …",
+      working: "Working …",
+      privacy: "Note: This app stores entries locally (LocalStorage). No sign-up required.",
+      crisisTitle: "Important note",
+      wipe: "Delete all entries",
+      backup: "Backup (JSON)",
+      import: "Import (JSON)"
+    },
+    pl: {
+      appTagline: "Aplikacja psychologiczna do rozwoju i refleksji",
+      welcome: "Witaj",
+      welcomeText: "Wybierz sekcję. Możesz zapisywać teksty i eksportować PDF.",
+      journal: "Dziennik",
+      focus: "Fokus",
+      focusHint: "Wybierz obszar skupienia",
+      cbt: "Ćwiczenia CBT",
+      settings: "Ustawienia",
+      history: "Historia",
+      analysisTitle: "Analiza",
+      analysisHint: "Refleksja AI pojawi się tutaj",
+      noAnalysis: "Brak analizy. Wpisz tekst po lewej stronie i kliknij „Analizuj”.",
+      historyHint: "Kliknij, aby wczytać",
+      inputPH: "Co Cię teraz zajmuje?",
+      focusPH: "Opisz swoją sytuację …",
+      cbtPH: "Jaka sytuacja / myśl Cię martwi?",
+      reflect: "Refleksja",
+      analyze: "Analiza",
+      cbtRun: "CBT przeróbka",
+      save: "Zapisz",
+      pdf: "Eksport PDF",
+      clear: "Wyczyść",
+      noAnalysis: "Brak analizy. Wpisz tekst po lewej i kliknij Analiza.",
+noEmotions: "Nie wykryto jeszcze emocji.",
+      loading: "Myślę …",
+      analyzing: "Analizuję …",
+      working: "Pracuję …",
+      privacy: "Uwaga: Dane są przechowywane lokalnie (LocalStorage). Bez rejestracji.",
+      crisisTitle: "Ważna informacja",
+      wipe: "Usuń wszystkie wpisy",
+      backup: "Kopia (JSON)",
+      import: "Import (JSON)"
+    },
+    ru: {
+      appTagline: "Психологическое приложение для роста и рефлексии",
+      welcome: "Добро пожаловать",
+      welcomeText: "Выберите раздел. Можно сохранять тексты и экспортировать PDF.",
+      journal: "Дневник",
+      focus: "Фокус",
+      focusHint: "Выберите направление",
+      cbt: "Упражнения CBT",
+      settings: "Настройки",
+      history: "История",
+      analysisTitle: "Анализ",
+      analysisHint: "Здесь появится анализ ИИ",
+      noAnalysis: "Пока нет анализа. Введите текст слева и нажмите «Анализировать».",
+      historyHint: "Нажмите, чтобы загрузить",
+      inputPH: "Что вас сейчас беспокоит?",
+      focusPH: "Опишите ситуацию …",
+      cbtPH: "Какая ситуация / мысль вас тревожит?",
+      reflect: "Рефлексия",
+      analyze: "Анализ",
+      cbtRun: "CBT переработка",
+      save: "Сохранить",
+      pdf: "Экспорт PDF",
+      clear: "Очистить",
+noEmotions: "Эмоции пока не распознаны.",
+      loading: "Думаю …",
+      analyzing: "Анализирую …",
+      working: "Работаю …",
+      privacy: "Примечание: записи хранятся локально (LocalStorage). Регистрация не нужна.",
+      crisisTitle: "Важное сообщение",
+      wipe: "Удалить все записи",
+      backup: "Резерв (JSON)",
+      import: "Импорт (JSON)"
+    },
+    es: {
+      appTagline: "App psicológica para crecimiento y reflexión",
+      welcome: "Bienvenido/a",
+      welcomeText: "Elige una sección. Puedes guardar textos y exportar PDF.",
+      journal: "Diario",
+      focus: "Enfoque",
+      focusHint: "Elige un enfoque",
+      cbt: "Ejercicios CBT",
+      settings: "Ajustes",
+      history: "Historial",
+      analysisTitle: "Análisis",
+      analysisHint: "La reflexión de IA aparecerá aquí",
+      noAnalysis: "Aún no hay análisis. Escribe texto a la izquierda y pulsa «Analizar».",
+      historyHint: "Toca para cargar",
+      inputPH: "¿Qué tienes en mente ahora?",
+      focusPH: "Describe tu situación …",
+      cbtPH: "¿Qué situación / pensamiento te preocupa?",
+      reflect: "Reflexionar",
+      analyze: "Analizar",
+      cbtRun: "CBT reescribir",
+      save: "Guardar",
+      pdf: "Exportar PDF",
+      clear: "Borrar",
+      noAnalysis: "Aún no hay análisis. Escribe texto a la izquierda y haz clic en Analizar.",
+noEmotions: "Aún no se detectaron emociones.",
+      loading: "Pensando …",
+      analyzing: "Analizando …",
+      working: "Trabajando …",
+      privacy: "Nota: esta app guarda en local (LocalStorage). Sin registro.",
+      crisisTitle: "Aviso importante",
+      wipe: "Borrar todas las entradas",
+      backup: "Copia (JSON)",
+      import: "Importar (JSON)"
+    },
+    zh: {
+      appTagline: "用于成长与反思的心理应用",
+      welcome: "欢迎",
+      welcomeText: "请选择一个模块。你可以保存文本并导出 PDF。",
+      journal: "日记",
+      focus: "焦点",
+      focusHint: "选择一个重点方向",
+      cbt: "CBT 练习",
+      settings: "设置",
+      history: "历史",
+      analysisTitle: "分析",
+      analysisHint: "AI 反思将在这里显示",
+      noAnalysis: "暂无分析，请在左侧输入文本并点击“分析”。",
+      historyHint: "点击加载",
+      inputPH: "你现在在想什么？",
+      focusPH: "描述你的情况 …",
+      cbtPH: "哪个情境/想法困扰你？",
+      reflect: "反思",
+      analyze: "分析",
+      cbtRun: "CBT 重写",
+      save: "保存",
+      pdf: "导出 PDF",
+      clear: "清空",
+      noAnalysis: "暂无分析。请在左侧输入文本并点击分析。",
+noEmotions: "尚未检测到情绪。",
+      loading: "思考中 …",
+      analyzing: "分析中 …",
+      working: "处理中 …",
+      privacy: "提示：内容保存在本机（LocalStorage），无需注册。",
+      crisisTitle: "重要提示",
+      wipe: "删除所有记录",
+      backup: "备份 (JSON)",
+      import: "导入 (JSON)"
+    }
+  };
+
+  const LANGS = [
+    { code:"de", label:"DE" },
+    { code:"en", label:"EN" },
+    { code:"pl", label:"PL" },
+    { code:"ru", label:"RU" },
+    { code:"es", label:"ES" },
+    { code:"zh", label:"ZH" },
+  ];
+
+  // -----------------------
+  // Modules / Topics (C)
+  // -----------------------
+  const MODULES = [
+    { id:"self_reflection", name:{de:"Selbstreflexion",en:"Self-Reflection",pl:"Samo-refleksja",ru:"Саморефлексия",es:"Autorreflexión",zh:"自我反思"},
+      desc:{de:"Emotionen, Muster, Bedürfnisse erkennen.",en:"Understand emotions, patterns, needs.",pl:"Rozpoznaj emocje i wzorce.",ru:"Понять эмоции и паттерны.",es:"Entender emociones y patrones.",zh:"理解情绪与模式。"} },
+
+    { id:"self_awareness", name:{de:"Selbstwahrnehmung",en:"Self-Awareness",pl:"Samoświadomość",ru:"Самоосознание",es:"Autoconciencia",zh:"自我觉察"},
+      desc:{de:"Körper, Gedanken & Gefühle präzise beobachten.",en:"Observe body, thoughts & feelings.",pl:"Obserwuj ciało, myśli i uczucia.",ru:"Наблюдать тело/мысли/чувства.",es:"Observar cuerpo, pensamientos y emociones.",zh:"观察身体与想法。"} },
+
+    { id:"self_worth", name:{de:"Selbstwertgefühl",en:"Self-Worth",pl:"Poczucie własnej wartości",ru:"Самооценка",es:"Autoestima",zh:"自我价值"},
+      desc:{de:"Innere Kritiker beruhigen, neue Sicht stärken.",en:"Soothe inner critic, build a new view.",pl:"Uspokój krytyka wewnętrznego.",ru:"Смягчить внутреннего критика.",es:"Calmar el crítico interno.",zh:"安抚内在批评。"} },
+
+    { id:"pair_module", name:{de:"Beziehung / Paar",en:"Couple / Relationship",pl:"Związek / Para",ru:"Пара / Отношения",es:"Pareja / Relación",zh:"伴侣关系"},
+      desc:{de:"Konflikt, Kommunikation, Sexualität.",en:"Conflict, communication, sexuality.",pl:"Konflikt, komunikacja, seksualność.",ru:"Конфликт, коммуникация, сексуальность.",es:"Conflicto, comunicación, sexualidad.",zh:"冲突、沟通与亲密。"} },
+
+    { id:"freud_model", name:{de:"Freud: Es–Ich–Über-Ich",en:"Freud: Id–Ego–Superego",pl:"Freud: Id–Ego–Superego",ru:"Фрейд: Ид–Эго–Суперэго",es:"Freud: Ello–Yo–Superyó",zh:"弗洛伊德：本我-自我-超我"},
+      desc:{de:"Strukturmodell + dynamischer Konflikt.",en:"Structural model + dynamic conflict.",pl:"Model strukturalny i konflikt.",ru:"Структура и внутренний конфликт.",es:"Modelo estructural y conflicto.",zh:"结构模型与冲突。"} },
+  ];
+
+  // Pair subtopics
+  const PAIR = [
+    { key:"conflict", label:{de:"Paarkonflikte",en:"Conflicts",pl:"Konflikty",ru:"Конфликты",es:"Conflictos",zh:"冲突"} },
+    { key:"comms", label:{de:"Paarkommunikation",en:"Communication",pl:"Komunikacja",ru:"Коммуникация",es:"Comunicación",zh:"沟通"} },
+    { key:"sexual", label:{de:"Sexualität",en:"Sexuality",pl:"Seksualność",ru:"Сексуальность",es:"Sexualidad",zh:"亲密/性"} },
+  ];
+
+  // -----------------------
+  // State
+  // -----------------------
+  const state = {
+    lang: localStorage.getItem("mr_lang") || "de",
+    theme: localStorage.getItem("mr_theme") || "dark",
+    screen: localStorage.getItem("mr_screen") || "start",
+    module: localStorage.getItem("mr_module") || "self_reflection",
+    pair: localStorage.getItem("mr_pair") || "conflict",
+    entries: []
+  };
+ function getToken(){
+  const user = window.netlifyIdentity && window.netlifyIdentity.currentUser();
+  return user ? user.token.access_token : null;
+}  
+
+async function loadEntriesCloud(){
+  const token = getToken();
+  if(!token) return null;
+
+  const r = await fetch("/.netlify/functions/loadEntries",{
+    headers:{
+      Authorization:"Bearer "+token
+    }
+  });
+
+  if(!r.ok) return null;
+
+  const data = await r.json();
+  return data.entries || [];
+}
+
+async function saveEntriesCloud(entries){
+  const token = getToken();
+  if(!token) return false;
+
+  const r = await fetch("/.netlify/functions/saveEntries",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:"Bearer "+token
+    },
+    body:JSON.stringify({entries})
+  });
+
+  return r.ok;
+}
+
+ 
+  const el = (id)=>document.getElementById(id);
+  
+  function setTheme(theme){
+    state.theme = theme;
+    document.body.setAttribute("data-theme", theme);
+    localStorage.setItem("mr_theme", theme);
+    el("themeBtn").textContent = theme === "dark" ? "🌙" : "☀️";
+  }
+
+  function setLang(lang){
+    state.lang = lang;
+    localStorage.setItem("mr_lang", lang);
+    applyI18n();
+    renderLangButtons();
+    renderModules();
+    renderPairTabs();
+    renderHistory();
+  }
+
+  function t(key){
+    return (I18N[state.lang] && I18N[state.lang][key]) || (I18N.de[key] || key);
+  }
+
+  function applyI18n(){
+    if (el("appTagline")) el("appTagline").textContent = t("appTagline");
+    if (el("screenTitle")) el("screenTitle").textContent = t(state.screen === "start" ? "welcome" : state.screen);
+    if (el("welcomeText")) el("welcomeText").textContent = t("welcomeText");
+
+    if (el("journalTitle")) el("journalTitle").textContent = t("journal");
+    if (el("focusTitle")) el("focusTitle").textContent = t("focus");
+    if (el("focusHint")) el("focusHint").textContent = t("focusHint");
+    if (el("analysisTitle")) el("analysisTitle").textContent = t("analysisTitle");
+    if (el("analysisHint")) el("analysisHint").textContent = t("analysisHint");
+    if (el("cbtTitle")) el("cbtTitle").textContent = t("cbt");
+    if (el("settingsTitle")) el("settingsTitle").textContent = t("settings");
+    if (el("historyTitle")) el("historyTitle").textContent = t("history");
+    if (el("historyHint")) el("historyHint").textContent = t("historyHint");
+
+    if (el("noAnalysisText")) el("noAnalysisText").textContent = t("noAnalysis");
+
+    if (el("input")) el("input").placeholder = t("inputPH");
+    if (el("focusInput")) el("focusInput").placeholder = t("focusPH");
+    if (el("cbtInput")) el("cbtInput").placeholder = t("cbtPH");
+
+    if (el("reflectBtn")) el("reflectBtn").textContent = " ✨ " + t("reflect");
+    el("focusRun").textContent = "✨ " + t("analyze");
+    el("cbtRun").textContent = "✨ " + t("cbtRun");
+
+    if (el("saveBtn")) el("saveBtn").textContent = " 💾 " + t("save");
+    el("focusSave").textContent = "💾 " + t("save");
+    el("cbtSave").textContent = "💾 " + t("save");
+
+    if (el("pdfBtn")) el("pdfBtn").textContent = " 📄 " + t("pdf");
+    el("focusPdf").textContent = "📄 " + t("pdf");
+    el("cbtPdf").textContent = "📄 " + t("pdf");
+
+    if (el("clearBtn")) el("clearBtn").textContent = " 🗑 " + t("clear");
+
+    if (el("loadingText")) el("loadingText").textContent = t("loading");
+    el("focusLoadingText").textContent = t("analyzing");
+    el("cbtLoadingText").textContent = t("working");
+
+    if (el("crisisTitle")) el("crisisTitle").textContent = t("crisisTitle");
+    el("focusCrisisTitle").textContent = t("crisisTitle");
+    el("cbtCrisisTitle").textContent = t("crisisTitle");
+
+   if (el("privacyText")) el("privacyText").textContent = t("privacy");
+
+    if (el("wipeBtn")) el("wipeBtn").textContent = " 🧹 " + t("wipe");
+if (el("exportJsonBtn")) el("exportJsonBtn").textContent = " ⬇️ " + t("backup");
+if (el("noAnalysisText")) el("noAnalysisText").textContent = t("noAnalysis");
+  }
+
+  function renderLangButtons(){
+  const pill = el("langPill");
+    if (!pill) return;
+pill.innerHTML = "";
+
+    pill.innerHTML = "";
+    LANGS.forEach(l=>{
+      const b = document.createElement("button");
+      b.className = "btn" + (state.lang===l.code ? " active" : "");
+      b.textContent = l.label;
+      b.onclick = ()=>setLang(l.code);
+      pill.appendChild(b);
+    });
+  }
+  
+  function setScreen(screen){
+    state.screen = screen;
+    localStorage.setItem("mr_screen", screen);
+
+    // hide all screens
+    ["start","journal","focus","cbt","settings"].forEach(s=>{
+     const scr = el("screen-"+s);
+if (scr) scr.style.display = (s===screen ? "block" : "none");
+    });
+
+    // nav active
+    document.querySelectorAll(".navBtn").forEach(n=>{
+      n.classList.toggle("active", n.dataset.screen===screen);
+    });
+
+    if (el("screenTitle")) el("screenTitle").textContent = t(screen==="start" ? "welcome" : screen);
+  }
+
+  // -----------------------
+  // Rendering: Modules & Pair subtabs
+  // -----------------------
+  function renderModules(){
+    const grid = el("moduleGrid");
+    grid.innerHTML = "";
+    MODULES.forEach(m=>{
+      const div = document.createElement("div");
+      div.className = "tile" + (state.module===m.id ? " active" : "");
+      div.onclick = ()=>{
+        state.module = m.id;
+        localStorage.setItem("mr_module", m.id);
+        renderModules();
+        renderPairTabs();
+      };
+      div.innerHTML = `
+        <div class="name">${m.name[state.lang] || m.name.de}</div>
+        <div class="desc">${m.desc[state.lang] || m.desc.de}</div>
+      `;
+      grid.appendChild(div);
+    });
+    renderPairTabs();
+  }
+
+  function renderPairTabs(){
+    const show = state.module === "pair_module";
+    el("pairSubTabs").style.display = show ? "block" : "none";
+    if(!show) return;
+
+    // label buttons
+    el("pairConflict").textContent = PAIR[0].label[state.lang] || PAIR[0].label.de;
+    el("pairComms").textContent = PAIR[1].label[state.lang] || PAIR[1].label.de;
+    el("pairSexual").textContent = PAIR[2].label[state.lang] || PAIR[2].label.de;
+
+    document.querySelectorAll("[data-pair]").forEach(b=>{
+      b.classList.toggle("active", b.dataset.pair === state.pair);
+    });
+  }
+
+  document.querySelectorAll("[data-pair]").forEach(b=>{
+    b.onclick = ()=>{
+      state.pair = b.dataset.pair;
+      localStorage.setItem("mr_pair", state.pair);
+      renderPairTabs();
+    };
+  });
+
+  // -----------------------
+  // History (D)
+  // -----------------------
+  function loadEntries(){
+    try{
+      state.entries = JSON.parse(localStorage.getItem("mr_entries")||"[]");
+    }catch{ state.entries=[]; }
+  }
+  function saveEntries(){
+    localStorage.setItem("mr_entries", JSON.stringify(state.entries));
+  }
+
+  function addEntry({screen, module, pair, text, output}){
+    const now = new Date();
+    const item = {
+      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random(),
+      ts: now.toISOString(),
+      screen, module, pair,
+      lang: state.lang,
+      text, output
+    };
+    state.entries.unshift(item);
+    saveEntries();
+    renderHistory();
+  }
+
+  function renderHistory(){
+    const list = el("historyList");
+const empty = el("historyEmpty");
+if (!list || !empty) return;
+
+list.innerHTML = "";
+empty.style.display = state.entries.length ? "none" : "block";
+
+    state.entries.forEach(item=>{
+      const d = new Date(item.ts);
+      const title = (item.screen==="journal" ? "Journal" : item.screen==="focus" ? "Fokus" : item.screen==="cbt" ? "CBT" : "Entry");
+      const mod = item.module ? (" • " + item.module.replaceAll("_"," ")) : "";
+      const line1 = (item.text||"").trim().slice(0,70) || "(leer)";
+      const row = document.createElement("div");
+      row.className = "entry";
+      row.innerHTML = `
+        <div class="meta">
+          <b>${title}${mod}</b>
+          <small>${d.toLocaleString()} • ${item.lang?.toUpperCase?.() || ""}</small>
+          <small>${escapeHtml(line1)}</small>
+        </div>
+        <button class="x" title="Delete">×</button>
+      `;
+      row.onclick = (e)=>{
+        if(e.target.classList.contains("x")) return;
+        // load into correct screen
+        setScreen(item.screen);
+        if(item.screen==="journal"){
+          el("input").value = item.text || "";
+          el("output").innerHTML = mdToHtml(item.output || "");
+        }
+        if(item.screen==="focus"){
+          state.module = item.module || state.module;
+          state.pair = item.pair || state.pair;
+          localStorage.setItem("mr_module", state.module);
+          localStorage.setItem("mr_pair", state.pair);
+          renderModules(); renderPairTabs();
+          el("focusInput").value = item.text || "";
+          document.getElementById("resultOutput").innerHTML = mdToHtml(item.output || "");
+        }
+        if(item.screen==="cbt"){
+          el("cbtInput").value = item.text || "";
+          el("cbtOutput").innerHTML = mdToHtml(item.output || "");
+        }
+      };
+      row.querySelector(".x").onclick = (e)=>{
+        e.stopPropagation();
+        state.entries = state.entries.filter(x=>x.id!==item.id);
+        saveEntries();
+        renderHistory();
+      };
+      list.appendChild(row);
+    });
+  }
+
+  // -----------------------
+  // Markdown-ish rendering (simple)
+  // -----------------------
+  function escapeHtml(s){
+    return (s||"")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;");
+  }
+
+  function mdToHtml(md){
+    const safe = escapeHtml(md);
+    // headings
+    let html = safe
+      .replace(/^###\s?(.*)$/gm, "<h3>$1</h3>")
+      .replace(/^##\s?(.*)$/gm, "<h2>$1</h2>")
+      .replace(/^#\s?(.*)$/gm, "<h1>$1</h1>");
+    // bold
+    html = html.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+    // lists
+    html = html.replace(/^\-\s(.+)$/gm, "• $1");
+    // line breaks
+    html = html.replace(/\n/g, "<br>");
+    return html;
+  }
+
+  // -----------------------
+  // AI call
+  // -----------------------
+  async function callAI({text, mode, topic}){
+    const res = await fetch("https://mindreflect-app.netlify.app/.netlify/functions/reflect",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({
+        text,
+        lang: state.lang,
+        mode,
+        topic
+      })
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data?.error || "Server error");
+    return data;
+  }
+
+  function showCrisis(boxId, titleId, textId, message){
+    const box = el(boxId);
+    const title = el(titleId);
+    const textEl = el(textId);
+    if (!box || !title || !textEl) return;
+
+    if (!message) {
+     box.classList.remove("visible");
+    textEl.textContent = "";
+    return;
+}
+box.classList.add("visible");
+title.textContent = t("crisisTitle");
+textEl.textContent = message;
+  }
+
+  // -----------------------
+  // Buttons
+  // -----------------------
+  if (el("themeBtn")) {
+  el("themeBtn").onclick = () => {
+    setTheme(state.theme === "dark" ? "light" : "dark");
+  };
+}
+  // bottom nav
+  document.querySelectorAll(".navBtn").forEach(b=>{
+    b.onclick = ()=>setScreen(b.dataset.screen);
+  });
+
+  // quick buttons on start
+  document.querySelectorAll("[data-quick]").forEach(b=>{
+    b.onclick = ()=>{
+      setScreen(b.dataset.quick);
+      document.querySelectorAll("[data-quick]").forEach(x=>x.classList.toggle("active", x===b));
+    };
+  });
+
+  // JOURNAL actions
+  el("reflectBtn").onclick = async ()=>{
+    const text = el("input").value.trim();
+    if(!text) return;
+    el("loading").classList.add("visible");
+    showCrisis("crisisBox","crisisTitle","crisisText", null);
+    try{
+      const data = await callAI({ text, mode:"journal_reflect", topic:"self_reflection", lang: state.lang });
+      if(data.crisis){
+        showCrisis("crisisBox","crisisTitle","crisisText", data.crisis_message || "");
+      }
+      el("output").innerHTML = formatAnalysis(data.output ||t("noAnalysis"));
+    }catch(e){
+      el("output").innerHTML = "⚠️ " + escapeHtml(e.message);
+    }finally{
+      el("loading").classList.remove("visible");
+    }
+  };
+
+  el("saveBtn").onclick = ()=>{
+    const text = el("input").value.trim();
+    const out = el("output").textContent.trim();
+    if(!text && !out) return;
+    addEntry({ screen:"journal", module:"self_reflection", pair:null, text, output: out });
+  };
+
+  el("clearBtn").onclick = ()=>{
+    el("input").value = "";
+    el("output").innerHTML = "";
+    showCrisis("crisisBox","crisisTitle","crisisText", null);
+  };
+
+  el("pdfBtn").onclick = ()=>{
+    exportPDF({
+      title: "MindReflect – Journal",
+      body: el("input").value,
+      output: el("output").textContent
+    });
+  };
+function detectEmotions(text){
+  const t = (text || "").toLowerCase();
+
+ const emotionMap = [
+  {
+    id: "sadness",
+    icon: "😢",
+    label: { de: "Traurigkeit", en: "Sadness", pl: "Smutek", ru: "Грусть", es: "Tristeza", zh: "悲伤" },
+    words: ["traurig","traurigkeit","sad","sadness","smutny","smutna","smutek","грустный","грусть","triste","tristes","tristeza","悲伤","难过"]
+  },
+  {
+    id: "loneliness",
+    icon: "🥺",
+    label: { de: "Einsamkeit", en: "Loneliness", pl: "Samotność", ru: "Одиночество", es: "Soledad", zh: "孤独" },
+    words: ["einsam","allein","isoliert","lonely","alone","isolated","samotny","samotna","samotność","одинокий","одиночество","solo","soledad","孤独","寂寞"]
+  },
+  {
+    id: "depression",
+    icon: "🫥",
+    label: { de: "Depression", en: "Depression", pl: "Depresja", ru: "Депрессия", es: "Depresión", zh: "抑郁" },
+    words: ["depressiv","depression","depressed","depressive","depresja","depresyjny","depresyjna","депрессия","депрессивный","depresión","deprimido","抑郁","沮丧"]
+  },
+  {
+    id: "hopelessness",
+    icon: "🕳️",
+    label: { de: "Hoffnungslosigkeit", en: "Hopelessness", pl: "Beznadzieja", ru: "Безнадёжность", es: "Desesperanza", zh: "绝望" },
+    words: ["hoffnungslos","hoffnungslosigkeit","ausweglos","hopeless","hopelessness","helpless","beznadziejny","beznadzieja","безнадёжность","безысходность","desesperanza","sin esperanza","绝望","无望"]
+  },
+  {
+    id: "despair",
+    icon: "😭",
+    label: { de: "Verzweiflung", en: "Despair", pl: "Rozpacz", ru: "Отчаяние", es: "Desesperación", zh: "绝望感" },
+    words: ["verzweifelt","verzweiflung","despair","desperate","rozpacz","zrozpaczony","отчаяние","отчаянный","desesperación","desesperado","绝望感","崩溃"]
+  },
+  {
+    id: "grief",
+    icon: "🖤",
+    label: { de: "Trauer", en: "Grief", pl: "Żałoba", ru: "Горе", es: "Duelo", zh: "哀伤" },
+    words: ["trauer","trauere","verlustschmerz","grief","mourning","bereaved","żałoba","smutek po stracie","горе","скорбь","duelo","luto","哀伤","悲痛"]
+  },
+  {
+    id: "heartbreak",
+    icon: "💔",
+    label: { de: "Herzschmerz", en: "Heartbreak", pl: "Złamane serce", ru: "Разбитое сердце", es: "Corazón roto", zh: "心碎" },
+    words: ["herzschmerz","gebrochenes herz","heartbreak","heartbroken","broken heart","złamane serce","разбитое сердце","corazón roto","心碎"]
+  },
+  {
+    id: "emptiness",
+    icon: "🫙",
+    label: { de: "Leere", en: "Emptiness", pl: "Pustka", ru: "Пустота", es: "Vacío", zh: "空虚" },
+    words: ["leer","leere","innerlich leer","empty","emptiness","numb inside","pustka","pusty","пустота","пустой внутри","vacío","vacío interior","空虚","内心空荡"]
+  },
+  {
+    id: "numbness",
+    icon: "😶",
+    label: { de: "Gefühllosigkeit", en: "Numbness", pl: "Odrętwienie", ru: "Онемение", es: "Entumecimiento", zh: "麻木" },
+    words: ["gefühllos","taub","abgestumpft","numb","emotionally numb","detached","odrętwiały","odrętwienie","онемение","бесчувственный","entumecido","insensible","麻木","无感"]
+  },
+  {
+    id: "melancholy",
+    icon: "🌧️",
+    label: { de: "Melancholie", en: "Melancholy", pl: "Melancholia", ru: "Меланхолия", es: "Melancolía", zh: "忧郁" },
+    words: ["melancholie","melancholisch","melancholy","wistful","melancholia","меланхолия","melancolía","忧郁","惆怅"]
+  },
+
+  {
+    id: "fear",
+    icon: "😨",
+    label: { de: "Angst", en: "Fear", pl: "Strach", ru: "Страх", es: "Miedo", zh: "恐惧" },
+    words: ["angst","fürchte","furcht","fear","afraid","scared","strach","boję","страх","боюсь","miedo","temor","恐惧","害怕"]
+  },
+  {
+    id: "anxiety",
+    icon: "😰",
+    label: { de: "Ängstlichkeit", en: "Anxiety", pl: "Lęk", ru: "Тревога", es: "Ansiedad", zh: "焦虑" },
+    words: ["ängstlich","unsicher","sorge","anxiety","anxious","worried","lęk","lękowy","тревога","тревожный","ansiedad","ansioso","焦虑","不安"]
+  },
+  {
+    id: "panic",
+    icon: "😱",
+    label: { de: "Panik", en: "Panic", pl: "Panika", ru: "Паника", es: "Pánico", zh: "恐慌" },
+    words: ["panik","panisch","panic","panicking","panika","паника","pánico","恐慌","惊慌"]
+  },
+  {
+    id: "worry",
+    icon: "😟",
+    label: { de: "Sorge", en: "Worry", pl: "Zmartwienie", ru: "Беспокойство", es: "Preocupación", zh: "担忧" },
+    words: ["sorge","besorgt","worry","worried","concerned","zmartwienie","martwię","беспокойство","волнуюсь","preocupación","preocupado","担忧","担心"]
+  },
+  {
+    id: "terror",
+    icon: "🫨",
+    label: { de: "Entsetzen", en: "Terror", pl: "Przerażenie", ru: "Ужас", es: "Terror", zh: "惊恐" },
+    words: ["entsetzen","schockangst","terror","terrified","horrified","przerażenie","ужас","в ужасе","terror","aterrado","惊恐","吓坏"]
+  },
+  {
+    id: "insecurity",
+    icon: "🫤",
+    label: { de: "Unsicherheit", en: "Insecurity", pl: "Niepewność", ru: "Неуверенность", es: "Inseguridad", zh: "不安全感" },
+    words: ["unsicherheit","unsicher","insecurity","insecure","self-doubt","niepewność","неуверенность","inseguridad","不安全感","没安全感"]
+  },
+  {
+    id: "dread",
+    icon: "🌫️",
+    label: { de: "Beklemmung", en: "Dread", pl: "Lęk przed czymś", ru: "Тягостное ожидание", es: "Aprensión", zh: "惴惴不安" },
+    words: ["beklemmung","grauen","dread","foreboding","aprensión","apprehension","niepokój","тягостное ожидание","惴惴不安"]
+  },
+  {
+    id: "overthinking",
+    icon: "🌀",
+    label: { de: "Gedankenkreisen", en: "Overthinking", pl: "Natłok myśli", ru: "Навязчивые мысли", es: "Sobrepensar", zh: "过度思考" },
+    words: ["gedankenkreisen","grübeln","overthinking","ruminating","rumination","natłok myśli","rozmyślanie","навязчивые мысли","sobrepensar","过度思考","想太多"]
+  },
+  {
+    id: "paranoia",
+    icon: "👁️",
+    label: { de: "Paranoia", en: "Paranoia", pl: "Paranoja", ru: "Паранойя", es: "Paranoia", zh: "偏执" },
+    words: ["paranoia","paranoid","paranoja","паранойя","paranoia","偏执","疑神疑鬼"]
+  },
+  {
+    id: "suspicion",
+    icon: "🤨",
+    label: { de: "Misstrauen", en: "Suspicion", pl: "Podejrzliwość", ru: "Подозрительность", es: "Sospecha", zh: "猜疑" },
+    words: ["misstrauen","misstrauisch","suspicion","suspicious","podejrzliwość","подозрительность","sospecha","猜疑","怀疑"]
+  },
+
+  {
+    id: "anger",
+    icon: "😡",
+    label: { de: "Wut", en: "Anger", pl: "Złość", ru: "Гнев", es: "Ira", zh: "愤怒" },
+    words: ["wut","wütend","ärger","anger","angry","mad","złość","zły","гнев","злой","ira","enojado","愤怒","生气"]
+  },
+  {
+    id: "rage",
+    icon: "🤬",
+    label: { de: "Zorn", en: "Rage", pl: "Furia", ru: "Ярость", es: "Rabia", zh: "暴怒" },
+    words: ["zorn","rasend","rage","furious","fury","furia","ярость","rabia","furioso","暴怒","狂怒"]
+  },
+  {
+    id: "irritation",
+    icon: "😤",
+    label: { de: "Genervtsein", en: "Irritation", pl: "Irytacja", ru: "Раздражение", es: "Irritación", zh: "烦躁" },
+    words: ["genervt","gereizt","irritation","irritated","annoyed","irytacja","раздражение","irritación","烦躁","不耐烦"]
+  },
+  {
+    id: "frustration",
+    icon: "😣",
+    label: { de: "Frustration", en: "Frustration", pl: "Frustracja", ru: "Фрустрация", es: "Frustración", zh: "挫败" },
+    words: ["frustration","frustriert","frustrated","frustrating","frustracja","фрустрация","frustración","挫败","受挫"]
+  },
+  {
+    id: "resentment",
+    icon: "🧨",
+    label: { de: "Verbitterung", en: "Resentment", pl: "Ur aza", ru: "Обида/озлобленность", es: "Resentimiento", zh: "怨恨" },
+    words: ["verbittert","verbitterung","resentment","bitter","uraza","обида","озлобленность","resentimiento","怨恨","愤懑"]
+  },
+  {
+    id: "envy",
+    icon: "🟢",
+    label: { de: "Neid", en: "Envy", pl: "Zazdrość", ru: "Зависть", es: "Envidia", zh: "嫉妒" },
+    words: ["neid","neidisch","envy","envious","zazdrość","зависть","envidia","嫉妒"]
+  },
+  {
+    id: "jealousy",
+    icon: "💚",
+    label: { de: "Eifersucht", en: "Jealousy", pl: "Zazdrość partnerska", ru: "Ревность", es: "Celos", zh: "吃醋" },
+    words: ["eifersucht","eifersüchtig","jealous","jealousy","celos","ревность","吃醋","妒忌"]
+  },
+  {
+    id: "hatred",
+    icon: "🖤",
+    label: { de: "Hass", en: "Hatred", pl: "Nienawiść", ru: "Ненависть", es: "Odio", zh: "仇恨" },
+    words: ["hass","hasse","hatred","hate","nienawiść","ненависть","odio","仇恨"]
+  },
+  {
+    id: "bitterness",
+    icon: "🥀",
+    label: { de: "Bitterkeit", en: "Bitterness", pl: "Gorycz", ru: "Горечь", es: "Amargura", zh: "苦涩" },
+    words: ["bitterkeit","bitter","bitterness","gorycz","горечь","amargura","苦涩"]
+  },
+  {
+    id: "indignation",
+    icon: "⚡",
+    label: { de: "Empörung", en: "Indignation", pl: "Oburzenie", ru: "Возмущение", es: "Indignación", zh: "愤慨" },
+    words: ["empörung","empört","indignation","outraged","oburzenie","возмущение","indignación","愤慨"]
+  },
+
+  {
+    id: "shame",
+    icon: "😳",
+    label: { de: "Scham", en: "Shame", pl: "Wstyd", ru: "Стыд", es: "Vergüenza", zh: "羞耻" },
+    words: ["scham","schäme","peinlich","shame","ashamed","embarrassed","wstyd","стыд","vergüenza","avergonzado","羞耻","丢脸"]
+  },
+  {
+    id: "guilt",
+    icon: "😔",
+    label: { de: "Schuldgefühl", en: "Guilt", pl: "Poczucie winy", ru: "Вина", es: "Culpa", zh: "内疚" },
+    words: ["schuld","schuldig","schuldgefühl","guilt","guilty","poczucie winy","wina","вина","culpa","culpable","内疚"]
+  },
+  {
+    id: "embarrassment",
+    icon: "🫣",
+    label: { de: "Verlegenheit", en: "Embarrassment", pl: "Zakłopotanie", ru: "Смущение", es: "Vergüenza ajena", zh: "尴尬" },
+    words: ["verlegen","verlegenheit","embarrassed","embarrassment","awkward","zakłopotanie","смущение","vergüenza","尴尬"]
+  },
+  {
+    id: "humiliation",
+    icon: "🧎",
+    label: { de: "Demütigung", en: "Humiliation", pl: "Upokorzenie", ru: "Унижение", es: "Humillación", zh: "羞辱" },
+    words: ["gedemütigt","demütigung","humiliated","humiliation","upokorzenie","унижение","humillación","羞辱"]
+  },
+  {
+    id: "worthlessness",
+    icon: "🫥",
+    label: { de: "Wertlosigkeit", en: "Worthlessness", pl: "Bezwartościowość", ru: "Ничтожность", es: "Inutilidad", zh: "一无是处感" },
+    words: ["wertlos","nutzlos","worthless","useless","bezwartościowy","ничтожный","inútil","一无是处","没价值"]
+  },
+  {
+    id: "self_loathing",
+    icon: "💢",
+    label: { de: "Selbsthass", en: "Self-loathing", pl: "Nienawiść do siebie", ru: "Самоненависть", es: "Odio a uno mismo", zh: "自我厌恶" },
+    words: ["selbsthass","ich hasse mich","self-loathing","self hate","nienawiść do siebie","самоненависть","odio a mí mismo","自我厌恶"]
+  },
+  {
+    id: "regret",
+    icon: "⏳",
+    label: { de: "Reue", en: "Regret", pl: "Żal", ru: "Сожаление", es: "Arrepentimiento", zh: "后悔" },
+    words: ["reue","bereue","regret","regretful","żałuję","żal","сожаление","arrepentimiento","后悔"]
+  },
+  {
+    id: "remorse",
+    icon: "🙏",
+    label: { de: "Gewissensbiss", en: "Remorse", pl: "Wyrzuty sumienia", ru: "Раскаяние", es: "Remordimiento", zh: "自责" },
+    words: ["gewissensbisse","gewissensbiss","remorse","remorseful","wyrzuty sumienia","раскаяние","remordimiento","自责"]
+  },
+  {
+    id: "self_doubt",
+    icon: "🤷",
+    label: { de: "Selbstzweifel", en: "Self-doubt", pl: "Zwątpienie w siebie", ru: "Неуверенность в себе", es: "Duda de uno mismo", zh: "自我怀疑" },
+    words: ["selbstzweifel","zweifle an mir","self-doubt","doubt myself","zwątpienie w siebie","неуверенность в себе","duda de mí","自我怀疑"]
+  },
+  {
+    id: "inferiority",
+    icon: "📉",
+    label: { de: "Minderwertigkeit", en: "Inferiority", pl: "Niższość", ru: "Неполноценность", es: "Inferioridad", zh: "自卑" },
+    words: ["minderwertig","minderwertigkeit","inferior","inferiority","niższość","неполноценность","inferioridad","自卑"]
+  },
+
+  {
+    id: "exhaustion",
+    icon: "🥱",
+    label: { de: "Erschöpfung", en: "Exhaustion", pl: "Wyczerpanie", ru: "Истощение", es: "Agotamiento", zh: "筋疲力尽" },
+    words: ["erschöpft","erschöpfung","ausgebrannt","exhausted","exhaustion","drained","wyczerpany","wyczerpanie","истощение","agotado","agotamiento","筋疲力尽","累垮"]
+  },
+  {
+    id: "fatigue",
+    icon: "😴",
+    label: { de: "Müdigkeit", en: "Fatigue", pl: "Zmęczenie", ru: "Усталость", es: "Fatiga", zh: "疲惫" },
+    words: ["müde","müdigkeit","fatigue","tired","worn out","zmęczony","усталость","fatiga","疲惫","累"]
+  },
+  {
+    id: "burnout",
+    icon: "🔥",
+    label: { de: "Burnout", en: "Burnout", pl: "Wypalenie", ru: "Выгорание", es: "Agotamiento emocional", zh: "倦怠" },
+    words: ["burnout","ausgebrannt","burned out","wypalenie","выгорание","agotamiento emocional","倦怠"]
+  },
+  {
+    id: "stress",
+    icon: "😫",
+    label: { de: "Stress", en: "Stress", pl: "Stres", ru: "Стресс", es: "Estrés", zh: "压力" },
+    words: ["stress","gestresst","stress","stressed","stres","стресс","estrés","压力","有压力"]
+  },
+  {
+    id: "overwhelm",
+    icon: "😵‍💫",
+    label: { de: "Überforderung", en: "Overwhelm", pl: "Przytłoczenie", ru: "Перегруженность", es: "Abrumación", zh: "不堪重负" },
+    words: ["überfordert","überforderung","zu viel","overwhelmed","overwhelm","too much","przytłoczony","перегружен","abrumado","不堪重负"]
+  },
+  {
+    id: "tension",
+    icon: "🧷",
+    label: { de: "Anspannung", en: "Tension", pl: "Napięcie", ru: "Напряжение", es: "Tensión", zh: "紧张" },
+    words: ["anspannung","angespannt","tension","tense","napięcie","напряжение","tensión","紧张"]
+  },
+  {
+    id: "restlessness",
+    icon: "🏃",
+    label: { de: "Unruhe", en: "Restlessness", pl: "Niepokój ruchowy", ru: "Нервозность", es: "Inquietud", zh: "坐立不安" },
+    words: ["unruhe","ruhelos","restless","restlessness","agitated","niepokój","нервозность","inquietud","坐立不安"]
+  },
+  {
+    id: "insomnia",
+    icon: "🌙",
+    label: { de: "Schlaflosigkeit", en: "Insomnia", pl: "Bezsenność", ru: "Бессонница", es: "Insomnio", zh: "失眠" },
+    words: ["schlaflos","schlaflosigkeit","insomnia","can't sleep","bezsenność","бессонница","insomnio","失眠","睡不着"]
+  },
+  {
+    id: "brain_fog",
+    icon: "🌫️",
+    label: { de: "Benommenheit", en: "Brain fog", pl: "Mgła umysłowa", ru: "Туман в голове", es: "Niebla mental", zh: "脑雾" },
+    words: ["benommen","brain fog","foggy","mental fog","mgła umysłowa","туман в голове","niebla mental","脑雾"]
+  },
+  {
+    id: "shutdown",
+    icon: "🔌",
+    label: { de: "Abschalten", en: "Shutdown", pl: "Wyłączenie", ru: "Отключение", es: "Bloqueo", zh: "宕机感" },
+    words: ["abschalten","zu","shutdown","shut down","frozen","wyłączony","отключился","bloqueo","卡住","宕机感"]
+  },
+
+  {
+    id: "joy",
+    icon: "😊",
+    label: { de: "Freude", en: "Joy", pl: "Radość", ru: "Радость", es: "Alegría", zh: "快乐" },
+    words: ["freude","fröhlich","joy","happy","glad","radość","радость","alegría","快乐","开心"]
+  },
+  {
+    id: "hope",
+    icon: "🌤️",
+    label: { de: "Hoffnung", en: "Hope", pl: "Nadzieja", ru: "Надежда", es: "Esperanza", zh: "希望" },
+    words: ["hoffnung","hoffnungsvoll","hope","hopeful","nadzieja","надежда","esperanza","希望"]
+  },
+  {
+    id: "relief",
+    icon: "😌",
+    label: { de: "Erleichterung", en: "Relief", pl: "Ulga", ru: "Облегчение", es: "Alivio", zh: "松一口气" },
+    words: ["erleichtert","erleichterung","relief","relieved","ulga","облегчение","alivio","松一口气"]
+  },
+  {
+    id: "gratitude",
+    icon: "🙏",
+    label: { de: "Dankbarkeit", en: "Gratitude", pl: "Wdzięczność", ru: "Благодарность", es: "Gratitud", zh: "感激" },
+    words: ["dankbar","dankbarkeit","grateful","gratitude","wdzięczność","благодарность","gratitud","感激"]
+  },
+  {
+    id: "love",
+    icon: "❤️",
+    label: { de: "Liebe", en: "Love", pl: "Miłość", ru: "Любовь", es: "Amor", zh: "爱" },
+    words: ["liebe","verliebt","love","loving","miłość","любовь","amor","爱"]
+  },
+  {
+    id: "affection",
+    icon: "🤍",
+    label: { de: "Zuneigung", en: "Affection", pl: "Czułość", ru: "Нежность", es: "Cariño", zh: "关爱" },
+    words: ["zuneigung","zärtlich","affection","fondness","czułość","нежность","cariño","关爱"]
+  },
+  {
+    id: "calm",
+    icon: "🧘",
+    label: { de: "Ruhe", en: "Calm", pl: "Spokój", ru: "Спокойствие", es: "Calma", zh: "平静" },
+    words: ["ruhe","ruhig","calm","peaceful","spokój","спокойствие","calma","平静"]
+  },
+  {
+    id: "peace",
+    icon: "🕊️",
+    label: { de: "Frieden", en: "Peace", pl: "Pokój", ru: "Покой", es: "Paz", zh: "安宁" },
+    words: ["frieden","innerer frieden","peace","at peace","pokój","покой","paz","安宁"]
+  },
+  {
+    id: "contentment",
+    icon: "🙂",
+    label: { de: "Zufriedenheit", en: "Contentment", pl: "Zadowolenie", ru: "Удовлетворение", es: "Satisfacción", zh: "满足" },
+    words: ["zufrieden","zufriedenheit","content","contentment","zadowolenie","удовлетворение","satisfacción","满足"]
+  },
+  {
+    id: "optimism",
+    icon: "✨",
+    label: { de: "Optimismus", en: "Optimism", pl: "Optymizm", ru: "Оптимизм", es: "Optimismo", zh: "乐观" },
+    words: ["optimistisch","optimismus","optimistic","optimism","optymizm","оптимизм","optimismo","乐观"]
+  },
+
+  {
+    id: "confusion",
+    icon: "😕",
+    label: { de: "Verwirrung", en: "Confusion", pl: "Dezorientacja", ru: "Растерянность", es: "Confusión", zh: "困惑" },
+    words: ["verwirrt","verwirrung","confused","confusion","dezorientacja","растерянность","confusión","困惑"]
+  },
+  {
+    id: "doubt",
+    icon: "❓",
+    label: { de: "Zweifel", en: "Doubt", pl: "Wątpliwość", ru: "Сомнение", es: "Duda", zh: "怀疑" },
+    words: ["zweifel","zweifle","doubt","doubting","wątpliwość","сомнение","duda","怀疑"]
+  },
+  {
+    id: "uncertainty",
+    icon: "🌁",
+    label: { de: "Ungewissheit", en: "Uncertainty", pl: "Niepewność", ru: "Неопределённость", es: "Incertidumbre", zh: "不确定" },
+    words: ["ungewiss","ungewissheit","uncertain","uncertainty","niepewność","неопределённость","incertidumbre","不确定"]
+  },
+  {
+    id: "disappointment",
+    icon: "😞",
+    label: { de: "Enttäuschung", en: "Disappointment", pl: "Rozczarowanie", ru: "Разочарование", es: "Decepción", zh: "失望" },
+    words: ["enttäuscht","enttäuschung","disappointed","disappointment","rozczarowanie","разочарование","decepción","失望"]
+  },
+  {
+    id: "hurt",
+    icon: "🩹",
+    label: { de: "Verletztheit", en: "Hurt", pl: "Zranienie", ru: "Обида", es: "Dolor emocional", zh: "受伤" },
+    words: ["verletzt","verletztheit","hurt","hurt feelings","zraniony","обида","dolor emocional","受伤","心里受伤"]
+  },
+  {
+    id: "betrayal",
+    icon: "🗡️",
+    label: { de: "Verrat", en: "Betrayal", pl: "Zdrada", ru: "Предательство", es: "Traición", zh: "背叛" },
+    words: ["verrat","betrogen","betrayal","betrayed","zdrada","предательство","traición","背叛"]
+  },
+  {
+    id: "rejection",
+    icon: "🚪",
+    label: { de: "Zurückweisung", en: "Rejection", pl: "Odrzucenie", ru: "Отвержение", es: "Rechazo", zh: "被拒绝" },
+    words: ["zurückgewiesen","zurückweisung","rejection","rejected","odrzucenie","отвержение","rechazo","被拒绝"]
+  },
+  {
+    id: "abandonment",
+    icon: "🧍‍♀️",
+    label: { de: "Verlassenheit", en: "Abandonment", pl: "Opuszczenie", ru: "Покинутость", es: "Abandono", zh: "被抛弃感" },
+    words: ["verlassenheit","verlassen","abandonment","abandoned","opuszczenie","покинутость","abandono","被抛弃"]
+  },
+  {
+    id: "misunderstood",
+    icon: "🫥",
+    label: { de: "Unverstanden", en: "Misunderstood", pl: "Niezrozumienie", ru: "Непонятость", es: "Incomprensión", zh: "不被理解" },
+    words: ["missverstanden","unverstanden","misunderstood","not understood","niezrozumiana","niezrozumiany","непонятый","incomprendido","不被理解"]
+  },
+  {
+    id: "alienation",
+    icon: "👽",
+    label: { de: "Entfremdung", en: "Alienation", pl: "Wyobcowanie", ru: "Отчуждение", es: "Alienación", zh: "疏离" },
+    words: ["entfremdet","entfremdung","alienated","alienation","wyobcowanie","отчуждение","alienación","疏离"]
+  },
+
+  {
+    id: "motivation",
+    icon: "🚀",
+    label: { de: "Motivation", en: "Motivation", pl: "Motywacja", ru: "Мотивация", es: "Motivación", zh: "动力" },
+    words: ["motiviert","motivation","motivated","motivation","motywacja","мотивация","motivación","动力"]
+  },
+  {
+    id: "determination",
+    icon: "💪",
+    label: { de: "Entschlossenheit", en: "Determination", pl: "Determinacja", ru: "Решимость", es: "Determinación", zh: "决心" },
+    words: ["entschlossen","entschlossenheit","determined","determination","determinacja","решимость","determinación","决心"]
+  },
+  {
+    id: "confidence",
+    icon: "😎",
+    label: { de: "Selbstvertrauen", en: "Confidence", pl: "Pewność siebie", ru: "Уверенность", es: "Confianza", zh: "自信" },
+    words: ["selbstvertrauen","selbstsicher","confidence","confident","pewność siebie","уверенность","confianza","自信"]
+  },
+  {
+    id: "pride",
+    icon: "🏅",
+    label: { de: "Stolz", en: "Pride", pl: "Duma", ru: "Гордость", es: "Orgullo", zh: "自豪" },
+    words: ["stolz","pride","proud","duma","гордость","orgullo","自豪"]
+  },
+  {
+    id: "courage",
+    icon: "🛡️",
+    label: { de: "Mut", en: "Courage", pl: "Odwaga", ru: "Мужество", es: "Valentía", zh: "勇气" },
+    words: ["mut","mutig","courage","brave","odwaga","мужество","valentía","勇气"]
+  },
+  {
+    id: "curiosity",
+    icon: "🔍",
+    label: { de: "Neugier", en: "Curiosity", pl: "Ciekawość", ru: "Любопытство", es: "Curiosidad", zh: "好奇" },
+    words: ["neugier","neugierig","curious","curiosity","ciekawość","любопытство","curiosidad","好奇"]
+  },
+  {
+    id: "surprise",
+    icon: "😲",
+    label: { de: "Überraschung", en: "Surprise", pl: "Zaskoczenie", ru: "Удивление", es: "Sorpresa", zh: "惊讶" },
+    words: ["überrascht","überraschung","surprised","surprise","zaskoczenie","удивление","sorpresa","惊讶"]
+  },
+  {
+    id: "awe",
+    icon: "🤩",
+    label: { de: "Ehrfurcht", en: "Awe", pl: "Zachwyt", ru: "Благоговение", es: "Asombro", zh: "敬畏" },
+    words: ["ehrfurcht","staunen","awe","awed","zachwyt","благоговение","asombro","敬畏"]
+  },
+  {
+    id: "inspiration",
+    icon: "💡",
+    label: { de: "Inspiration", en: "Inspiration", pl: "Inspiracja", ru: "Вдохновение", es: "Inspiración", zh: "灵感" },
+    words: ["inspiriert","inspiration","inspired","inspiration","inspiracja","вдохновение","inspiración","灵感"]
+  },
+  {
+    id: "creativity",
+    icon: "🎨",
+    label: { de: "Kreativität", en: "Creativity", pl: "Kreatywność", ru: "Творчество", es: "Creatividad", zh: "创造力" },
+    words: ["kreativ","kreativität","creative","creativity","kreatywność","творчество","creatividad","创造力"]
+  },
+
+  {
+    id: "love_need",
+    icon: "🤲",
+    label: { de: "Bedürfnis nach Nähe", en: "Need for closeness", pl: "Potrzeba bliskości", ru: "Потребность в близости", es: "Necesidad de cercanía", zh: "渴望亲近" },
+    words: ["nähe","sehne mich nach nähe","need closeness","need affection","bliskość","близость","cercanía","渴望亲近"]
+  },
+  {
+    id: "validation_need",
+    icon: "🪞",
+    label: { de: "Bedürfnis nach Bestätigung", en: "Need for validation", pl: "Potrzeba uznania", ru: "Потребность в признании", es: "Necesidad de validación", zh: "渴望被认可" },
+    words: ["bestätigung","anerkennung","validation","validated","uznanie","признание","validación","被认可"]
+  },
+  {
+    id: "security_need",
+    icon: "🏠",
+    label: { de: "Bedürfnis nach Sicherheit", en: "Need for safety", pl: "Potrzeba bezpieczeństwa", ru: "Потребность в безопасности", es: "Necesidad de seguridad", zh: "需要安全感" },
+    words: ["sicherheit","geborgenheit","need safety","safe","bezpieczeństwo","безопасность","seguridad","安全感"]
+  },
+  {
+    id: "control_need",
+    icon: "🎛️",
+    label: { de: "Bedürfnis nach Kontrolle", en: "Need for control", pl: "Potrzeba kontroli", ru: "Потребность в контроле", es: "Necesidad de control", zh: "需要掌控" },
+    words: ["kontrolle","kontrollverlust","need control","out of control","kontrola","контроль","control","掌控","失控"]
+  },
+  {
+    id: "freedom_need",
+    icon: "🕊️",
+    label: { de: "Bedürfnis nach Freiheit", en: "Need for freedom", pl: "Potrzeba wolności", ru: "Потребность в свободе", es: "Necesidad de libertad", zh: "渴望自由" },
+    words: ["freiheit","eingeengt","need freedom","trapped","wolność","свобода","libertad","自由","被困住"]
+  },
+  {
+    id: "rest_need",
+    icon: "🛏️",
+    label: { de: "Bedürfnis nach Ruhe", en: "Need for rest", pl: "Potrzeba odpoczynku", ru: "Потребность в отдыхе", es: "Necesidad de descanso", zh: "需要休息" },
+    words: ["ruhe brauchen","pause","need rest","need a break","odpoczynek","отдых","descanso","需要休息"]
+  },
+  {
+    id: "connection_need",
+    icon: "🔗",
+    label: { de: "Bedürfnis nach Verbindung", en: "Need for connection", pl: "Potrzeba kontaktu", ru: "Потребность в связи", es: "Necesidad de conexión", zh: "需要联结" },
+    words: ["verbindung","kontakt","need connection","need support","kontakt","связь","conexión","联结"]
+  },
+  {
+    id: "belonging_need",
+    icon: "👥",
+    label: { de: "Bedürfnis nach Zugehörigkeit", en: "Need for belonging", pl: "Potrzeba przynależności", ru: "Потребность в принадлежности", es: "Necesidad de pertenencia", zh: "需要归属感" },
+    words: ["zugehörigkeit","dazugehören","belonging","need to belong","przynależność","принадлежность","pertenencia","归属感"]
+  },
+  {
+    id: "understanding_need",
+    icon: "🫂",
+    label: { de: "Bedürfnis verstanden zu werden", en: "Need to be understood", pl: "Potrzeba bycia zrozumianym", ru: "Потребность быть понятым", es: "Necesidad de ser comprendido", zh: "需要被理解" },
+    words: ["verstanden werden","misunderstood","need understanding","zrozumiana","понятым","comprendido","被理解"]
+  },
+  {
+    id: "purpose_need",
+    icon: "🧭",
+    label: { de: "Sinnsuche", en: "Need for purpose", pl: "Potrzeba sensu", ru: "Потребность в смысле", es: "Necesidad de sentido", zh: "需要意义感" },
+    words: ["sinnlos","sinnsuche","purpose","meaning","sens","смысл","sentido","意义感"]
+  },
+
+  {
+    id: "helplessness",
+    icon: "🫳",
+    label: { de: "Hilflosigkeit", en: "Helplessness", pl: "Bezradność", ru: "Беспомощность", es: "Impotencia", zh: "无助" },
+    words: ["hilflos","hilflosigkeit","helpless","helplessness","bezradność","беспомощность","impotencia","无助"]
+  },
+  {
+    id: "powerlessness",
+    icon: "🔒",
+    label: { de: "Ohnmacht", en: "Powerlessness", pl: "Bezsilność", ru: "Бессилие", es: "Impotencia profunda", zh: "无力感" },
+    words: ["ohnmacht","machtlos","powerless","powerlessness","bezsilność","бессилие","impotencia","无力感"]
+  },
+  {
+    id: "withdrawal",
+    icon: "🚷",
+    label: { de: "Rückzug", en: "Withdrawal", pl: "Wycofanie", ru: "Отстранение", es: "Retraimiento", zh: "退缩" },
+    words: ["rückzug","ziehe mich zurück","withdrawal","withdrawing","wycofanie","отстранение","retraimiento","退缩"]
+  },
+  {
+    id: "avoidance",
+    icon: "🙈",
+    label: { de: "Vermeidung", en: "Avoidance", pl: "Unikanie", ru: "Избегание", es: "Evitación", zh: "回避" },
+    words: ["vermeidung","vermeide","avoidance","avoiding","unikanie","избегание","evitación","回避"]
+  },
+  {
+    id: "freeze",
+    icon: "🧊",
+    label: { de: "Erstarrung", en: "Freeze", pl: "Zamrożenie", ru: "Ступор", es: "Parálisis", zh: "僵住" },
+    words: ["erstarrt","erstarrung","freeze","frozen","zamrożenie","ступор","parálisis","僵住"]
+  },
+  {
+    id: "dissociation",
+    icon: "🫥",
+    label: { de: "Dissoziation", en: "Dissociation", pl: "Dysocjacja", ru: "Диссоциация", es: "Disociación", zh: "解离" },
+    words: ["dissoziation","wie neben mir","dissociation","detached from myself","dysocjacja","диссоциация","disociación","解离"]
+  },
+  {
+    id: "rejection_sensitivity",
+    icon: "📡",
+    label: { de: "Zurückweisungssensibilität", en: "Rejection sensitivity", pl: "Wrażliwość na odrzucenie", ru: "Чувствительность к отвержению", es: "Sensibilidad al rechazo", zh: "拒绝敏感" },
+    words: ["zurückweisung","rejection sensitive","wrażliwość na odrzucenie","чувствительность к отвержению","sensibilidad al rechazo","拒绝敏感"]
+  },
+  {
+    id: "attachment_fear",
+    icon: "🪢",
+    label: { de: "Bindungsangst", en: "Fear of attachment", pl: "Lęk przed bliskością", ru: "Страх близости", es: "Miedo al apego", zh: "害怕亲密" },
+    words: ["bindungsangst","angst vor nähe","fear of attachment","fear of intimacy","lęk przed bliskością","страх близости","miedo al apego","害怕亲密"]
+  },
+  {
+    id: "abandonment_fear",
+    icon: "🚶",
+    label: { de: "Verlustangst", en: "Fear of abandonment", pl: "Lęk przed porzuceniem", ru: "Страх быть брошенным", es: "Miedo al abandono", zh: "害怕被抛弃" },
+    words: ["verlustangst","angst verlassen zu werden","fear of abandonment","lęk przed porzuceniem","страх быть брошенным","miedo al abandono","害怕被抛弃"]
+  },
+  {
+    id: "people_pleasing",
+    icon: "🙇",
+    label: { de: "Anpassung", en: "People-pleasing", pl: "Uleganie", ru: "Угодничество", es: "Complacer a todos", zh: "讨好" },
+    words: ["anpassen","allen recht machen","people pleasing","people-pleaser","uleganie","угодничество","complacer a todos","讨好"]
+  },
+
+  {
+    id: "resignation",
+    icon: "🪫",
+    label: { de: "Resignation", en: "Resignation", pl: "Rezygnacja", ru: "Смирение/опущенные руки", es: "Resignación", zh: "认命" },
+    words: ["resignation","resigniert","resigned","giving up","rezygnacja","опустились руки","resignación","认命"]
+  },
+  {
+    id: "surrender",
+    icon: "🏳️",
+    label: { de: "Aufgabe", en: "Surrender", pl: "Poddanie się", ru: "Сдача", es: "Rendición", zh: "放弃抵抗" },
+    words: ["aufgeben","aufgabe","surrender","give up","poddanie się","сдача","rendición","放弃抵抗"]
+  },
+  {
+    id: "vulnerability",
+    icon: "🫀",
+    label: { de: "Verletzlichkeit", en: "Vulnerability", pl: "Wrażliwość", ru: "Уязвимость", es: "Vulnerabilidad", zh: "脆弱" },
+    words: ["verletzlich","verletzlichkeit","vulnerable","vulnerability","wrażliwość","уязвимость","vulnerabilidad","脆弱"]
+  },
+  {
+    id: "tenderness",
+    icon: "🌸",
+    label: { de: "Sanftheit", en: "Tenderness", pl: "Delikatność", ru: "Нежность", es: "Ternura", zh: "温柔" },
+    words: ["sanft","zart","tender","tenderness","delikatność","нежность","ternura","温柔"]
+  },
+  {
+    id: "compassion",
+    icon: "🤲",
+    label: { de: "Mitgefühl", en: "Compassion", pl: "Współczucie", ru: "Сострадание", es: "Compasión", zh: "同情/慈悲" },
+    words: ["mitgefühl","compassion","compassionate","współczucie","сострадание","compasión","同情","慈悲"]
+  },
+  {
+    id: "self_compassion",
+    icon: "🤍",
+    label: { de: "Selbstmitgefühl", en: "Self-compassion", pl: "Współczucie dla siebie", ru: "Самосострадание", es: "Autocompasión", zh: "自我慈悲" },
+    words: ["selbstmitgefühl","self compassion","be kind to myself","самосострадание","autocompasión","自我慈悲"]
+  },
+  {
+    id: "acceptance",
+    icon: "🌿",
+    label: { de: "Akzeptanz", en: "Acceptance", pl: "Akceptacja", ru: "Принятие", es: "Aceptación", zh: "接纳" },
+    words: ["akzeptanz","akzeptiere","acceptance","accepting","akceptacja","принятие","aceptación","接纳"]
+  },
+  {
+    id: "forgiveness",
+    icon: "🕊️",
+    label: { de: "Vergebung", en: "Forgiveness", pl: "Przebaczenie", ru: "Прощение", es: "Perdón", zh: "原谅" },
+    words: ["vergebung","verzeihen","forgive","forgiveness","przebaczenie","прощение","perdón","原谅"]
+  },
+  {
+    id: "trust",
+    icon: "🤝",
+    label: { de: "Vertrauen", en: "Trust", pl: "Zaufanie", ru: "Доверие", es: "Confianza", zh: "信任" },
+    words: ["vertrauen","vertraue","trust","trusting","zaufanie","доверие","confianza","信任"]
+  },
+  {
+    id: "mistrust",
+    icon: "🚫🤝",
+    label: { de: "Misstrauen", en: "Mistrust", pl: "Brak zaufania", ru: "Недоверие", es: "Desconfianza", zh: "不信任" },
+    words: ["misstrauen","mistrust","distrust","brak zaufania","недоверие","desconfianza","不信任"]
+  }
+];
+
+const scoreMap = new Map();
+
+for (const emotion of emotionMap) {
+  let score = 0;
+
+  for (const word of emotion.words) {
+    if (!word) continue;
+
+    if (t.includes(word.toLowerCase())) {
+      score += 2;
+    }
+
+    const safeWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const pattern = new RegExp(`(^|\\s)${safeWord}($|\\s)`, "i");
+    if (pattern.test(t)) {
+      score += 2;
+    }
+  }
+
+  if (score > 0) {
+    scoreMap.set(emotion.id, {
+      ...emotion,
+      score
+    });
+  }
+}
+
+return Array.from(scoreMap.values())
+  .sort((a,b)=>b.score-a.score)
+  .slice(0,8); 
+}
+  // FOCUS actions
+  el("focusRun").onclick = async ()=>{
+    const text = el("focusInput").value.trim();
+    const emotions = detectEmotions(text);
+const emotionBox = document.getElementById("focusEmotionBox");
+
+if (emotionBox) {
+  emotionBox.innerHTML = emotions.length
+  ? emotions.map(e => `<span class="emotionTag">${e.icon} ${e.label?.[state.lang] || e.id}</span>`).join("")
+  : '<span class="muted">' + t("noEmotions") + '</span>';
+}
+    if(!text) return;
+
+    document.getElementById("resultOutput").innerHTML = "";
+
+    el("focusLoading").classList.add("visible");
+    showCrisis("focusCrisisBox","focusCrisisTitle","focusCrisisText", null);
+
+    const topic = (state.module==="pair_module")
+      ? ("pair_" + state.pair)
+      : state.module;
+
+    try{
+      const data = await callAI({ text, mode:"focus_module", topic });
+      if(data.crisis){
+        showCrisis("focusCrisisBox","focusCrisisTitle","focusCrisisText", data.crisis_message || "");
+      }
+      document.getElementById("resultOutput").innerHTML = mdToHtml(data.output ||t("noAnalysis"));
+    }catch(e){
+      document.getElementById("resultOutput").innerHTML = "⚠️ " + escapeHtml(e.message);
+    }finally{
+      el("focusLoading").classList.remove("visible");
+    }
+  };
+
+  el("focusSave").onclick = ()=>{
+    const text = el("focusInput").value.trim();
+   const out = document.getElementById("resultOutput").textContent.trim();
+    if(!text && !out) return;
+
+    addEntry({
+      screen:"focus",
+      module: state.module,
+      pair: state.module==="pair_module" ? state.pair : null,
+      text,
+      output: out
+    });
+  };
+
+  el("focusPdf").onclick = ()=>{
+    const topic = (state.module==="pair_module")
+      ? ("Beziehung – " + (PAIR.find(p=>p.key===state.pair)?.label[state.lang] || ""))
+      : (MODULES.find(m=>m.id===state.module)?.name[state.lang] || "");
+
+    exportPDF({
+      title: "MindReflect – Fokus: " + topic,
+      body: el("focusInput").value,
+      output: el("focusOutput").textContent
+    });
+  };
+
+  // CBT actions
+  el("cbtRun").onclick = async ()=>{
+    const text = el("cbtInput").value.trim();
+    if(!text) return;
+
+    el("cbtLoading").classList.add("visible");
+    showCrisis("cbtCrisisBox","cbtCrisisTitle","cbtCrisisText", null);
+
+    try{
+      const data = await callAI({ text, mode:"cbt", topic:"cbt" });
+      if(data.crisis){
+        showCrisis("cbtCrisisBox","cbtCrisisTitle","cbtCrisisText", data.crisis_message || "");
+      }
+      el("cbtOutput").innerHTML = mdToHtml(data.output || "");
+    }catch(e){
+      el("cbtOutput").innerHTML = "⚠️ " + escapeHtml(e.message);
+    }finally{
+      el("cbtLoading").classList.remove("visible");
+    }
+  };
+
+  el("cbtSave").onclick = ()=>{
+    const text = el("cbtInput").value.trim();
+    const out = el("cbtOutput").textContent.trim();
+    if(!text && !out) return;
+    addEntry({ screen:"cbt", module:"cbt", pair:null, text, output: out });
+  };
+
+  el("cbtPdf").onclick = ()=>{
+    exportPDF({
+      title: "MindReflect – CBT",
+      body: el("cbtInput").value,
+      output: el("cbtOutput").textContent
+    });
+  };
+
+  // Settings
+  el("wipeBtn").onclick = ()=>{
+    if(!confirm("Wirklich alle Einträge löschen?")) return;
+    state.entries = [];
+    saveEntries();
+    renderHistory();
+  };
+
+  el("exportJsonBtn").onclick = ()=>{
+    const blob = new Blob([JSON.stringify(state.entries, null, 2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "mindreflect-backup.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  el("importJson").addEventListener("change", async (e)=>{
+    const file = e.target.files?.[0];
+    if(!file) return;
+    const txt = await file.text();
+    try{
+      const data = JSON.parse(txt);
+      if(!Array.isArray(data)) throw new Error("Invalid file");
+      state.entries = data;
+      saveEntries();
+      renderHistory();
+      alert("Import ok ✅");
+    }catch{
+      alert("Import fehlgeschlagen ❌");
+    }finally{
+      e.target.value = "";
+    }
+  });
+
+  // -----------------------
+  // PDF Export (D)
+  // -----------------------
+  function exportPDF({title, body, output}){
+    try{
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit:"pt", format:"a4" });
+
+      const margin = 42;
+      const width = doc.internal.pageSize.getWidth() - margin*2;
+      let y = margin;
+
+      doc.setFont("helvetica","bold");
+      doc.setFontSize(16);
+      doc.text(title, margin, y);
+      y += 18;
+
+      doc.setFont("helvetica","normal");
+      doc.setFontSize(10);
+      doc.text(new Date().toLocaleString(), margin, y);
+      y += 18;
+
+      doc.setFontSize(12);
+      doc.setFont("helvetica","bold");
+      doc.text("Eingabe", margin, y);
+      y += 14;
+
+      doc.setFont("helvetica","normal");
+      const bodyLines = doc.splitTextToSize((body||"").trim() || "-", width);
+      doc.text(bodyLines, margin, y);
+      y += bodyLines.length * 14 + 18;
+
+      doc.setFont("helvetica","bold");
+      doc.text("Antwort", margin, y);
+      y += 14;
+
+      doc.setFont("helvetica","normal");
+      const outLines = doc.splitTextToSize((output||"").trim() || "-", width);
+      // add pages if needed
+      for(const line of outLines){
+        if(y > doc.internal.pageSize.getHeight() - margin){
+          doc.addPage();
+          y = margin;
+        }
+        doc.text(line, margin, y);
+        y += 14;
+      }
+
+      doc.save("mindreflect.pdf");
+    }catch(err){
+      // fallback: print
+      const w = window.open("", "_blank");
+      w.document.write(`<pre>${escapeHtml(title)}\n\n${escapeHtml(body)}\n\n---\n\n${escapeHtml(output)}</pre>`);
+      w.print();
+      w.close();
+    }
+  }
+
+  // -----------------------
+  // Init
+  // -----------------------
+  function init(){
+    setTheme(state.theme);
+    renderLangButtons();
+    applyI18n();
+
+    loadEntries();
+    renderHistory();
+
+    renderModules();
+    renderPairTabs();
+
+    setScreen(state.screen);
+
+    // Ensure language in <html>
+    document.documentElement.lang = state.lang;
+  }
+
+ init();
+</script>
+
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script>
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on("init", (user) => {
+      if (!user) {
+        window.netlifyIdentity.on("login", () => {
+          document.location.reload();
+        });
+      }
+    });
+  }
+</script>
+
+<script>
+ 
+ loadEntries();
+ renderHistory();
+  const result = document.getElementById("resultOutput");
+const hint = document.getElementById("noAnalysisText");
+
+function toggleNoAnalysisHint(){
+  if (!result || !hint) return;
+  hint.style.display = result.innerText.trim().length > 0 ? "none" : "block";
+}
+
+toggleNoAnalysisHint();
+
+if (result) {
+  const observer = new MutationObserver(toggleNoAnalysisHint);
+  observer.observe(result, { childList: true, subtree: true, characterData: true });
+}
+
+  function formatAnalysis(text){
+
+const parts = text.match(/\d+\.\s[\s\S]*?(?=\n\d+\.\s|$)/g) || [];
+
+let html = "";
+    const emotions = detectEmotions(text);
+
+if(emotions.length){
+  html += `
+  <div class="analysisBlock">
+    <h3 class="emotionTitle">Erkannte Emotionen</h3>
+    <div class="emotionWrap">
+      ${emotions.map(e => `<span class="emotionTag">${e.icon} ${e.key}</span>`).join("")}
+    </div>
+  </div>
+  `;
+}
+
+parts.forEach(p=>{
+if(!p.trim()) return;
+
+const lines = p.trim().split("\n");
+const title = lines.shift().replace(/^\d+\.\s*/, "");
+
+html += `
+<div class="analysisBlock">
+<h3>${title}</h3>
+<p>${lines.join("<br>")}</p>
+</div>
+`;
+
+});
+
+return html;
+
+}
+
+</script>
+
+</body>
+</html>
