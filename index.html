@@ -1452,9 +1452,9 @@ textEl.textContent = message;
       if(data.crisis){
         showCrisis("crisisBox","crisisTitle","crisisText", data.crisis_message || "");
       }
-      el("output").innerHTML = formatAnalysis(data.output ||t("noAnalysis"));
+     if(el("output")) el("output").innerHTML = formatAnalysis(data.output || t("noAnalysis"));
     }catch(e){
-      el("output").innerHTML = "⚠️ " + escapeHtml(e.message);
+    if(el("output")) el("output").innerHTML = "⚠️ " + escapeHtml(e.message); 
     }finally{
       el("loading").classList.remove("visible");
     }
