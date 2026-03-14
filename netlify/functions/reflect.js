@@ -239,12 +239,10 @@ const replyLanguage = languageMap[lang] || "German";
         max_output_tokens: 1800,
        input: mode === "journal_reflect"
   ? buildJournalPrompt(text, lang || "de")
-  : buildFocusPrompt(text, topic || "self_reflection", lang || "de"),
+  : buildFocusPrompt(text, topic || "self_reflection", lang || "de")
       })
-        
-})
     });
-
+        
     const data = await response.json();
 
     console.log("OpenAI full response:", JSON.stringify(data));
