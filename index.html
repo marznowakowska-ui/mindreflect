@@ -1458,8 +1458,8 @@ el("resultOutput").innerHTML = "";
       if(data.crisis){
         showCrisis("crisisBox","crisisTitle","crisisText", data.crisis_message || "");
       }
-if (el("resultOutput")) {
-  el("resultOutput").innerHTML = formatAnalysis(data.output || t("noAnalysis"));
+if (journalOut) {
+  journalOut.innerHTML = formatAnalysis(data.output || t("noAnalysis"));
 }
     }catch(e){
     if(journalOut) journalOut.innerHTML = "⚠️ " + escapeHtml(e.message); 
