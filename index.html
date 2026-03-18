@@ -1458,12 +1458,8 @@ el("resultOutput").innerHTML = "";
       if(data.crisis){
         showCrisis("crisisBox","crisisTitle","crisisText", data.crisis_message || "");
       }
-if (journalOut) {
-  const analysisHtml = formatAnalysis(data.output || t("noAnalysis"));
-  const emotions = detectEmotions(text);
-const emotionsHtml = `<div style="margin-top:12px;">${renderEmotionTags(emotions)}</div>`;
-
-journalOut.innerHTML = analysisHtml + emotionsHtml;
+if (el("resultOutput")) {
+  el("resultOutput").innerHTML = formatAnalysis(data.output || t("noAnalysis"));
 }
     }catch(e){
     if(journalOut) journalOut.innerHTML = "⚠️ " + escapeHtml(e.message); 
