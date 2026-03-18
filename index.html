@@ -1430,7 +1430,12 @@ textEl.textContent = message;
 }
   // bottom nav
   document.querySelectorAll(".navBtn").forEach(b=>{
-    b.onclick = ()=>setScreen(b.dataset.screen);
+   b.onclick = ()=>{
+setScreen(b.dataset.screen);
+if (b.dataset.screen === "journal" && el("resultOutput")) {
+el("resultOutput").innerHTML = "";
+}
+};
   });
 
   // quick buttons on start
@@ -1452,9 +1457,9 @@ textEl.textContent = message;
       if(data.crisis){
         showCrisis("crisisBox","crisisTitle","crisisText", data.crisis_message || "");
       }
-     if(el("output")) el("output").innerHTML = formatAnalysis(data.output || t("noAnalysis"));
+     if(el("resultOutput")) el("resultOutput").innerHTML = formatAnalysis(data.output || t("noAnalysis"));
     }catch(e){
-    if(el("output")) el("output").innerHTML = "⚠️ " + escapeHtml(e.message); 
+    if(el("resultOutput")) el("resultOutput").innerHTML = "⚠️ " + escapeHtml(e.message); 
     }finally{
       el("loading").classList.remove("visible");
     }
@@ -1462,14 +1467,14 @@ textEl.textContent = message;
 
   el("saveBtn").onclick = ()=>{
     const text = el("input").value.trim();
-  const out = el("output") ? el("output").textContent.trim() : "";
+  const out = el("resultOutput") ? el("resultOutput").textContent.trim() : "";
     if(!text && !out) return;
     addEntry({ screen:"journal", module:"self_reflection", pair:null, text, output: out });
   };
 
   el("clearBtn").onclick = ()=>{
     el("input").value = "";
-    if(el("output")) el("output").innerHTML = "";
+    if(el("resultOutput")) el("resultOutput").innerHTML = "";
     showCrisis("crisisBox","crisisTitle","crisisText", null);
   };
 
@@ -1477,7 +1482,7 @@ textEl.textContent = message;
     exportPDF({
       title: "MindReflect – Journal",
       body: el("input").value,
-      output: el("output")? el("output").textContent:""
+      output: el("resultOutput")?  el("resultOutput").textContent:""
     });
   };
 function detectEmotions(text){
