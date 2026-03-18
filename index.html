@@ -1460,8 +1460,10 @@ el("resultOutput").innerHTML = "";
       }
 if (journalOut) {
   const analysisHtml = formatAnalysis(data.output || t("noAnalysis"));
-  const emotionsHtml = `<div>${renderEmotionTags(detectEmotions(text))}</div>`;
-  journalOut.innerHTML = analysisHtml + emotionsHtml;
+  const emotions = detectEmotions(text);
+const emotionsHtml = `<div style="margin-top:12px;">${renderEmotionTags(emotions)}</div>`;
+
+journalOut.innerHTML = analysisHtml + emotionsHtml;
 }
     }catch(e){
     if(journalOut) journalOut.innerHTML = "⚠️ " + escapeHtml(e.message); 
