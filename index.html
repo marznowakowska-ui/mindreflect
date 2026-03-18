@@ -1455,7 +1455,9 @@ el("resultOutput").innerHTML = "";
     showCrisis("crisisBox","crisisTitle","crisisText", null);
      const journalOut = el("journalOutput");
     try{
-      const data = await callAI({ text, mode:"journal_reflect", topic:"self_reflection", lang: state.lang });
+     const data = await callAI({ text, mode:"journal_reflect", topic:"self_reflection", lang: state.lang });
+
+console.log("AI DATA:", data);
       if(data.crisis){
         showCrisis("crisisBox","crisisTitle","crisisText", data.crisis_message || "");
       }
