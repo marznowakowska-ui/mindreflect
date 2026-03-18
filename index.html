@@ -1458,7 +1458,11 @@ el("resultOutput").innerHTML = "";
       if(data.crisis){
         showCrisis("crisisBox","crisisTitle","crisisText", data.crisis_message || "");
       }
-if (journalOut) journalOut.innerHTML = formatAnalysis(data.output || t("noAnalysis"));
+if (journalOut) {
+  const analysisHtml = formatAnalysis(data.output || t("noAnalysis"));
+  const emotionsHtml = `<div>${renderEmotionTags(detectEmotions(text))}</div>`;
+  journalOut.innerHTML = analysisHtml + emotionsHtml;
+}
     }catch(e){
     if(journalOut) journalOut.innerHTML = "⚠️ " + escapeHtml(e.message); 
     }finally{
