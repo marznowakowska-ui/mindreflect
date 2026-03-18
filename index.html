@@ -1333,7 +1333,7 @@ empty.style.display = state.entries.length ? "none" : "block";
         setScreen(item.screen);
         if(item.screen==="journal"){
           el("input").value = item.text || "";
-          el("output").innerHTML = mdToHtml(item.output || "");
+          (el("resultOutput") || el("output")).innerHTML = mdToHtml(item.output || "");
         }
         if(item.screen==="focus"){
           state.module = item.module || state.module;
@@ -1452,7 +1452,7 @@ el("resultOutput").innerHTML = "";
     if(!text) return;
     el("loading").classList.add("visible");
     showCrisis("crisisBox","crisisTitle","crisisText", null);
-     const journalOut = el("output") || el("resultOutput");
+     const journalOut = el("resultOutput") || el("output");
     try{
       const data = await callAI({ text, mode:"journal_reflect", topic:"self_reflection", lang: state.lang });
       if(data.crisis){
@@ -1460,7 +1460,7 @@ el("resultOutput").innerHTML = "";
       }
 if (journalOut) journalOut.innerHTML = formatAnalysis(data.output || t("noAnalysis"));
     }catch(e){
-    if(journalOut)innerHTML = "⚠️ " + escapeHtml(e.message); 
+    if(journalOut) journalOut.innerHTML = "⚠️ " + escapeHtml(e.message); 
     }finally{
       el("loading").classList.remove("visible");
     }
@@ -1468,7 +1468,7 @@ if (journalOut) journalOut.innerHTML = formatAnalysis(data.output || t("noAnalys
 
  el("saveBtn").onclick = ()=>{
   const text = el("input").value.trim();
-  const outEl = el("output") || el("resultOutput");
+  const outEl = el("resultOutput") || el("output");
   const out = outEl ? outEl.textContent.trim() : "";
   if(!text && !out) return;
   addEntry({ screen:"journal", module:"self_reflection", pair:null, text, output: out });
@@ -1485,22 +1485,36 @@ if (journalOut) journalOut.innerHTML = formatAnalysis(data.output || t("noAnalys
   exportPDF({
     title: "MindReflect – Journal",
     body: el("input").value,
-    output: (el("output") || el("resultOutput")) ? (el("output") || el("resultOutput")).textContent : ""
+    output: (el("resultOutput") || el("output")) ? (el("resultOutput") || el("output")).textContent : ""
   });
 };
   function renderEmotionTags(items){
   if (!items || !items.length) return "";
 
   return items.map(em => {
-    const icon = em.icon || "•";
-    const label =
-      typeof em.label === "object"
-        ? (em.label[state.lang] || em.label.de || em.id || "Emotion")
-        : (em.label || em.id || "Emotion");
+    if (typeof em === "string") {
+      return `<span class="emotionTag">• ${escapeHtml(em)}</span>`;
+    }
 
-    return `<span class="emotionTag">${icon} ${escapeHtml(label)}</span>`;
+    const icon = em.icon || em.emoji || em.symbol || "•";
+
+    const rawLabel =
+      em.label ??
+      em.name ??
+      em.text ??
+      em.title ??
+      em.id ??
+      "Emotion";
+
+    const label =
+      typeof rawLabel === "object"
+        ? (rawLabel[state.lang] || rawLabel.de || Object.values(rawLabel)[0] || em.id || "Emotion")
+        : rawLabel;
+
+    return `<span class="emotionTag">${icon} ${escapeHtml(String(label))}</span>`;
   }).join("");
 }
+
 function detectEmotions(text){
   const t = (text || "").toLowerCase();
 
