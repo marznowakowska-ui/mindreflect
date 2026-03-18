@@ -1452,39 +1452,42 @@ el("resultOutput").innerHTML = "";
     if(!text) return;
     el("loading").classList.add("visible");
     showCrisis("crisisBox","crisisTitle","crisisText", null);
+     const journalOut = el("output") || el("resultOutput");
     try{
       const data = await callAI({ text, mode:"journal_reflect", topic:"self_reflection", lang: state.lang });
       if(data.crisis){
         showCrisis("crisisBox","crisisTitle","crisisText", data.crisis_message || "");
       }
-    if(el("resultOutput")) el("resultOutput").innerHTML = formatAnalysis(data.output || t("noAnalysis")) + "<div>" + renderEmotionTags(data.emotions || []) + "</div>";
+if (journalOut) journalOut.innerHTML = formatAnalysis(data.output || t("noAnalysis"));
     }catch(e){
-    if(el("resultOutput")) el("resultOutput").innerHTML = "⚠️ " + escapeHtml(e.message); 
+    if(journalOut)innerHTML = "⚠️ " + escapeHtml(e.message); 
     }finally{
       el("loading").classList.remove("visible");
     }
   };
 
-  el("saveBtn").onclick = ()=>{
-    const text = el("input").value.trim();
-  const out = el("resultOutput") ? el("resultOutput").textContent.trim() : "";
-    if(!text && !out) return;
-    addEntry({ screen:"journal", module:"self_reflection", pair:null, text, output: out });
-  };
+ el("saveBtn").onclick = ()=>{
+  const text = el("input").value.trim();
+  const outEl = el("output") || el("resultOutput");
+  const out = outEl ? outEl.textContent.trim() : "";
+  if(!text && !out) return;
+  addEntry({ screen:"journal", module:"self_reflection", pair:null, text, output: out });
+};
 
   el("clearBtn").onclick = ()=>{
-    el("input").value = "";
-    if(el("resultOutput")) el("resultOutput").innerHTML = "";
-    showCrisis("crisisBox","crisisTitle","crisisText", null);
-  };
+  el("input").value = "";
+  if (el("output")) el("output").innerHTML = "";
+  if (el("resultOutput")) el("resultOutput").innerHTML = "";
+  showCrisis("crisisBox","crisisTitle","crisisText", null);
+};
 
   el("pdfBtn").onclick = ()=>{
-    exportPDF({
-      title: "MindReflect – Journal",
-      body: el("input").value,
-      output: el("resultOutput")?  el("resultOutput").textContent:""
-    });
-  };
+  exportPDF({
+    title: "MindReflect – Journal",
+    body: el("input").value,
+    output: (el("output") || el("resultOutput")) ? (el("output") || el("resultOutput")).textContent : ""
+  });
+};
   function renderEmotionTags(items){
   if (!items || !items.length) return "";
 
