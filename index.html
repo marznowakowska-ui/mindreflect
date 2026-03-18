@@ -1457,7 +1457,7 @@ el("resultOutput").innerHTML = "";
       if(data.crisis){
         showCrisis("crisisBox","crisisTitle","crisisText", data.crisis_message || "");
       }
-     if(el("resultOutput")) el("resultOutput").innerHTML = formatAnalysis(data.output || t("noAnalysis"));
+    if(el("resultOutput")) el("resultOutput").innerHTML = formatAnalysis(data.output || t("noAnalysis")) + "<div>" + renderEmotionTags(data.emotions || []) + "</div>";
     }catch(e){
     if(el("resultOutput")) el("resultOutput").innerHTML = "⚠️ " + escapeHtml(e.message); 
     }finally{
@@ -1485,6 +1485,19 @@ el("resultOutput").innerHTML = "";
       output: el("resultOutput")?  el("resultOutput").textContent:""
     });
   };
+  function renderEmotionTags(items){
+  if (!items || !items.length) return "";
+
+  return items.map(em => {
+    const icon = em.icon || "•";
+    const label =
+      typeof em.label === "object"
+        ? (em.label[state.lang] || em.label.de || em.id || "Emotion")
+        : (em.label || em.id || "Emotion");
+
+    return `<span class="emotionTag">${icon} ${escapeHtml(label)}</span>`;
+  }).join("");
+}
 function detectEmotions(text){
   const t = (text || "").toLowerCase();
 
