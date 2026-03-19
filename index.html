@@ -1455,13 +1455,12 @@ el("resultOutput").innerHTML = "";
      const journalOut = el("resultOutput");
     try{
      const data = await callAI({ text, mode:"journal_reflect", topic:"self_reflection", lang: state.lang });
-
-console.log("AI DATA:", data);
+      
       if(data.crisis){
         showCrisis("crisisBox","crisisTitle","crisisText", data.crisis_message || "");
       }
 if (journalOut) {
-  journalOut.textContent = data.output || t("noAnalysis");
+  journalOut.innerHTML = formatAnalysis(data.output || t("noAnalysis"));
 }
     }catch(e){
     if(journalOut) journalOut.innerHTML = "⚠️ " + escapeHtml(e.message); 
