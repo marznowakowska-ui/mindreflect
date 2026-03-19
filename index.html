@@ -701,8 +701,7 @@ box-sizing:border-box;
             <button class="btn" id="pdfBtn">📄 PDF Export</button>
             <button class="btn danger" id="clearBtn">🗑️ Löschen</button>
           </div>
-           <div id="journalOutput" class="analysisBox"></div>
-
+    
           <div class="spinner" id="loading">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span id="loadingText">Denke nach …</span>
@@ -1453,7 +1452,7 @@ el("resultOutput").innerHTML = "";
     if(!text) return;
     el("loading").classList.add("visible");
     showCrisis("crisisBox","crisisTitle","crisisText", null);
-     const journalOut = el("journalOutput");
+     const journalOut = el("resultOutput");
     try{
      const data = await callAI({ text, mode:"journal_reflect", topic:"self_reflection", lang: state.lang });
 
