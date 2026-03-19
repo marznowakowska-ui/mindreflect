@@ -1460,7 +1460,7 @@ el("resultOutput").innerHTML = "";
         showCrisis("crisisBox","crisisTitle","crisisText", data.crisis_message || "");
       }
 if (journalOut) {
-  journalOut.innerHTML = formatAnalysis(data.output || t("noAnalysis"));
+ journalOut.textContent = data.output || t("noAnalysis");
 }
     }catch(e){
     if(journalOut) journalOut.innerHTML = "⚠️ " + escapeHtml(e.message); 
