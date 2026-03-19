@@ -700,8 +700,8 @@ box-sizing:border-box;
             <button class="btn" id="saveBtn">💾 Speichern</button>
             <button class="btn" id="pdfBtn">📄 PDF Export</button>
             <button class="btn danger" id="clearBtn">🗑️ Löschen</button>
-            <div id="journalOutput" class="analysisBox"></div>
           </div>
+           <div id="journalOutput" class="analysisBox"></div>
 
           <div class="spinner" id="loading">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -1462,7 +1462,7 @@ console.log("AI DATA:", data);
         showCrisis("crisisBox","crisisTitle","crisisText", data.crisis_message || "");
       }
 if (journalOut) {
-  journalOut.innerHTML = formatAnalysis(data.output || t("noAnalysis"));
+  journalOut.textContent = data.output || t("noAnalysis");
 }
     }catch(e){
     if(journalOut) journalOut.innerHTML = "⚠️ " + escapeHtml(e.message); 
